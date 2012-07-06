@@ -35,8 +35,6 @@
 
 struct _alljoyn_message_handle {
     _alljoyn_message_handle(ajn::BusAttachmentC& bus) : msg(bus) { }
-    _alljoyn_message_handle(const ajn::_Message& other) : msg(other) { }
-
     ajn::Message msg;
 };
 
