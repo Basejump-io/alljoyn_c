@@ -46,7 +46,8 @@ QC_BOOL alljoyn_interfacedescription_getmember(const alljoyn_interfacedescriptio
         member->signature = found_member->signature.c_str();
         member->returnSignature = found_member->returnSignature.c_str();
         member->argNames = found_member->argNames.c_str();
-        member->annotation = found_member->annotation;
+        //TODO add back in annotations
+        //member->annotation = found_member->annotation;
         member->internal_member = found_member;
     }
     return (found_member == NULL ? QC_FALSE : QC_TRUE);
@@ -76,7 +77,8 @@ size_t alljoyn_interfacedescription_getmembers(const alljoyn_interfacedescriptio
         members[i].signature = tempMembers[i]->signature.c_str();
         members[i].returnSignature = tempMembers[i]->returnSignature.c_str();
         members[i].argNames = tempMembers[i]->argNames.c_str();
-        members[i].annotation = tempMembers[i]->annotation;
+        //TODO add back in annotations
+        //members[i].annotation = tempMembers[i]->annotation;
         members[i].internal_member = tempMembers[i];
     }
 
@@ -111,7 +113,8 @@ QC_BOOL alljoyn_interfacedescription_getmethod(alljoyn_interfacedescription ifac
         member->signature = found_member->signature.c_str();
         member->returnSignature = found_member->returnSignature.c_str();
         member->argNames = found_member->argNames.c_str();
-        member->annotation = found_member->annotation;
+        //TODO add back annotations
+        //member->annotation = found_member->annotation;
         member->internal_member = found_member;
     } else {
         found_member = NULL;
@@ -137,7 +140,8 @@ QC_BOOL alljoyn_interfacedescription_getsignal(alljoyn_interfacedescription ifac
         member->signature = found_member->signature.c_str();
         member->returnSignature = found_member->returnSignature.c_str();
         member->argNames = found_member->argNames.c_str();
-        member->annotation = found_member->annotation;
+        //TODO add back annotations
+        //member->annotation = found_member->annotation;
         member->internal_member = found_member;
     } else {
         found_member = NULL;

@@ -51,6 +51,7 @@ class BusListenerCallbackC : BusListener {
 
     void ListenerUnregistered()
     {
+        printf("Inside BusListenerCallbackC.ListenerUnregistered\n");
         if (callbacks.listener_unregistered != NULL) {
             DeferredCallback_1<void, const void*>* dcb =
                 new DeferredCallback_1<void, const void*>(callbacks.listener_unregistered, context);
@@ -96,6 +97,7 @@ class BusListenerCallbackC : BusListener {
 
     void BusDisconnected()
     {
+        printf("Inside BusListenerCallbackC.BusDisconnected\n");
         if (callbacks.bus_disconnected != NULL) {
             DeferredCallback_1<void, const void*>* dcb =
                 new DeferredCallback_1<void, const void*>(callbacks.bus_disconnected, context);

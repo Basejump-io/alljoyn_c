@@ -163,7 +163,8 @@ class BusObjectC : public BusObject {
         c_member.signature = member->signature.c_str();
         c_member.returnSignature = member->returnSignature.c_str();
         c_member.argNames = member->argNames.c_str();
-        c_member.annotation = member->annotation;
+        // TODO Add back in annotations
+        //c_member.annotation = member->annotation;
         c_member.internal_member = member;
 
         /* Look up the C callback via map and invoke */

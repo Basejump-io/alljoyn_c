@@ -133,7 +133,8 @@ void BusAttachmentC::SignalHandlerRemap(const InterfaceDescription::Member* memb
     c_member.signature = member->signature.c_str();
     c_member.returnSignature = member->returnSignature.c_str();
     c_member.argNames = member->argNames.c_str();
-    c_member.annotation = member->annotation;
+    //TODO add back in annotations
+    //c_member.annotation = member->annotation;
     c_member.internal_member = member;
 
     /*look up the C callback via map and invoke */

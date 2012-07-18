@@ -51,7 +51,8 @@ typedef struct {
     const char* signature;                      /**< Method call IN arguments (NULL for signals) */
     const char* returnSignature;                /**< Signal or method call OUT arguments */
     const char* argNames;                       /**< Comma separated list of argument names - can be NULL */
-    uint8_t annotation;                         /**< Exclusive OR of flags MEMBER_ANNOTATE_NO_REPLY and MEMBER_ANNOTATE_DEPRECATED */
+    //TODO add back in annotations
+    //uint8_t annotation;                         /**< Exclusive OR of flags MEMBER_ANNOTATE_NO_REPLY and MEMBER_ANNOTATE_DEPRECATED */
 
     const void* internal_member;                /**< For internal use only */
 } alljoyn_interfacedescription_member;
