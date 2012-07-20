@@ -109,4 +109,4 @@ else:
     unittest_env.Install('$TESTDIR/bin', unittest_prog)
     
     #install gtest utilities
-    env.Install('$TESTDIR/bin', Dir('test_report').srcnode())
+    #env.Install('$TESTDIR/bin', Dir('test_report').srcnode())
