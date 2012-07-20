@@ -25,35 +25,35 @@ static const char* OBJECT_NAME = "org.alljoyn.test.BusListenerTest";
 //static const char* OBJECT_PATH = "/org/alljoyn/test/BusListenerTest";
 
 /* flags */
-static QC_BOOL listener_registered_flag = QC_FALSE;
-static QC_BOOL listener_unregistered_flag = QC_FALSE;
-static QC_BOOL found_advertised_name_flag = QC_FALSE;
-static QC_BOOL lost_advertised_name_flag = QC_FALSE;
-static QC_BOOL name_owner_changed_flag = QC_FALSE;
-static QC_BOOL bus_stopping_flag = QC_FALSE;
-static QC_BOOL bus_disconnected_flag = QC_FALSE;
+static QCC_BOOL listener_registered_flag = QCC_FALSE;
+static QCC_BOOL listener_unregistered_flag = QCC_FALSE;
+static QCC_BOOL found_advertised_name_flag = QCC_FALSE;
+static QCC_BOOL lost_advertised_name_flag = QCC_FALSE;
+static QCC_BOOL name_owner_changed_flag = QCC_FALSE;
+static QCC_BOOL bus_stopping_flag = QCC_FALSE;
+static QCC_BOOL bus_disconnected_flag = QCC_FALSE;
 
 /* bus listener functions */
 static void listener_registered(const void* context, alljoyn_busattachment bus) {
-    listener_registered_flag = QC_TRUE;
+    listener_registered_flag = QCC_TRUE;
 }
 static void listener_unregistered(const void* context) {
-    listener_unregistered_flag = QC_TRUE;
+    listener_unregistered_flag = QCC_TRUE;
 }
 static void found_advertised_name(const void* context, const char* name, alljoyn_transportmask transport, const char* namePrefix) {
-    found_advertised_name_flag = QC_TRUE;
+    found_advertised_name_flag = QCC_TRUE;
 }
 static void lost_advertised_name(const void* context, const char* name, alljoyn_transportmask transport, const char* namePrefix) {
-    lost_advertised_name_flag = QC_TRUE;
+    lost_advertised_name_flag = QCC_TRUE;
 }
 static void name_owner_changed(const void* context, const char* busName, const char* previousOwner, const char* newOwner) {
-    name_owner_changed_flag = QC_TRUE;
+    name_owner_changed_flag = QCC_TRUE;
 }
 static void bus_stopping(const void* context) {
-    bus_stopping_flag = QC_TRUE;
+    bus_stopping_flag = QCC_TRUE;
 }
 static void bus_disconnected(const void* context) {
-    bus_disconnected_flag = QC_TRUE;
+    bus_disconnected_flag = QCC_TRUE;
 }
 
 class BusListenerTest : public testing::Test {
@@ -71,7 +71,7 @@ class BusListenerTest : public testing::Test {
             &bus_disconnected
         };
         buslistener = alljoyn_buslistener_create(&buslistenerCbs, NULL);
-        bus = alljoyn_busattachment_create("BusListenerTest", QC_FALSE);
+        bus = alljoyn_busattachment_create("BusListenerTest", QCC_FALSE);
     }
 
     virtual void TearDown() {
@@ -80,13 +80,13 @@ class BusListenerTest : public testing::Test {
     }
 
     void resetFlags() {
-        listener_registered_flag = QC_FALSE;
-        listener_unregistered_flag = QC_FALSE;
-        found_advertised_name_flag = QC_FALSE;
-        lost_advertised_name_flag = QC_FALSE;
-        name_owner_changed_flag = QC_FALSE;
-        bus_stopping_flag = QC_FALSE;
-        bus_disconnected_flag = QC_FALSE;
+        listener_registered_flag = QCC_FALSE;
+        listener_unregistered_flag = QCC_FALSE;
+        found_advertised_name_flag = QCC_FALSE;
+        lost_advertised_name_flag = QCC_FALSE;
+        name_owner_changed_flag = QCC_FALSE;
+        bus_stopping_flag = QCC_FALSE;
+        bus_disconnected_flag = QCC_FALSE;
     }
     QStatus status;
     alljoyn_busattachment bus;
@@ -170,7 +170,7 @@ TEST_F(BusListenerTest, found_lost_advertised_name) {
     }
     EXPECT_TRUE(listener_registered_flag);
 
-    alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
+    alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QCC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
 
     status = alljoyn_busattachment_findadvertisedname(bus, OBJECT_NAME);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);

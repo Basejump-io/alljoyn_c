@@ -26,25 +26,25 @@ static const char* OBJECT_NAME = "org.alljoyn.test.SessionTest";
 static const char* OBJECT_PATH = "/org/alljoyn/test/SessionTest";
 static const alljoyn_sessionport SESSION_PORT = 42;
 
-QC_BOOL joincompleted_flag;
-QC_BOOL joinsessionhandler_flag;
-QC_BOOL foundadvertisedname_flag;
-QC_BOOL sessionjoined_flag;
+QCC_BOOL joincompleted_flag;
+QCC_BOOL joinsessionhandler_flag;
+QCC_BOOL foundadvertisedname_flag;
+QCC_BOOL sessionjoined_flag;
 alljoyn_sessionid joinsessionid;
 alljoyn_sessionid joinsessionid_alt;
 
 /* AcceptSessionJoiner callback */
-static QC_BOOL accept_session_joiner(const void* context, alljoyn_sessionport sessionPort,
-                                     const char* joiner,  const alljoyn_sessionopts opts)
+static QCC_BOOL accept_session_joiner(const void* context, alljoyn_sessionport sessionPort,
+                                      const char* joiner,  const alljoyn_sessionopts opts)
 {
     //printf("accept_session_joiner\n");
-    QC_BOOL ret = QC_FALSE;
+    QCC_BOOL ret = QCC_FALSE;
     if (sessionPort != SESSION_PORT) {
         //printf("Rejecting join attempt on unexpected session port %d\n", sessionPort);
     } else {
         //printf("Accepting join session request from %s (opts.proximity=%x, opts.traffic=%x, opts.transports=%x)\n",
         //       joiner, alljoyn_sessionopts_proximity(opts), alljoyn_sessionopts_traffic(opts), alljoyn_sessionopts_transports(opts));
-        ret = QC_TRUE;
+        ret = QCC_TRUE;
     }
     return ret;
 }
@@ -71,7 +71,7 @@ void found_advertised_name(const void* context, const char* name, alljoyn_transp
     //printf("FoundAdvertisedName(name=%s, prefix=%s)\n", name, namePrefix);
     EXPECT_STREQ(OBJECT_NAME, name);
     if (0 == strcmp(name, OBJECT_NAME)) {
-        foundadvertisedname_flag = QC_TRUE;
+        foundadvertisedname_flag = QCC_TRUE;
     }
 }
 /* Exposed methods */
@@ -109,7 +109,7 @@ class SessionTest : public testing::Test {
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
         alljoyn_interfacedescription testIntf = NULL;
-        status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QC_FALSE);
+        status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QCC_FALSE);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
         status = alljoyn_interfacedescription_addmethod(testIntf, "ping", "s", "s", "in,out", 0, 0);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -135,7 +135,7 @@ class SessionTest : public testing::Test {
             NULL, /* BusObject Registered CB */
             NULL  /* BusObject Unregistered CB */
         };
-        alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QC_FALSE, &busObjCbs, NULL);
+        alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
 
         status = alljoyn_busobject_addinterface(testObj, testIntf);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -163,7 +163,7 @@ class SessionTest : public testing::Test {
         sessionPortListener = alljoyn_sessionportlistener_create(&spl_cbs, NULL);
 
         /* Bind SessionPort */
-        alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
+        alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QCC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
         alljoyn_sessionport sp = SESSION_PORT;
         status = alljoyn_busattachment_bindsessionport(servicebus, &sp, opts, sessionPortListener);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -211,8 +211,8 @@ TEST_F(SessionTest, joinsession) {
     buslistener = alljoyn_buslistener_create(&callbacks, NULL);
     alljoyn_busattachment_registerbuslistener(bus, buslistener);
 
-    foundadvertisedname_flag = QC_FALSE;
-    sessionjoined_flag = QC_FALSE;
+    foundadvertisedname_flag = QCC_FALSE;
+    sessionjoined_flag = QCC_FALSE;
     /* Begin discover of the well-known name */
     status = alljoyn_busattachment_findadvertisedname(bus, OBJECT_NAME);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -225,7 +225,7 @@ TEST_F(SessionTest, joinsession) {
     EXPECT_TRUE(foundadvertisedname_flag);
 
     /* We found a remote bus that is advertising basic service's  well-known name so connect to it */
-    alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
+    alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QCC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
     alljoyn_sessionid sid;
     status = alljoyn_busattachment_joinsession(bus, OBJECT_NAME, SESSION_PORT, NULL, &sid, opts);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -239,7 +239,7 @@ TEST_F(SessionTest, joinsession) {
     EXPECT_EQ(sid, joinsessionid);
 
     alljoyn_sessionopts_destroy(opts);
-    //joincompleted_flag = QC_TRUE;
+    //joincompleted_flag = QCC_TRUE;
 
     alljoyn_busattachment_unregisterbuslistener(bus, buslistener);
     TearDownSessionTestService();
@@ -262,8 +262,8 @@ TEST_F(SessionTest, joinsessionasync) {
     buslistener = alljoyn_buslistener_create(&callbacks, NULL);
     alljoyn_busattachment_registerbuslistener(bus, buslistener);
 
-    foundadvertisedname_flag = QC_FALSE;
-    sessionjoined_flag = QC_FALSE;
+    foundadvertisedname_flag = QCC_FALSE;
+    sessionjoined_flag = QCC_FALSE;
     /* Begin discover of the well-known name */
     status = alljoyn_busattachment_findadvertisedname(bus, OBJECT_NAME);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -276,7 +276,7 @@ TEST_F(SessionTest, joinsessionasync) {
     EXPECT_TRUE(foundadvertisedname_flag);
 
     /* We found a remote bus that is advertising basic service's  well-known name so connect to it */
-    alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
+    alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QCC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
 
     char dave[64] = "A test string to send as the context void*";
     status = alljoyn_busattachment_joinsessionasync(bus, OBJECT_NAME, SESSION_PORT, NULL, opts, &joinsessionhandler, (void*)dave);

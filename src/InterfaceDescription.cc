@@ -35,8 +35,8 @@ void alljoyn_interfacedescription_activate(alljoyn_interfacedescription iface)
     ((ajn::InterfaceDescription*)iface)->Activate();
 }
 
-QC_BOOL alljoyn_interfacedescription_getmember(const alljoyn_interfacedescription iface, const char* name,
-                                               alljoyn_interfacedescription_member* member)
+QCC_BOOL alljoyn_interfacedescription_getmember(const alljoyn_interfacedescription iface, const char* name,
+                                                alljoyn_interfacedescription_member* member)
 {
     const ajn::InterfaceDescription::Member* found_member = ((const ajn::InterfaceDescription*)iface)->GetMember(name);
     if (found_member != NULL) {
@@ -50,7 +50,7 @@ QC_BOOL alljoyn_interfacedescription_getmember(const alljoyn_interfacedescriptio
         //member->annotation = found_member->annotation;
         member->internal_member = found_member;
     }
-    return (found_member == NULL ? QC_FALSE : QC_TRUE);
+    return (found_member == NULL ? QCC_FALSE : QCC_TRUE);
 }
 
 QStatus alljoyn_interfacedescription_addmember(alljoyn_interfacedescription iface, alljoyn_messagetype type,
@@ -89,10 +89,10 @@ size_t alljoyn_interfacedescription_getmembers(const alljoyn_interfacedescriptio
     return ret;
 }
 
-QC_BOOL alljoyn_interfacedescription_hasmember(alljoyn_interfacedescription iface,
-                                               const char* name, const char* inSig, const char* outSig)
+QCC_BOOL alljoyn_interfacedescription_hasmember(alljoyn_interfacedescription iface,
+                                                const char* name, const char* inSig, const char* outSig)
 {
-    return (((ajn::InterfaceDescription*)iface)->HasMember(name, inSig, outSig) == true ? QC_TRUE : QC_FALSE);
+    return (((ajn::InterfaceDescription*)iface)->HasMember(name, inSig, outSig) == true ? QCC_TRUE : QCC_FALSE);
 }
 
 QStatus alljoyn_interfacedescription_addmethod(alljoyn_interfacedescription iface, const char* name, const char* inputSig, const char* outSig, const char* argNames, uint8_t annotation, const char* accessPerms)
@@ -100,7 +100,7 @@ QStatus alljoyn_interfacedescription_addmethod(alljoyn_interfacedescription ifac
     return ((ajn::InterfaceDescription*)iface)->AddMember(ajn::MESSAGE_METHOD_CALL, name, inputSig, outSig, argNames, annotation, accessPerms);
 }
 
-QC_BOOL alljoyn_interfacedescription_getmethod(alljoyn_interfacedescription iface, const char* name, alljoyn_interfacedescription_member* member)
+QCC_BOOL alljoyn_interfacedescription_getmethod(alljoyn_interfacedescription iface, const char* name, alljoyn_interfacedescription_member* member)
 {
     const ajn::InterfaceDescription::Member* found_member = ((const ajn::InterfaceDescription*)iface)->GetMember(name);
     /*
@@ -119,7 +119,7 @@ QC_BOOL alljoyn_interfacedescription_getmethod(alljoyn_interfacedescription ifac
     } else {
         found_member = NULL;
     }
-    return (found_member == NULL ? QC_FALSE : QC_TRUE);
+    return (found_member == NULL ? QCC_FALSE : QCC_TRUE);
 }
 
 QStatus alljoyn_interfacedescription_addsignal(alljoyn_interfacedescription iface, const char* name, const char* sig, const char* argNames, uint8_t annotation, const char* accessPerms)
@@ -127,7 +127,7 @@ QStatus alljoyn_interfacedescription_addsignal(alljoyn_interfacedescription ifac
     return ((ajn::InterfaceDescription*)iface)->AddMember(ajn::MESSAGE_SIGNAL, name, sig, NULL, argNames, annotation, accessPerms);
 }
 
-QC_BOOL alljoyn_interfacedescription_getsignal(alljoyn_interfacedescription iface, const char* name, alljoyn_interfacedescription_member* member)
+QCC_BOOL alljoyn_interfacedescription_getsignal(alljoyn_interfacedescription iface, const char* name, alljoyn_interfacedescription_member* member)
 {
     const ajn::InterfaceDescription::Member* found_member = ((const ajn::InterfaceDescription*)iface)->GetMember(name);
     /*
@@ -146,11 +146,11 @@ QC_BOOL alljoyn_interfacedescription_getsignal(alljoyn_interfacedescription ifac
     } else {
         found_member = NULL;
     }
-    return (found_member == NULL ? QC_FALSE : QC_TRUE);
+    return (found_member == NULL ? QCC_FALSE : QCC_TRUE);
 }
 
-QC_BOOL alljoyn_interfacedescription_getproperty(const alljoyn_interfacedescription iface, const char* name,
-                                                 alljoyn_interfacedescription_property* property)
+QCC_BOOL alljoyn_interfacedescription_getproperty(const alljoyn_interfacedescription iface, const char* name,
+                                                  alljoyn_interfacedescription_property* property)
 {
     const ajn::InterfaceDescription::Property* found_prop = ((const ajn::InterfaceDescription*)iface)->GetProperty(name);
     if (found_prop != NULL) {
@@ -159,7 +159,7 @@ QC_BOOL alljoyn_interfacedescription_getproperty(const alljoyn_interfacedescript
         property->access = found_prop->access;
         property->internal_property = found_prop;
     }
-    return (found_prop == NULL ? QC_FALSE : QC_TRUE);
+    return (found_prop == NULL ? QCC_FALSE : QCC_TRUE);
 }
 
 size_t alljoyn_interfacedescription_getproperties(const alljoyn_interfacedescription iface,
@@ -192,14 +192,14 @@ QStatus alljoyn_interfacedescription_addproperty(alljoyn_interfacedescription if
     return ((ajn::InterfaceDescription*)iface)->AddProperty(name, signature, access);
 }
 
-QC_BOOL alljoyn_interfacedescription_hasproperty(const alljoyn_interfacedescription iface, const char* name)
+QCC_BOOL alljoyn_interfacedescription_hasproperty(const alljoyn_interfacedescription iface, const char* name)
 {
-    return (((const ajn::InterfaceDescription*)iface)->HasProperty(name) == true ? QC_TRUE : QC_FALSE);
+    return (((const ajn::InterfaceDescription*)iface)->HasProperty(name) == true ? QCC_TRUE : QCC_FALSE);
 }
 
-QC_BOOL alljoyn_interfacedescription_hasproperties(const alljoyn_interfacedescription iface)
+QCC_BOOL alljoyn_interfacedescription_hasproperties(const alljoyn_interfacedescription iface)
 {
-    return (((const ajn::InterfaceDescription*)iface)->HasProperties() == true ? QC_TRUE : QC_FALSE);
+    return (((const ajn::InterfaceDescription*)iface)->HasProperties() == true ? QCC_TRUE : QCC_FALSE);
 }
 
 const char* alljoyn_interfacedescription_getname(const alljoyn_interfacedescription iface)
@@ -224,35 +224,35 @@ size_t alljoyn_interfacedescription_introspect(const alljoyn_interfacedescriptio
     return s.size();
 }
 
-QC_BOOL alljoyn_interfacedescription_issecure(const alljoyn_interfacedescription iface)
+QCC_BOOL alljoyn_interfacedescription_issecure(const alljoyn_interfacedescription iface)
 {
     return ((const ajn::InterfaceDescription*)iface)->IsSecure();
 }
 
-QC_BOOL alljoyn_interfacedescription_eql(const alljoyn_interfacedescription one,
-                                         const alljoyn_interfacedescription other)
+QCC_BOOL alljoyn_interfacedescription_eql(const alljoyn_interfacedescription one,
+                                          const alljoyn_interfacedescription other)
 {
     const ajn::InterfaceDescription& _one = *((const ajn::InterfaceDescription*)one);
     const ajn::InterfaceDescription& _other = *((const ajn::InterfaceDescription*)other);
 
-    return (_one == _other ? QC_TRUE : QC_FALSE);
+    return (_one == _other ? QCC_TRUE : QCC_FALSE);
 }
 
-QC_BOOL alljoyn_interfacedescription_member_eql(const alljoyn_interfacedescription_member one,
-                                                const alljoyn_interfacedescription_member other)
+QCC_BOOL alljoyn_interfacedescription_member_eql(const alljoyn_interfacedescription_member one,
+                                                 const alljoyn_interfacedescription_member other)
 {
     const ajn::InterfaceDescription::Member _one = *((ajn::InterfaceDescription::Member*)one.internal_member);
     const ajn::InterfaceDescription::Member _other = *((ajn::InterfaceDescription::Member*)other.internal_member);
 
-    return (_one == _other ? QC_TRUE : QC_FALSE);
+    return (_one == _other ? QCC_TRUE : QCC_FALSE);
 }
 
-QC_BOOL alljoyn_interfacedescription_property_eql(const alljoyn_interfacedescription_property one,
-                                                  const alljoyn_interfacedescription_property other)
+QCC_BOOL alljoyn_interfacedescription_property_eql(const alljoyn_interfacedescription_property one,
+                                                   const alljoyn_interfacedescription_property other)
 {
     const ajn::InterfaceDescription::Property _one = *((ajn::InterfaceDescription::Property*)one.internal_property);
     const ajn::InterfaceDescription::Property _other = *((ajn::InterfaceDescription::Property*)other.internal_property);
 
-    return (_one == _other ? QC_TRUE : QC_FALSE);
+    return (_one == _other ? QCC_TRUE : QCC_FALSE);
 }
 

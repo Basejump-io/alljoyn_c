@@ -28,7 +28,7 @@ static const char* INTERFACE_NAME = "org.alljoyn.test.MessageTest";
 static const char* OBJECT_NAME =    "org.alljoyn.test.MessageTest";
 static const char* OBJECT_PATH =   "/org/alljoyn/test/MessageTest";
 
-static QC_BOOL name_owner_changed_flag = QC_FALSE;
+static QCC_BOOL name_owner_changed_flag = QCC_FALSE;
 
 /* Exposed methods */
 static void ping_method(alljoyn_busobject bus, const alljoyn_interfacedescription_member* member, alljoyn_message msg)
@@ -45,7 +45,7 @@ static void ping_method(alljoyn_busobject bus, const alljoyn_interfacedescriptio
 static void name_owner_changed(const void* context, const char* busName, const char* previousOwner, const char* newOwner)
 {
     if (strcmp(busName, OBJECT_NAME) == 0) {
-        name_owner_changed_flag = QC_TRUE;
+        name_owner_changed_flag = QCC_TRUE;
     }
 }
 
@@ -74,7 +74,7 @@ class MessageTest : public testing::Test {
 
         /* create/activate alljoyn_interface */
         alljoyn_interfacedescription testIntf = NULL;
-        status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QC_FALSE);
+        status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QCC_FALSE);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
         status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", 0);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -100,7 +100,7 @@ class MessageTest : public testing::Test {
             NULL,
             NULL
         };
-        alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QC_FALSE, &busObjCbs, NULL);
+        alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
         const alljoyn_interfacedescription exampleIntf = alljoyn_busattachment_getinterface(servicebus, INTERFACE_NAME);
         ASSERT_TRUE(exampleIntf);
 
@@ -109,7 +109,7 @@ class MessageTest : public testing::Test {
 
         /* register method handlers */
         alljoyn_interfacedescription_member ping_member;
-        QC_BOOL foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "ping", &ping_member);
+        QCC_BOOL foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "ping", &ping_member);
         EXPECT_TRUE(foundMember);
 
         /* add methodhandlers */
@@ -123,7 +123,7 @@ class MessageTest : public testing::Test {
         status = alljoyn_busattachment_registerbusobject(servicebus, testObj);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
-        name_owner_changed_flag = QC_FALSE;
+        name_owner_changed_flag = QCC_FALSE;
 
         /* request name */
         uint32_t flags = DBUS_NAME_FLAG_REPLACE_EXISTING | DBUS_NAME_FLAG_DO_NOT_QUEUE;

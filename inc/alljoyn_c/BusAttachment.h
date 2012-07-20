@@ -55,9 +55,9 @@ typedef void (*alljoyn_busattachment_joinsessioncb_ptr)(QStatus status, alljoyn_
  * @note Any BusAttachment allocated using this function must be freed using
  *
  * @param applicationName       Name of the application.
- * @param allowRemoteMessages   QC_TRUE if this attachment is allowed to receive messages from remote devices.
+ * @param allowRemoteMessages   QCC_TRUE if this attachment is allowed to receive messages from remote devices.
  */
-extern AJ_API alljoyn_busattachment alljoyn_busattachment_create(const char* applicationName, QC_BOOL allowRemoteMessages);
+extern AJ_API alljoyn_busattachment alljoyn_busattachment_create(const char* applicationName, QCC_BOOL allowRemoteMessages);
 
 /**
  * Free an allocated BusAttachment.
@@ -74,7 +74,7 @@ extern AJ_API void alljoyn_busattachment_destroy(alljoyn_busattachment bus);
  * receiving messages cannot begin until the bus is Connect()ed.
  *
  * There are two ways to determine whether the bus is currently connected:
- *    -# alljoyn_busattachment() returns QC_TRUE
+ *    -# alljoyn_busattachment() returns QCC_TRUE
  *    -# alljoyn_busobject_callback object_registered is called by the bus
  *
  * In most cases, it is not required to understand the threading model of
@@ -229,7 +229,7 @@ extern AJ_API QStatus alljoyn_busattachment_join(alljoyn_busattachment bus);
  * @param[out] iface
  *      - Interface description
  *      - NULL if cannot be created.
- * @param secure If QC_TRUE the interface is secure and method calls and signals will be encrypted.
+ * @param secure If QCC_TRUE the interface is secure and method calls and signals will be encrypted.
  *
  * @return
  *      - #ER_OK if creation was successful.
@@ -237,7 +237,7 @@ extern AJ_API QStatus alljoyn_busattachment_join(alljoyn_busattachment bus);
  * @see BusAttachment::CreateInterface
  */
 extern AJ_API QStatus alljoyn_busattachment_createinterface(alljoyn_busattachment bus, const char* name,
-                                                            alljoyn_interfacedescription* iface, QC_BOOL secure);
+                                                            alljoyn_interfacedescription* iface, QCC_BOOL secure);
 
 /**
  * Connect to a remote bus address.
@@ -525,16 +525,16 @@ extern AJ_API QStatus alljoyn_busattachment_unbindsessionport(alljoyn_busattachm
  */
 extern AJ_API QStatus alljoyn_busattachment_enablepeersecurity(alljoyn_busattachment bus, const char* authMechanisms,
                                                                alljoyn_authlistener listener, const char* keyStoreFileName,
-                                                               QC_BOOL isShared);
+                                                               QCC_BOOL isShared);
 
 /**
  * Check is peer security has been enabled for this bus attachment.
  *
  * @param bus The bus on which to query if peer security is enabled.
  *
- * @return   Returns QC_TRUE if peer security has been enabled, QC_FALSE otherwise.
+ * @return   Returns QCC_TRUE if peer security has been enabled, QCC_FALSE otherwise.
  */
-extern AJ_API QC_BOOL alljoyn_busattachment_ispeersecurityenabled(alljoyn_busattachment bus);
+extern AJ_API QCC_BOOL alljoyn_busattachment_ispeersecurityenabled(alljoyn_busattachment bus);
 
 /**
  * Initialize one more interface descriptions from an XML string in DBus introspection format.
@@ -582,18 +582,18 @@ extern AJ_API size_t alljoyn_busattachment_getinterfaces(const alljoyn_busattach
  */
 extern AJ_API QStatus alljoyn_busattachment_deleteinterface(alljoyn_busattachment bus, alljoyn_interfacedescription iface);
 /**
- * Returns QC_TRUE if the mesage bus has been started.
+ * Returns QCC_TRUE if the mesage bus has been started.
  *
  * @param bus The bus to query.
  */
-extern AJ_API QC_BOOL alljoyn_busattachment_isstarted(alljoyn_busattachment bus);
+extern AJ_API QCC_BOOL alljoyn_busattachment_isstarted(alljoyn_busattachment bus);
 
 /**
- * Returns QC_TRUE if the mesage bus has been requested to stop.
+ * Returns QCC_TRUE if the mesage bus has been requested to stop.
  *
  * @param bus The bus to query.
  */
-extern AJ_API QC_BOOL alljoyn_busattachment_isstopping(alljoyn_busattachment bus);
+extern AJ_API QCC_BOOL alljoyn_busattachment_isstopping(alljoyn_busattachment bus);
 
 /**
  * Indicate whether bus is currently connected.
@@ -603,7 +603,7 @@ extern AJ_API QC_BOOL alljoyn_busattachment_isstopping(alljoyn_busattachment bus
  * @param bus The bus to query.
  * @return true if the bus is connected.
  */
-extern AJ_API QC_BOOL alljoyn_busattachment_isconnected(const alljoyn_busattachment bus);
+extern AJ_API QCC_BOOL alljoyn_busattachment_isconnected(const alljoyn_busattachment bus);
 
 /**
  * Disconnect a remote bus address connection.
@@ -910,7 +910,7 @@ extern AJ_API QStatus alljoyn_busattachment_setlinktimeout(alljoyn_busattachment
  *      - #ER_OK if name ownership was able to be determined.
  *      - An error status otherwise
  */
-extern AJ_API QStatus alljoyn_busattachment_namehasowner(alljoyn_busattachment bus, const char* name, QC_BOOL* hasOwner);
+extern AJ_API QStatus alljoyn_busattachment_namehasowner(alljoyn_busattachment bus, const char* name, QCC_BOOL* hasOwner);
 
 /**
  * Get the peer GUID for this peer of the local peer or an authenticated remote peer. The bus

@@ -48,12 +48,12 @@ void alljoyn_message_destroy(alljoyn_message msg)
     delete msg;
 }
 
-QC_BOOL alljoyn_message_isbroadcastsignal(alljoyn_message msg)
+QCC_BOOL alljoyn_message_isbroadcastsignal(alljoyn_message msg)
 {
     return msg->msg->IsBroadcastSignal();
 }
 
-QC_BOOL alljoyn_message_isglobalbroadcast(alljoyn_message msg)
+QCC_BOOL alljoyn_message_isglobalbroadcast(alljoyn_message msg)
 {
     return msg->msg->IsGlobalBroadcast();
 }
@@ -63,17 +63,17 @@ uint8_t alljoyn_message_getflags(alljoyn_message msg)
     return msg->msg->GetFlags();
 }
 
-QC_BOOL alljoyn_message_isexpired(alljoyn_message msg, uint32_t* tillExpireMS)
+QCC_BOOL alljoyn_message_isexpired(alljoyn_message msg, uint32_t* tillExpireMS)
 {
     return msg->msg->IsExpired(tillExpireMS);
 }
 
-QC_BOOL alljoyn_message_isunreliable(alljoyn_message msg)
+QCC_BOOL alljoyn_message_isunreliable(alljoyn_message msg)
 {
     return msg->msg->IsUnreliable();
 }
 
-QC_BOOL alljoyn_message_isencrypted(alljoyn_message msg)
+QCC_BOOL alljoyn_message_isencrypted(alljoyn_message msg)
 {
     return msg->msg->IsEncrypted();
 }
@@ -221,7 +221,7 @@ uint32_t alljoyn_message_gettimestamp(alljoyn_message msg)
     return msg->msg->GetTimeStamp();
 }
 
-QC_BOOL alljoyn_message_eql(const alljoyn_message one, const alljoyn_message other)
+QCC_BOOL alljoyn_message_eql(const alljoyn_message one, const alljoyn_message other)
 {
     return (one->msg == other->msg);
 }

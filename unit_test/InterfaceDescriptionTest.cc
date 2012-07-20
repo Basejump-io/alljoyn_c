@@ -21,10 +21,10 @@
 TEST(InterfaceDescriptionTest, addmember) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     ASSERT_TRUE(bus != NULL);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -36,10 +36,10 @@ TEST(InterfaceDescriptionTest, addmember) {
 TEST(InterfaceDescriptionTest, getmember) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     ASSERT_TRUE(bus != NULL);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -76,10 +76,10 @@ TEST(InterfaceDescriptionTest, getmember) {
 TEST(InterfaceDescriptionTest, getmembers) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     ASSERT_TRUE(bus != NULL);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -122,10 +122,10 @@ TEST(InterfaceDescriptionTest, getmembers) {
 TEST(InterfaceDescriptionTest, hasmembers) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     ASSERT_TRUE(bus != NULL);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -149,9 +149,9 @@ TEST(InterfaceDescriptionTest, hasmembers) {
 TEST(InterfaceDescriptionTest, activate) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -167,9 +167,9 @@ TEST(InterfaceDescriptionTest, activate) {
 TEST(InterfaceDescriptionTest, introspect) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -205,25 +205,25 @@ TEST(InterfaceDescriptionTest, introspect) {
 TEST(InterfaceDescriptionTest, issecure) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_TRUE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_TRUE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
-    EXPECT_EQ(QC_TRUE, alljoyn_interfacedescription_issecure(testIntf));
+    EXPECT_EQ(QCC_TRUE, alljoyn_interfacedescription_issecure(testIntf));
     status = alljoyn_busattachment_deleteinterface(bus, testIntf);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
-    EXPECT_EQ(QC_FALSE, alljoyn_interfacedescription_issecure(testIntf));
+    EXPECT_EQ(QCC_FALSE, alljoyn_interfacedescription_issecure(testIntf));
     alljoyn_busattachment_destroy(bus);
 }
 
 TEST(InterfaceDescriptionTest, addproperty) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addproperty(testIntf, "prop1", "s", ALLJOYN_PROP_ACCESS_READ);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -250,9 +250,9 @@ TEST(InterfaceDescriptionTest, addproperty) {
 TEST(InterfaceDescriptionTest, hasproperty) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addproperty(testIntf, "prop1", "s", ALLJOYN_PROP_ACCESS_READ);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -271,9 +271,9 @@ TEST(InterfaceDescriptionTest, hasproperty) {
 TEST(InterfaceDescriptionTest, hasproperties) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     /*
      * At this point this is an empty interface the call to hasproperties should
@@ -311,9 +311,9 @@ TEST(InterfaceDescriptionTest, hasproperties) {
 TEST(InterfaceDescriptionTest, getname) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
 
     EXPECT_STREQ("org.alljoyn.test.InterfaceDescription", alljoyn_interfacedescription_getname(testIntf));
 
@@ -323,9 +323,9 @@ TEST(InterfaceDescriptionTest, getname) {
 TEST(InterfaceDescriptionTest, addmethod) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmethod(testIntf, "method1", "ss", "b", "string1,string2,bool", 0, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -350,9 +350,9 @@ TEST(InterfaceDescriptionTest, addmethod) {
 TEST(InterfaceDescriptionTest, getmethod) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmethod(testIntf, "method1", "ss", "b", "string1,string2,bool", 0, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -387,9 +387,9 @@ TEST(InterfaceDescriptionTest, getmethod) {
 TEST(InterfaceDescriptionTest, addsignal) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addsignal(testIntf, "signal1", "s", "string", 0, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -412,9 +412,9 @@ TEST(InterfaceDescriptionTest, addsignal) {
 TEST(InterfaceDescriptionTest, getsignal) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addsignal(testIntf, "signal1", "s", "string", 0, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -447,9 +447,9 @@ TEST(InterfaceDescriptionTest, getsignal) {
 TEST(InterfaceDescriptionTest, getproperty) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addproperty(testIntf, "prop1", "s", ALLJOYN_PROP_ACCESS_READ);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -480,9 +480,9 @@ TEST(InterfaceDescriptionTest, getproperty) {
 TEST(InterfaceDescriptionTest, getproperties) {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addproperty(testIntf, "prop1", "s", ALLJOYN_PROP_ACCESS_READ);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -528,10 +528,10 @@ TEST(InterfaceDescriptionTest, alljoyn_interfacedescription_member_eql)
 {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     ASSERT_TRUE(bus != NULL);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -558,9 +558,9 @@ TEST(InterfaceDescriptionTest, alljoyn_interfacedescription_property_eql)
 {
     QStatus status = ER_OK;
     alljoyn_busattachment bus = NULL;
-    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QC_FALSE);
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addproperty(testIntf, "prop1", "s", ALLJOYN_PROP_ACCESS_READ);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);

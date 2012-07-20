@@ -32,9 +32,9 @@ namespace ajn {
 
 class BusObjectC : public BusObject {
   public:
-    BusObjectC(alljoyn_busattachment bus, const char* path, QC_BOOL isPlaceholder, \
+    BusObjectC(alljoyn_busattachment bus, const char* path, QCC_BOOL isPlaceholder, \
                const alljoyn_busobject_callbacks* callbacks_in, const void* context_in) :
-        BusObject(*((BusAttachment*)bus), path, isPlaceholder == QC_TRUE ? true : false)
+        BusObject(*((BusAttachment*)bus), path, isPlaceholder == QCC_TRUE ? true : false)
     {
         context = context_in;
         memcpy(&callbacks, callbacks_in, sizeof(alljoyn_busobject_callbacks));
@@ -182,7 +182,7 @@ struct _alljoyn_busobject_handle {
     /* Empty by design, this is just to allow the type restrictions to save coders from themselves */
 };
 
-alljoyn_busobject alljoyn_busobject_create(alljoyn_busattachment bus, const char* path, QC_BOOL isPlaceholder,
+alljoyn_busobject alljoyn_busobject_create(alljoyn_busattachment bus, const char* path, QCC_BOOL isPlaceholder,
                                            const alljoyn_busobject_callbacks* callbacks_in, const void* context_in)
 {
     return (alljoyn_busobject) new ajn::BusObjectC(bus, path, isPlaceholder, callbacks_in, context_in);

@@ -30,10 +30,10 @@ struct _alljoyn_sessionopts_handle {
     /* Empty by design, this is just to allow the type restrictions to save coders from themselves */
 };
 
-alljoyn_sessionopts alljoyn_sessionopts_create(uint8_t traffic, QC_BOOL isMultipoint,
+alljoyn_sessionopts alljoyn_sessionopts_create(uint8_t traffic, QCC_BOOL isMultipoint,
                                                uint8_t proximity, alljoyn_transportmask transports)
 {
-    return (alljoyn_sessionopts) new ajn::SessionOpts((ajn::SessionOpts::TrafficType)traffic, isMultipoint == QC_TRUE ? true : false,
+    return (alljoyn_sessionopts) new ajn::SessionOpts((ajn::SessionOpts::TrafficType)traffic, isMultipoint == QCC_TRUE ? true : false,
                                                       (ajn::SessionOpts::Proximity)proximity, (ajn::TransportMask)transports);
 }
 
@@ -47,9 +47,9 @@ uint8_t alljoyn_sessionopts_traffic(const alljoyn_sessionopts opts)
     return ((const ajn::SessionOpts*)opts)->traffic;
 }
 
-QC_BOOL alljoyn_sessionopts_multipoint(const alljoyn_sessionopts opts)
+QCC_BOOL alljoyn_sessionopts_multipoint(const alljoyn_sessionopts opts)
 {
-    return (((const ajn::SessionOpts*)opts)->isMultipoint ? QC_TRUE : QC_FALSE);
+    return (((const ajn::SessionOpts*)opts)->isMultipoint ? QCC_TRUE : QCC_FALSE);
 }
 
 uint8_t alljoyn_sessionopts_proximity(const alljoyn_sessionopts opts)
@@ -62,9 +62,9 @@ alljoyn_transportmask alljoyn_sessionopts_transports(const alljoyn_sessionopts o
     return ((const ajn::SessionOpts*)opts)->transports;
 }
 
-QC_BOOL alljoyn_sessionopts_iscompatible(const alljoyn_sessionopts one, const alljoyn_sessionopts other)
+QCC_BOOL alljoyn_sessionopts_iscompatible(const alljoyn_sessionopts one, const alljoyn_sessionopts other)
 {
-    return (((const ajn::SessionOpts*)one)->IsCompatible(*((const ajn::SessionOpts*)other)) == true ? QC_TRUE : QC_FALSE);
+    return (((const ajn::SessionOpts*)one)->IsCompatible(*((const ajn::SessionOpts*)other)) == true ? QCC_TRUE : QCC_FALSE);
 }
 
 int32_t alljoyn_sessionopts_cmp(const alljoyn_sessionopts one, const alljoyn_sessionopts other)

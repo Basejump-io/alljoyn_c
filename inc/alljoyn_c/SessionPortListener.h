@@ -35,8 +35,8 @@ typedef struct _alljoyn_sessionportlistener_handle*         alljoyn_sessionportl
 /**
  * Type for the AcceptSessionJoiner callback.
  */
-typedef QC_BOOL (*alljoyn_sessionportlistener_acceptsessionjoiner_ptr)(const void* context, alljoyn_sessionport sessionPort,
-                                                                       const char* joiner,  const alljoyn_sessionopts opts);
+typedef QCC_BOOL (*alljoyn_sessionportlistener_acceptsessionjoiner_ptr)(const void* context, alljoyn_sessionport sessionPort,
+                                                                        const char* joiner,  const alljoyn_sessionopts opts);
 
 /**
  * Type for the SessionJoined callback.

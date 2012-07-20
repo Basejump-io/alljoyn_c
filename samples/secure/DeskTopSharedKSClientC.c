@@ -48,14 +48,14 @@ static const char* OBJECT_NAME = "org.alljoyn.bus.samples.secure";
 static const char* OBJECT_PATH = "/SecureService";
 static const alljoyn_sessionport SERVICE_PORT = 42;
 
-static QC_BOOL s_joinComplete = QC_FALSE;
+static QCC_BOOL s_joinComplete = QCC_FALSE;
 static alljoyn_sessionid s_sessionId = 0;
 
-static volatile sig_atomic_t g_interrupt = QC_FALSE;
+static volatile sig_atomic_t g_interrupt = QCC_FALSE;
 
 static void SigIntHandler(int sig)
 {
-    g_interrupt = QC_TRUE;
+    g_interrupt = QCC_TRUE;
 }
 
 /*
@@ -91,7 +91,7 @@ void found_advertised_name(const void* context, const char* name, alljoyn_transp
     printf("FoundAdvertisedName(name=%s, prefix=%s)\n", name, namePrefix);
     if (0 == strcmp(name, OBJECT_NAME)) {
         /* We found a remote bus that is advertising basic service's  well-known name so connect to it */
-        alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
+        alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QCC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
         QStatus status = alljoyn_busattachment_joinsession(g_msgBus, name, SERVICE_PORT, NULL, &s_sessionId, opts);
 
         if (ER_OK != status) {
@@ -101,7 +101,7 @@ void found_advertised_name(const void* context, const char* name, alljoyn_transp
         }
         alljoyn_sessionopts_destroy(opts);
     }
-    s_joinComplete = QC_TRUE;
+    s_joinComplete = QCC_TRUE;
 }
 
 /* NameOwnerChanged callback */
@@ -127,8 +127,8 @@ void name_owner_changed(const void* context, const char* busName, const char* pr
  * If any other authMechanism is used other than SRP Key Exchange authentication
  * will fail.
  */
-QC_BOOL request_credentials(const void* context, const char* authMechanism, const char* authPeer, uint16_t authCount,
-                            const char* userName, uint16_t credMask, alljoyn_credentials credentials)
+QCC_BOOL request_credentials(const void* context, const char* authMechanism, const char* authPeer, uint16_t authCount,
+                             const char* userName, uint16_t credMask, alljoyn_credentials credentials)
 {
     printf("RequestCredentials for authenticating %s using mechanism %s\n", authPeer, authMechanism);
     if (strcmp(authMechanism, "ALLJOYN_SRP_KEYX") == 0) {
@@ -140,18 +140,18 @@ QC_BOOL request_credentials(const void* context, const char* authMechanism, cons
                 printf("Please enter one time password : ");
                 get_line(buf, bufSize, stdin);
                 alljoyn_credentials_setpassword(credentials, buf);
-                return QC_TRUE;
+                return QCC_TRUE;
             } else {
-                return QC_FALSE;
+                return QCC_FALSE;
             }
         }
     }
-    return QC_FALSE;
+    return QCC_FALSE;
 }
 
-void authentication_complete(const void* context, const char* authMechanism, const char* peerName, QC_BOOL success)
+void authentication_complete(const void* context, const char* authMechanism, const char* peerName, QCC_BOOL success)
 {
-    printf("Authentication %s %s\n", authMechanism, success == QC_TRUE ? "succesful" : "failed");
+    printf("Authentication %s %s\n", authMechanism, success == QCC_TRUE ? "succesful" : "failed");
 }
 
 /** Main entry point */
@@ -177,10 +177,10 @@ int main(int argc, char** argv, char** envArg)
     signal(SIGINT, SigIntHandler);
 
     /* Create message bus */
-    g_msgBus = alljoyn_busattachment_create("SRPSecurityClientC", QC_TRUE);
+    g_msgBus = alljoyn_busattachment_create("SRPSecurityClientC", QCC_TRUE);
 
     /* Add org.alljoyn.bus.samples.secure.SecureInterface interface */
-    status = alljoyn_busattachment_createinterface(g_msgBus, INTERFACE_NAME, &testIntf, QC_TRUE);
+    status = alljoyn_busattachment_createinterface(g_msgBus, INTERFACE_NAME, &testIntf, QCC_TRUE);
     if (status == ER_OK) {
         alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "Ping", "s",  "s", "inStr1,outStr", 0);
         alljoyn_interfacedescription_activate(testIntf);
@@ -213,7 +213,7 @@ int main(int argc, char** argv, char** envArg)
         };
         g_authListener = alljoyn_authlistener_create(&callbacks, NULL);
         status = alljoyn_busattachment_enablepeersecurity(g_msgBus, "ALLJOYN_SRP_KEYX", g_authListener,
-                                                          "/.alljoyn_keystore/central.ks", QC_TRUE);
+                                                          "/.alljoyn_keystore/central.ks", QCC_TRUE);
         if (ER_OK != status) {
             printf("BusAttachment::EnablePeerSecurity failed (%s)\n", QCC_StatusText(status));
         } else {
@@ -263,7 +263,7 @@ int main(int argc, char** argv, char** envArg)
 #endif
     }
 
-    if (status == ER_OK && g_interrupt == QC_FALSE) {
+    if (status == ER_OK && g_interrupt == QCC_FALSE) {
         alljoyn_message reply;
         alljoyn_msgarg inputs;
         size_t numArgs;

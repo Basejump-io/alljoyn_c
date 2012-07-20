@@ -198,12 +198,12 @@ QStatus alljoyn_proxybusobject_parsexml(alljoyn_proxybusobject proxyObj, const c
     return ((ajn::ProxyBusObject*)proxyObj)->ParseXml(xml, identifier);
 }
 
-QStatus alljoyn_proxybusobject_secureconnection(alljoyn_proxybusobject proxyObj, QC_BOOL forceAuth)
+QStatus alljoyn_proxybusobject_secureconnection(alljoyn_proxybusobject proxyObj, QCC_BOOL forceAuth)
 {
     return ((ajn::ProxyBusObject*)proxyObj)->SecureConnection(forceAuth);
 }
 
-QStatus alljoyn_proxybusobject_secureconnectionasync(alljoyn_proxybusobject proxyObj, QC_BOOL forceAuth)
+QStatus alljoyn_proxybusobject_secureconnectionasync(alljoyn_proxybusobject proxyObj, QCC_BOOL forceAuth)
 {
     return ((ajn::ProxyBusObject*)proxyObj)->SecureConnectionAsync(forceAuth);
 }
@@ -232,9 +232,9 @@ alljoyn_sessionid alljoyn_proxybusobject_getsessionid(alljoyn_proxybusobject pro
     return (alljoyn_sessionid)((ajn::ProxyBusObject*)proxyObj)->GetSessionId();
 }
 
-QC_BOOL alljoyn_proxybusobject_implementsinterface(alljoyn_proxybusobject proxyObj, const char* iface)
+QCC_BOOL alljoyn_proxybusobject_implementsinterface(alljoyn_proxybusobject proxyObj, const char* iface)
 {
-    return (QC_BOOL)((ajn::ProxyBusObject*)proxyObj)->ImplementsInterface(iface);
+    return (QCC_BOOL)((ajn::ProxyBusObject*)proxyObj)->ImplementsInterface(iface);
 }
 
 alljoyn_proxybusobject alljoyn_proxybusobject_copy(const alljoyn_proxybusobject source)
@@ -247,7 +247,7 @@ alljoyn_proxybusobject alljoyn_proxybusobject_copy(const alljoyn_proxybusobject 
     return (alljoyn_proxybusobject) ret;
 }
 
-QC_BOOL alljoyn_proxybusobject_isvalid(alljoyn_proxybusobject proxyObj)
+QCC_BOOL alljoyn_proxybusobject_isvalid(alljoyn_proxybusobject proxyObj)
 {
-    return (QC_BOOL)((ajn::ProxyBusObject*)proxyObj)->IsValid();
+    return (QCC_BOOL)((ajn::ProxyBusObject*)proxyObj)->IsValid();
 }

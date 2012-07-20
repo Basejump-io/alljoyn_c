@@ -80,10 +80,10 @@ extern AJ_API void alljoyn_interfacedescription_activate(alljoyn_interfacedescri
  * @param       name    Name of the member to lookup
  * @param[out]  member  The description of the member
  *
- * @return QC_FALSE if member does not exist, QC_TRUE otherwise.
+ * @return QCC_FALSE if member does not exist, QCC_TRUE otherwise.
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_getmember(const alljoyn_interfacedescription iface, const char* name,
-                                                             alljoyn_interfacedescription_member* member);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_getmember(const alljoyn_interfacedescription iface, const char* name,
+                                                              alljoyn_interfacedescription_member* member);
 
 /**
  * Add a member to the interface.
@@ -131,11 +131,11 @@ extern AJ_API size_t alljoyn_interfacedescription_getmembers(const alljoyn_inter
  * @param name       Name of the member to lookup
  * @param inSig      Input parameter signature of the member to lookup
  * @param outSig     Output parameter signature of the member to lookup (leave NULL for signals)
- * @return QC_TRUE if the member name exists.
+ * @return QCC_TRUE if the member name exists.
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_hasmember(alljoyn_interfacedescription iface,
-                                                             const char* name, const char* inSig,
-                                                             const char* outSig);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_hasmember(alljoyn_interfacedescription iface,
+                                                              const char* name, const char* inSig,
+                                                              const char* outSig);
 
 /**
  * Add a method call member to the interface.
@@ -164,7 +164,7 @@ extern AJ_API QStatus alljoyn_interfacedescription_addmethod(alljoyn_interfacede
  *      - Pointer to member.
  *      - NULL if does not exist.
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_getmethod(alljoyn_interfacedescription iface, const char* name, alljoyn_interfacedescription_member* member);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_getmethod(alljoyn_interfacedescription iface, const char* name, alljoyn_interfacedescription_member* member);
 
 /**
  * Add a signal member to the interface.
@@ -190,7 +190,7 @@ extern AJ_API QStatus alljoyn_interfacedescription_addsignal(alljoyn_interfacede
  *      - Pointer to member.
  *      - NULL if does not exist.
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_getsignal(alljoyn_interfacedescription iface, const char* name, alljoyn_interfacedescription_member* member);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_getsignal(alljoyn_interfacedescription iface, const char* name, alljoyn_interfacedescription_member* member);
 
 /**
  * Lookup a property description by name
@@ -198,10 +198,10 @@ extern AJ_API QC_BOOL alljoyn_interfacedescription_getsignal(alljoyn_interfacede
  * @param iface     Interface to query for a property.
  * @param name      Name of the property to lookup
  * @param property  The description of the property
- * @return QC_TRUE if the property was found, QC_FALSE otherwise
+ * @return QCC_TRUE if the property was found, QCC_FALSE otherwise
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_getproperty(const alljoyn_interfacedescription iface, const char* name,
-                                                               alljoyn_interfacedescription_property* property);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_getproperty(const alljoyn_interfacedescription iface, const char* name,
+                                                                alljoyn_interfacedescription_property* property);
 
 /**
  * Get all the properties.
@@ -242,7 +242,7 @@ extern AJ_API QStatus alljoyn_interfacedescription_addproperty(alljoyn_interface
  * @param name       Name of the property to lookup
  * @return true if the property exists.
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_hasproperty(const alljoyn_interfacedescription iface, const char* name);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_hasproperty(const alljoyn_interfacedescription iface, const char* name);
 
 /**
  * Check for existence of any properties
@@ -250,7 +250,7 @@ extern AJ_API QC_BOOL alljoyn_interfacedescription_hasproperty(const alljoyn_int
  * @param iface      Interface to query.
  * @return  true if interface has any properties.
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_hasproperties(const alljoyn_interfacedescription iface);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_hasproperties(const alljoyn_interfacedescription iface);
 
 /**
  * Returns the name of the interface
@@ -283,7 +283,7 @@ extern AJ_API size_t alljoyn_interfacedescription_introspect(const alljoyn_inter
  * @param iface      Interface to query.
  * @return true if the interface is secure.
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_issecure(const alljoyn_interfacedescription iface);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_issecure(const alljoyn_interfacedescription iface);
 
 /**
  * Equality operation.
@@ -291,10 +291,10 @@ extern AJ_API QC_BOOL alljoyn_interfacedescription_issecure(const alljoyn_interf
  * @param one   Interface to compare to other
  * @param other Interface to compare to one
  *
- * @return QC_TRUE if one == other
+ * @return QCC_TRUE if one == other
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_eql(const alljoyn_interfacedescription one,
-                                                       const alljoyn_interfacedescription other);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_eql(const alljoyn_interfacedescription one,
+                                                        const alljoyn_interfacedescription other);
 
 /**
  * Equality operation.
@@ -302,10 +302,10 @@ extern AJ_API QC_BOOL alljoyn_interfacedescription_eql(const alljoyn_interfacede
  * @param one   alljoyn_interfacedescription_member to compare to other
  * @param other alljoyn_interfacedescription_member to compare to one
  *
- * @return QC_TRUE if one == other
+ * @return QCC_TRUE if one == other
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_member_eql(const alljoyn_interfacedescription_member one,
-                                                              const alljoyn_interfacedescription_member other);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_member_eql(const alljoyn_interfacedescription_member one,
+                                                               const alljoyn_interfacedescription_member other);
 
 /**
  * Equality operation.
@@ -313,10 +313,10 @@ extern AJ_API QC_BOOL alljoyn_interfacedescription_member_eql(const alljoyn_inte
  * @param one   alljoyn_interfacedescription_property to compare to other
  * @param other alljoyn_interfacedescription_property to compare to one
  *
- * @return QC_TRUE if one == other
+ * @return QCC_TRUE if one == other
  */
-extern AJ_API QC_BOOL alljoyn_interfacedescription_property_eql(const alljoyn_interfacedescription_property one,
-                                                                const alljoyn_interfacedescription_property other);
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_property_eql(const alljoyn_interfacedescription_property one,
+                                                                 const alljoyn_interfacedescription_property other);
 
 #ifdef __cplusplus
 } /* extern "C" */
