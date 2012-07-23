@@ -56,7 +56,7 @@ typedef uint32_t alljoyn_sessionid;
  * @param transports    Allowed transport types bitmask.
  *
  */
-extern AJ_API alljoyn_sessionopts alljoyn_sessionopts_create(uint8_t traffic, QC_BOOL isMultipoint,
+extern AJ_API alljoyn_sessionopts alljoyn_sessionopts_create(uint8_t traffic, QCC_BOOL isMultipoint,
                                                              uint8_t proximity, alljoyn_transportmask transports);
 
 /**
@@ -82,7 +82,7 @@ extern AJ_API uint8_t alljoyn_sessionopts_traffic(const alljoyn_sessionopts opts
  *
  * @return Multipoint value specified by the specified SessionOpts.
  */
-extern AJ_API QC_BOOL alljoyn_sessionopts_multipoint(const alljoyn_sessionopts opts);
+extern AJ_API QCC_BOOL alljoyn_sessionopts_multipoint(const alljoyn_sessionopts opts);
 
 /**
  * Accessor for the proximity member of SessionOpts.
@@ -107,9 +107,9 @@ extern AJ_API alljoyn_transportmask alljoyn_sessionopts_transports(const alljoyn
  *
  * @param one    Options to be compared against other.
  * @param other  Options to be compared against one.
- * @return QC_TRUE iff this SessionOpts can use the option set offered by other.
+ * @return QCC_TRUE iff this SessionOpts can use the option set offered by other.
  */
-extern AJ_API QC_BOOL alljoyn_sessionopts_iscompatible(const alljoyn_sessionopts one, const alljoyn_sessionopts other);
+extern AJ_API QCC_BOOL alljoyn_sessionopts_iscompatible(const alljoyn_sessionopts one, const alljoyn_sessionopts other);
 
 /**
  * Compare two SessionOpts.

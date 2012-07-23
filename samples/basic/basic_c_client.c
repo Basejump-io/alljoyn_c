@@ -47,17 +47,17 @@ static const char* OBJECT_NAME = "org.alljoyn.Bus.method_sample";
 static const char* OBJECT_PATH = "/method_sample";
 static const alljoyn_sessionport SERVICE_PORT = 25;
 
-static QC_BOOL s_joinComplete = QC_FALSE;
+static QCC_BOOL s_joinComplete = QCC_FALSE;
 static alljoyn_sessionid s_sessionId = 0;
 
 /* Static BusListener */
 static alljoyn_buslistener g_busListener;
 
-static volatile sig_atomic_t g_interrupt = QC_FALSE;
+static volatile sig_atomic_t g_interrupt = QCC_FALSE;
 
 static void SigIntHandler(int sig)
 {
-    g_interrupt = QC_TRUE;
+    g_interrupt = QCC_TRUE;
 }
 
 /* FoundAdvertisedName callback */
@@ -66,7 +66,7 @@ void found_advertised_name(const void* context, const char* name, alljoyn_transp
     printf("FoundAdvertisedName(name=%s, prefix=%s)\n", name, namePrefix);
     if (0 == strcmp(name, OBJECT_NAME)) {
         /* We found a remote bus that is advertising basic service's  well-known name so connect to it */
-        alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
+        alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QCC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
         QStatus status = alljoyn_busattachment_joinsession(g_msgBus, name, SERVICE_PORT, NULL, &s_sessionId, opts);
 
         if (ER_OK != status) {
@@ -76,7 +76,7 @@ void found_advertised_name(const void* context, const char* name, alljoyn_transp
         }
         alljoyn_sessionopts_destroy(opts);
     }
-    s_joinComplete = QC_TRUE;
+    s_joinComplete = QCC_TRUE;
 }
 
 /* NameOwnerChanged callback */
@@ -116,10 +116,10 @@ int main(int argc, char** argv, char** envArg)
     signal(SIGINT, SigIntHandler);
 
     /* Create message bus */
-    g_msgBus = alljoyn_busattachment_create("myApp", QC_TRUE);
+    g_msgBus = alljoyn_busattachment_create("myApp", QCC_TRUE);
 
     /* Add org.alljoyn.Bus.method_sample interface */
-    status = alljoyn_busattachment_createinterface(g_msgBus, INTERFACE_NAME, &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(g_msgBus, INTERFACE_NAME, &testIntf, QCC_FALSE);
     if (status == ER_OK) {
         printf("Interface Created.\n");
         alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "cat", "ss",  "s", "inStr1,inStr2,outStr", 0);
@@ -172,7 +172,7 @@ int main(int argc, char** argv, char** envArg)
     }
 
     /* Wait for join session to complete */
-    while (s_joinComplete == QC_FALSE && g_interrupt == QC_FALSE) {
+    while (s_joinComplete == QCC_FALSE && g_interrupt == QCC_FALSE) {
 #ifdef _WIN32
         Sleep(10);
 #else
@@ -180,7 +180,7 @@ int main(int argc, char** argv, char** envArg)
 #endif
     }
 
-    if (status == ER_OK && g_interrupt == QC_FALSE) {
+    if (status == ER_OK && g_interrupt == QCC_FALSE) {
         alljoyn_message reply;
         alljoyn_msgarg inputs;
         size_t numArgs;

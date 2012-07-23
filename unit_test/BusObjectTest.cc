@@ -32,9 +32,9 @@ static const char* OBJECT_PATH = "/org/alljoyn/test/BusObjectTest";
 static const alljoyn_sessionport SERVICE_PORT = 25;
 
 /*********** BusObject callback functions **************/
-static QC_BOOL object_registered_flag = QC_FALSE;
-static QC_BOOL object_unregistered_flag = QC_FALSE;;
-static QC_BOOL name_owner_changed_flag = QC_FALSE;
+static QCC_BOOL object_registered_flag = QCC_FALSE;
+static QCC_BOOL object_unregistered_flag = QCC_FALSE;;
+static QCC_BOOL name_owner_changed_flag = QCC_FALSE;
 
 static const char* prop1 = "AllJoyn BusObject Test"; //read only property
 static int32_t prop2; //write only property
@@ -73,24 +73,24 @@ static QStatus set_property(const void* context, const char* ifcName, const char
 
 static void busobject_registered(const void* context)
 {
-    object_registered_flag = QC_TRUE;
+    object_registered_flag = QCC_TRUE;
 }
 
 static void busobject_unregistered(const void* context)
 {
-    object_unregistered_flag = QC_TRUE;
+    object_unregistered_flag = QCC_TRUE;
 }
 
 /* NameOwnerChanged callback */
 static void name_owner_changed(const void* context, const char* busName, const char* previousOwner, const char* newOwner)
 {
     if (strcmp(busName, OBJECT_NAME) == 0) {
-        name_owner_changed_flag = QC_TRUE;
+        name_owner_changed_flag = QCC_TRUE;
     }
 }
 
 /************* Method handlers *************/
-static QC_BOOL chirp_method_flag = QC_FALSE;
+static QCC_BOOL chirp_method_flag = QCC_FALSE;
 
 /* Exposed methods */
 static void ping_method(alljoyn_busobject bus, const alljoyn_interfacedescription_member* member, alljoyn_message msg)
@@ -105,7 +105,7 @@ static void ping_method(alljoyn_busobject bus, const alljoyn_interfacedescriptio
 
 static void chirp_method(alljoyn_busobject bus, const alljoyn_interfacedescription_member* member, alljoyn_message msg)
 {
-    chirp_method_flag = QC_TRUE;
+    chirp_method_flag = QCC_TRUE;
     alljoyn_msgarg outArg = alljoyn_msgarg_create();
     outArg = alljoyn_message_getarg(msg, 0);
     const char* str;
@@ -117,8 +117,8 @@ static void chirp_method(alljoyn_busobject bus, const alljoyn_interfacedescripti
 class BusObjectTest : public testing::Test {
   public:
     virtual void SetUp() {
-        object_registered_flag = QC_FALSE;
-        object_unregistered_flag = QC_TRUE;
+        object_registered_flag = QCC_FALSE;
+        object_unregistered_flag = QCC_TRUE;
 
         bus = alljoyn_busattachment_create("ProxyBusObjectTest", false);
         status = alljoyn_busattachment_start(bus);
@@ -141,7 +141,7 @@ class BusObjectTest : public testing::Test {
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
         alljoyn_interfacedescription testIntf = NULL;
-        status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QC_FALSE);
+        status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QCC_FALSE);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
         status = alljoyn_interfacedescription_addproperty(testIntf, "prop1", "s", ALLJOYN_PROP_ACCESS_READ);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -173,7 +173,7 @@ class BusObjectTest : public testing::Test {
             &busobject_registered,
             &busobject_unregistered
         };
-        alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QC_FALSE, &busObjCbs, NULL);
+        alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
 
         status = alljoyn_busobject_addinterface(testObj, testIntf);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -188,7 +188,7 @@ class BusObjectTest : public testing::Test {
         }
         EXPECT_TRUE(object_registered_flag);
 
-        name_owner_changed_flag = QC_FALSE;
+        name_owner_changed_flag = QCC_FALSE;
 
         /* request name */
         uint32_t flags = DBUS_NAME_FLAG_REPLACE_EXISTING | DBUS_NAME_FLAG_DO_NOT_QUEUE;
@@ -231,7 +231,7 @@ TEST_F(BusObjectTest, object_registered_unregistered)
         &busobject_registered,
         &busobject_unregistered
     };
-    alljoyn_busobject testObj = alljoyn_busobject_create(bus, OBJECT_PATH, QC_FALSE, &busObjCbs, NULL);
+    alljoyn_busobject testObj = alljoyn_busobject_create(bus, OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
     status = alljoyn_busattachment_registerbusobject(bus, testObj);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     for (size_t i = 0; i < 200; ++i) {
@@ -363,7 +363,7 @@ TEST_F(BusObjectTest, addmethodhandler)
 
     /* create/activate alljoyn_interface */
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmethod(testIntf, "ping", "s", "s", "in,out", 0, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -391,7 +391,7 @@ TEST_F(BusObjectTest, addmethodhandler)
         NULL,
         NULL
     };
-    alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QC_FALSE, &busObjCbs, NULL);
+    alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
     const alljoyn_interfacedescription exampleIntf = alljoyn_busattachment_getinterface(servicebus, INTERFACE_NAME);
     ASSERT_TRUE(exampleIntf);
 
@@ -400,23 +400,23 @@ TEST_F(BusObjectTest, addmethodhandler)
 
     /* register method handlers */
     alljoyn_interfacedescription_member ping_member;
-    QC_BOOL foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "ping", &ping_member);
+    QCC_BOOL foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "ping", &ping_member);
     EXPECT_TRUE(foundMember);
 
     alljoyn_interfacedescription_member chirp_member;
     foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "chirp", &chirp_member);
     EXPECT_TRUE(foundMember);
 
-    status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method, NULL);
+    status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
-    status = alljoyn_busobject_addmethodhandler(testObj, chirp_member, &chirp_method, NULL);
+    status = alljoyn_busobject_addmethodhandler(testObj, chirp_member, &chirp_method);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     status = alljoyn_busattachment_registerbusobject(servicebus, testObj);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
-    name_owner_changed_flag = QC_FALSE;
+    name_owner_changed_flag = QCC_FALSE;
 
     /* request name */
     uint32_t flags = DBUS_NAME_FLAG_REPLACE_EXISTING | DBUS_NAME_FLAG_DO_NOT_QUEUE;
@@ -445,7 +445,7 @@ TEST_F(BusObjectTest, addmethodhandler)
     alljoyn_msgarg_get(alljoyn_message_getarg(reply, 0), "s", &str);
     EXPECT_STREQ("AllJoyn", str);
 
-    chirp_method_flag = QC_FALSE;
+    chirp_method_flag = QCC_FALSE;
 
     status = alljoyn_proxybusobject_methodcall(proxyObj, INTERFACE_NAME, "chirp", input, 1, reply, ALLJOYN_MESSAGE_DEFAULT_TIMEOUT, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -478,7 +478,7 @@ TEST_F(BusObjectTest, addmethodhandlers)
 
     /* create/activate alljoyn_interface */
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmethod(testIntf, "ping", "s", "s", "in,out", 0, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -506,7 +506,7 @@ TEST_F(BusObjectTest, addmethodhandlers)
         NULL,
         NULL
     };
-    alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QC_FALSE, &busObjCbs, NULL);
+    alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
     const alljoyn_interfacedescription exampleIntf = alljoyn_busattachment_getinterface(servicebus, INTERFACE_NAME);
     ASSERT_TRUE(exampleIntf);
 
@@ -515,7 +515,7 @@ TEST_F(BusObjectTest, addmethodhandlers)
 
     /* register method handlers */
     alljoyn_interfacedescription_member ping_member;
-    QC_BOOL foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "ping", &ping_member);
+    QCC_BOOL foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "ping", &ping_member);
     EXPECT_TRUE(foundMember);
 
     alljoyn_interfacedescription_member chirp_member;
@@ -533,7 +533,7 @@ TEST_F(BusObjectTest, addmethodhandlers)
     status = alljoyn_busattachment_registerbusobject(servicebus, testObj);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
-    name_owner_changed_flag = QC_FALSE;
+    name_owner_changed_flag = QCC_FALSE;
 
     /* request name */
     uint32_t flags = DBUS_NAME_FLAG_REPLACE_EXISTING | DBUS_NAME_FLAG_DO_NOT_QUEUE;
@@ -562,7 +562,7 @@ TEST_F(BusObjectTest, addmethodhandlers)
     alljoyn_msgarg_get(alljoyn_message_getarg(reply, 0), "s", &str);
     EXPECT_STREQ("AllJoyn", str);
 
-    chirp_method_flag = QC_FALSE;
+    chirp_method_flag = QCC_FALSE;
 
     status = alljoyn_proxybusobject_methodcall(proxyObj, INTERFACE_NAME, "chirp", input, 1, reply, ALLJOYN_MESSAGE_DEFAULT_TIMEOUT, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -595,7 +595,7 @@ TEST_F(BusObjectTest, addmethodhandler_addmethodhandlers_mix)
 
     /* create/activate alljoyn_interface */
     alljoyn_interfacedescription testIntf = NULL;
-    status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(servicebus, INTERFACE_NAME, &testIntf, QCC_FALSE);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_interfacedescription_addmethod(testIntf, "ping", "s", "s", "in,out", 0, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -623,7 +623,7 @@ TEST_F(BusObjectTest, addmethodhandler_addmethodhandlers_mix)
         NULL,
         NULL
     };
-    alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QC_FALSE, &busObjCbs, NULL);
+    alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
     const alljoyn_interfacedescription exampleIntf = alljoyn_busattachment_getinterface(servicebus, INTERFACE_NAME);
     ASSERT_TRUE(exampleIntf);
 
@@ -632,7 +632,7 @@ TEST_F(BusObjectTest, addmethodhandler_addmethodhandlers_mix)
 
     /* register method handlers */
     alljoyn_interfacedescription_member ping_member;
-    QC_BOOL foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "ping", &ping_member);
+    QCC_BOOL foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "ping", &ping_member);
     EXPECT_TRUE(foundMember);
 
     alljoyn_interfacedescription_member chirp_member;
@@ -646,13 +646,13 @@ TEST_F(BusObjectTest, addmethodhandler_addmethodhandlers_mix)
     status = alljoyn_busobject_addmethodhandlers(testObj, methodEntries, sizeof(methodEntries) / sizeof(methodEntries[0]));
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
-    status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method, NULL);
+    status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     status = alljoyn_busattachment_registerbusobject(servicebus, testObj);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
-    name_owner_changed_flag = QC_FALSE;
+    name_owner_changed_flag = QCC_FALSE;
 
     /* request name */
     uint32_t flags = DBUS_NAME_FLAG_REPLACE_EXISTING | DBUS_NAME_FLAG_DO_NOT_QUEUE;
@@ -681,7 +681,7 @@ TEST_F(BusObjectTest, addmethodhandler_addmethodhandlers_mix)
     alljoyn_msgarg_get(alljoyn_message_getarg(reply, 0), "s", &str);
     EXPECT_STREQ("AllJoyn", str);
 
-    chirp_method_flag = QC_FALSE;
+    chirp_method_flag = QCC_FALSE;
 
     status = alljoyn_proxybusobject_methodcall(proxyObj, INTERFACE_NAME, "chirp", input, 1, reply, ALLJOYN_MESSAGE_DEFAULT_TIMEOUT, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);

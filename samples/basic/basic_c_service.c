@@ -54,11 +54,11 @@ static const char* OBJECT_NAME = "org.alljoyn.Bus.method_sample";
 static const char* OBJECT_PATH = "/method_sample";
 static const alljoyn_sessionport SERVICE_PORT = 25;
 
-static volatile sig_atomic_t g_interrupt = QC_FALSE;
+static volatile sig_atomic_t g_interrupt = QCC_FALSE;
 
 static void SigIntHandler(int sig)
 {
-    g_interrupt = QC_TRUE;
+    g_interrupt = QCC_TRUE;
 }
 
 /* ObjectRegistered callback */
@@ -79,16 +79,16 @@ void name_owner_changed(const void* context, const char* busName, const char* pr
 }
 
 /* AcceptSessionJoiner callback */
-QC_BOOL accept_session_joiner(const void* context, alljoyn_sessionport sessionPort,
-                              const char* joiner,  const alljoyn_sessionopts opts)
+QCC_BOOL accept_session_joiner(const void* context, alljoyn_sessionport sessionPort,
+                               const char* joiner,  const alljoyn_sessionopts opts)
 {
-    QC_BOOL ret = QC_FALSE;
+    QCC_BOOL ret = QCC_FALSE;
     if (sessionPort != SERVICE_PORT) {
         printf("Rejecting join attempt on unexpected session port %d\n", sessionPort);
     } else {
         printf("Accepting join session request from %s (opts.proximity=%x, opts.traffic=%x, opts.transports=%x)\n",
                joiner, alljoyn_sessionopts_proximity(opts), alljoyn_sessionopts_traffic(opts), alljoyn_sessionopts_transports(opts));
-        ret = QC_TRUE;
+        ret = QCC_TRUE;
     }
     return ret;
 }
@@ -125,7 +125,7 @@ int main(int argc, char** argv, char** envArg)
     alljoyn_busobject testObj;
     alljoyn_interfacedescription exampleIntf;
     alljoyn_interfacedescription_member cat_member;
-    QC_BOOL foundMember = QC_FALSE;
+    QCC_BOOL foundMember = QCC_FALSE;
     alljoyn_busobject_methodentry methodEntries[] = {
         { &cat_member, cat_method },
     };
@@ -143,10 +143,10 @@ int main(int argc, char** argv, char** envArg)
     signal(SIGINT, SigIntHandler);
 
     /* Create message bus */
-    g_msgBus = alljoyn_busattachment_create("myApp", QC_TRUE);
+    g_msgBus = alljoyn_busattachment_create("myApp", QCC_TRUE);
 
     /* Add org.alljoyn.Bus.method_sample interface */
-    status = alljoyn_busattachment_createinterface(g_msgBus, INTERFACE_NAME, &testIntf, QC_FALSE);
+    status = alljoyn_busattachment_createinterface(g_msgBus, INTERFACE_NAME, &testIntf, QCC_FALSE);
     if (status == ER_OK) {
         alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "cat", "ss",  "s", "inStr1,inStr2,outStr", 0);
         alljoyn_interfacedescription_activate(testIntf);
@@ -172,13 +172,13 @@ int main(int argc, char** argv, char** envArg)
     }
 
     /* Set up bus object */
-    testObj = alljoyn_busobject_create(g_msgBus, OBJECT_PATH, QC_FALSE, &busObjCbs, NULL);
+    testObj = alljoyn_busobject_create(g_msgBus, OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
     exampleIntf = alljoyn_busattachment_getinterface(g_msgBus, INTERFACE_NAME);
     assert(exampleIntf);
     alljoyn_busobject_addinterface(testObj, exampleIntf);
 
     foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "cat", &cat_member);
-    assert(foundMember == QC_TRUE);
+    assert(foundMember == QCC_TRUE);
 
     status = alljoyn_busobject_addmethodhandlers(testObj, methodEntries, sizeof(methodEntries) / sizeof(methodEntries[0]));
     if (ER_OK != status) {
@@ -230,7 +230,7 @@ int main(int argc, char** argv, char** envArg)
     s_sessionPortListener = alljoyn_sessionportlistener_create(&spl_cbs, NULL);
 
     /* Create session */
-    opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
+    opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QCC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
     if (ER_OK == status) {
         alljoyn_sessionport sp = SERVICE_PORT;
         status = alljoyn_busattachment_bindsessionport(g_msgBus, &sp, opts, s_sessionPortListener);
@@ -248,7 +248,7 @@ int main(int argc, char** argv, char** envArg)
     }
 
     if (ER_OK == status) {
-        while (g_interrupt == QC_FALSE) {
+        while (g_interrupt == QCC_FALSE) {
 #ifdef _WIN32
             Sleep(100);
 #else

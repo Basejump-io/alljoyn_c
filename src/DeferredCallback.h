@@ -50,8 +50,8 @@ class DeferredCallback {
     static int TriggerCallbacks()
     {
         int ret = 0;
-		int len = sPendingCallbacks.size();
-		for(int i = 0; i < len; i++) { //ONLY process the current list not what gets added from the calls 
+        int len = sPendingCallbacks.size();
+        for (int i = 0; i < len; i++) {        //ONLY process the current list not what gets added from the calls
             sCallbackListLock.Lock(MUTEX_CONTEXT);
             if (sPendingCallbacks.empty()) {
                 sCallbackListLock.Unlock(MUTEX_CONTEXT);
@@ -75,7 +75,7 @@ class DeferredCallback {
     }
 
   protected:
-	virtual void runCallbackNow(){};	
+    virtual void runCallbackNow() { };
 
     void Wait()
     {
@@ -113,10 +113,10 @@ class DeferredCallback_1 : public DeferredCallback {
     {
     }
 
-	virtual void runCallbackNow() {
-		retVal = _callback(_param1);
-		executeNow = true;
-	}
+    virtual void runCallbackNow() {
+        retVal = _callback(_param1);
+        executeNow = true;
+    }
 
     virtual R Execute()
     {
@@ -132,7 +132,7 @@ class DeferredCallback_1 : public DeferredCallback {
   protected:
     DeferredCallback_1_Callback _callback;
     T _param1;
-	R retVal;
+    R retVal;
 };
 
 template <typename T>
@@ -143,11 +143,11 @@ class DeferredCallback_1<void, T> : public DeferredCallback {
     DeferredCallback_1(DeferredCallback_1_Callback callback, T param1) : _callback(callback), _param1(param1)
     {
     }
-	
-	virtual void runCallbackNow() {
-		_callback(_param1);
-		executeNow = true;
-	}
+
+    virtual void runCallbackNow() {
+        _callback(_param1);
+        executeNow = true;
+    }
 
     virtual void Execute()
     {
@@ -172,10 +172,10 @@ class DeferredCallback_2 : public DeferredCallback {
     {
     }
 
-	virtual void runCallbackNow() {
-		retVal = _callback(_param1, _param2);
-		executeNow = true;
-	}
+    virtual void runCallbackNow() {
+        retVal = _callback(_param1, _param2);
+        executeNow = true;
+    }
 
     virtual R Execute()
     {
@@ -192,7 +192,7 @@ class DeferredCallback_2 : public DeferredCallback {
     DeferredCallback_2_Callback _callback;
     T _param1;
     U _param2;
-	R retVal;
+    R retVal;
 };
 
 template <typename T, typename U>
@@ -204,10 +204,10 @@ class DeferredCallback_2<void, T, U> : public DeferredCallback {
     {
     }
 
-	virtual void runCallbackNow() {
+    virtual void runCallbackNow() {
         _callback(_param1, _param2);
-		executeNow = true;
-	}
+        executeNow = true;
+    }
 
     virtual void Execute()
     {
@@ -234,10 +234,10 @@ class DeferredCallback_3 : public DeferredCallback {
     {
     }
 
-	virtual void runCallbackNow() {
-		retVal = _callback(_param1, _param2, _param3);
-		executeNow = true;
-	}
+    virtual void runCallbackNow() {
+        retVal = _callback(_param1, _param2, _param3);
+        executeNow = true;
+    }
 
     virtual R Execute()
     {
@@ -255,7 +255,7 @@ class DeferredCallback_3 : public DeferredCallback {
     T _param1;
     U _param2;
     V _param3;
-	R retVal;
+    R retVal;
 };
 
 template <typename T, typename U, typename V>
@@ -268,10 +268,10 @@ class DeferredCallback_3<void, T, U, V> : public DeferredCallback {
     {
     }
 
-	virtual void runCallbackNow() {
+    virtual void runCallbackNow() {
         _callback(_param1, _param2, _param3);
-		executeNow = true;
-	}
+        executeNow = true;
+    }
 
     virtual void Execute()
     {
@@ -299,10 +299,10 @@ class DeferredCallback_4 : public DeferredCallback {
     {
     }
 
-	virtual void runCallbackNow() {
-		retVal = _callback(_param1, _param2, _param3, _param4);
-		executeNow = true;
-	}
+    virtual void runCallbackNow() {
+        retVal = _callback(_param1, _param2, _param3, _param4);
+        executeNow = true;
+    }
 
     virtual R Execute()
     {
@@ -321,7 +321,7 @@ class DeferredCallback_4 : public DeferredCallback {
     U _param2;
     V _param3;
     W _param4;
-	R retVal;
+    R retVal;
 };
 
 template <typename T, typename U, typename V, typename W>
@@ -334,10 +334,10 @@ class DeferredCallback_4<void, T, U, V, W> : public DeferredCallback {
     {
     }
 
-	virtual void runCallbackNow() {
+    virtual void runCallbackNow() {
         _callback(_param1, _param2, _param3, _param4);
-		executeNow = true;
-	}
+        executeNow = true;
+    }
 
 
     virtual void Execute()

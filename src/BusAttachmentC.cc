@@ -95,7 +95,7 @@ QStatus BusAttachmentC::UnregisterSignalHandlerC(alljoyn_messagereceiver_signalh
                 if (srcPath == NULL || strcmp(it->second.sourcePath, srcPath) == 0) {
                     signalCallbackMap.erase(it);
                     return_status = ER_OK;
-					break;
+                    break;
                 }
             }
         }
@@ -155,9 +155,9 @@ void BusAttachmentC::SignalHandlerRemap(const InterfaceDescription::Member* memb
                 alljoyn_messagereceiver_signalhandler_ptr remappedHandler = it->second.handler;
 // TODO This MUST change to a compile flag
 //This code is specific to Unity
-				DeferredCallback_3<void, const alljoyn_interfacedescription_member*, const char *, alljoyn_message>* dcb =
-					new DeferredCallback_3<void, const alljoyn_interfacedescription_member*, const char *, alljoyn_message>(remappedHandler, &c_member, srcPath, (alljoyn_message) & message);
-				DEFERRED_CALLBACK_EXECUTE(dcb);		
+                DeferredCallback_3<void, const alljoyn_interfacedescription_member*, const char*, alljoyn_message>* dcb =
+                    new DeferredCallback_3<void, const alljoyn_interfacedescription_member*, const char*, alljoyn_message>(remappedHandler, &c_member, srcPath, (alljoyn_message) & message);
+                DEFERRED_CALLBACK_EXECUTE(dcb);
 //THis code is generic C
 //                remappedHandler(&c_member, srcPath, (alljoyn_message) & message);
             }

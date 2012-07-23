@@ -80,7 +80,7 @@ typedef struct {
  * @param isPlaceholder  Place-holder objects are created by the bus itself and serve only
  *                       as parent objects (in the object path sense) to other objects.
  */
-extern AJ_API alljoyn_busobject alljoyn_busobject_create(alljoyn_busattachment bus, const char* path, QC_BOOL isPlaceholder,
+extern AJ_API alljoyn_busobject alljoyn_busobject_create(alljoyn_busattachment bus, const char* path, QCC_BOOL isPlaceholder,
                                                          const alljoyn_busobject_callbacks* callbacks_in, const void* context_in);
 
 /**
@@ -137,14 +137,12 @@ extern AJ_API QStatus alljoyn_busobject_addinterface(alljoyn_busobject bus, cons
  *
  * @param member   Interface member implemented by handler.
  * @param handler  Method handler.
- * @param context  An optional context. This is mainly intended for implementing language
- *                 bindings and should normally be NULL.
  *
  * @return
  *      - #ER_OK if the method handler was added.
  *      - An error status otherwise
  */
-extern AJ_API QStatus alljoyn_busobject_addmethodhandler(alljoyn_busobject bus, const alljoyn_interfacedescription_member member, alljoyn_messagereceiver_methodhandler_ptr handler, void* context);
+extern AJ_API QStatus alljoyn_busobject_addmethodhandler(alljoyn_busobject bus, const alljoyn_interfacedescription_member member, alljoyn_messagereceiver_methodhandler_ptr handler);
 
 /**
  * Add a set of method handers at once.

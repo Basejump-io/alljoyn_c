@@ -56,13 +56,13 @@ static const uint16_t ALLJOYN_CRED_ONE_TIME_PWD = 0x2001; /**< Indicates the cre
 /**
  * Type for the RequestCredentials callback.
  */
-typedef QC_BOOL (*alljoyn_authlistener_requestcredentials_ptr)(const void* context, const char* authMechanism, const char* peerName, uint16_t authCount,
-                                                               const char* userName, uint16_t credMask, alljoyn_credentials credentials);
+typedef QCC_BOOL (*alljoyn_authlistener_requestcredentials_ptr)(const void* context, const char* authMechanism, const char* peerName, uint16_t authCount,
+                                                                const char* userName, uint16_t credMask, alljoyn_credentials credentials);
 /**
  * Type for the VerifyCredentials callback.
  */
-typedef QC_BOOL (*alljoyn_authlistener_verifycredentials_ptr)(const void* context, const char* authMechanism, const char* peerName,
-                                                              const alljoyn_credentials credentials);
+typedef QCC_BOOL (*alljoyn_authlistener_verifycredentials_ptr)(const void* context, const char* authMechanism, const char* peerName,
+                                                               const alljoyn_credentials credentials);
 /**
  * Type for the SecurityViolation callback.
  */
@@ -71,7 +71,7 @@ typedef void (*alljoyn_authlistener_securityviolation_ptr)(const void* context, 
 /**
  * Type for the AuthenticationComplete callback.
  */
-typedef void (*alljoyn_authlistener_authenticationcomplete_ptr)(const void* context, const char* authMechanism, const char* peerName, QC_BOOL success);
+typedef void (*alljoyn_authlistener_authenticationcomplete_ptr)(const void* context, const char* authMechanism, const char* peerName, QCC_BOOL success);
 
 /**
  * Structure used during alljoyn_authlistener_create to provide callbacks into C.
@@ -121,7 +121,7 @@ extern AJ_API void alljoyn_credentials_destroy(alljoyn_credentials cred);
  * @param creds  A logical or of the credential bit values.
  * @return true if the credentials are set.
  */
-extern AJ_API QC_BOOL alljoyn_credentials_isset(const alljoyn_credentials cred, uint16_t creds);
+extern AJ_API QCC_BOOL alljoyn_credentials_isset(const alljoyn_credentials cred, uint16_t creds);
 
 /**
  * Sets a requested password, pincode, or passphrase.

@@ -450,7 +450,7 @@ extern AJ_API QStatus alljoyn_proxybusobject_parsexml(alljoyn_proxybusobject pro
  * @param proxyObj   ProxyBusObject to explicitly set up a secure a connection
  * @param forceAuth  If true, forces an re-authentication even if the peer connection is already
  *                   authenticated.
- *                   Recommended default QC_FALSE
+ *                   Recommended default QCC_FALSE
  *
  * @return
  *          - #ER_OK if the connection was secured or an error status indicating that the
@@ -459,7 +459,7 @@ extern AJ_API QStatus alljoyn_proxybusobject_parsexml(alljoyn_proxybusobject pro
  *          - #ER_AUTH_FAIL if the attempt(s) to authenticate the peer failed.
  *          - Other error status codes indicating a failure.
  */
-extern AJ_API QStatus alljoyn_proxybusobject_secureconnection(alljoyn_proxybusobject proxyObj, QC_BOOL forceAuth);
+extern AJ_API QStatus alljoyn_proxybusobject_secureconnection(alljoyn_proxybusobject proxyObj, QCC_BOOL forceAuth);
 
 /**
  * Asynchronously secure the connection to the remote peer for this proxy object. Peer-to-peer
@@ -473,14 +473,14 @@ extern AJ_API QStatus alljoyn_proxybusobject_secureconnection(alljoyn_proxybusob
  * @param proxyObj   ProxyBusObject to explicitly set up a secure a connection
  * @param forceAuth  If true, forces an re-authentication even if the peer connection is already
  *                   authenticated.
- *                   Recommended default QC_FALSE
+ *                   Recommended default QCC_FALSE
  *
  * @return
  *          - #ER_OK if securing could begin.
  *          - #ER_BUS_NO_AUTHENTICATION_MECHANISM if BusAttachment::EnablePeerSecurity() has not been called.
  *          - Other error status codes indicating a failure.
  */
-extern AJ_API QStatus alljoyn_proxybusobject_secureconnectionasync(alljoyn_proxybusobject proxyObj, QC_BOOL forceAuth);
+extern AJ_API QStatus alljoyn_proxybusobject_secureconnectionasync(alljoyn_proxybusobject proxyObj, QCC_BOOL forceAuth);
 
 /**
  * Returns a pointer to an interface description. Returns NULL if the object does not implement
@@ -546,7 +546,7 @@ extern AJ_API alljoyn_sessionid alljoyn_proxybusobject_getsessionid(alljoyn_prox
  *
  * @return  true if the object implements the requested interface
  */
-extern AJ_API QC_BOOL alljoyn_proxybusobject_implementsinterface(alljoyn_proxybusobject proxyObj, const char* iface);
+extern AJ_API QCC_BOOL alljoyn_proxybusobject_implementsinterface(alljoyn_proxybusobject proxyObj, const char* iface);
 
 /**
  * create a copy of a proxybusobject.  This will create a new alljoyn_proxybusobject and
@@ -563,7 +563,7 @@ extern AJ_API alljoyn_proxybusobject alljoyn_proxybusobject_copy(const alljoyn_p
  *
  * @return true if a valid proxy bus object, false otherwise.
  */
-extern AJ_API QC_BOOL alljoyn_proxybusobject_isvalid(alljoyn_proxybusobject proxyObj);
+extern AJ_API QCC_BOOL alljoyn_proxybusobject_isvalid(alljoyn_proxybusobject proxyObj);
 
 #if 0
 /*TODO create C bindings for the following C++ methods */

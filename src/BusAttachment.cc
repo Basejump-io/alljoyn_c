@@ -29,9 +29,9 @@ struct _alljoyn_busattachment_handle {
     /* Empty by design, this is just to allow the type restrictions to save coders from themselves */
 };
 
-alljoyn_busattachment alljoyn_busattachment_create(const char* applicationName, QC_BOOL allowRemoteMessages)
+alljoyn_busattachment alljoyn_busattachment_create(const char* applicationName, QCC_BOOL allowRemoteMessages)
 {
-    bool allowRemoteMessagesBool = (allowRemoteMessages == QC_TRUE ? true : false);
+    bool allowRemoteMessagesBool = (allowRemoteMessages == QCC_TRUE ? true : false);
     return ((alljoyn_busattachment) new ajn::BusAttachmentC(applicationName, allowRemoteMessagesBool));
 }
 
@@ -59,9 +59,9 @@ extern AJ_API QStatus alljoyn_busattachment_join(alljoyn_busattachment bus)
 
 QStatus alljoyn_busattachment_createinterface(alljoyn_busattachment bus,
                                               const char* name,
-                                              alljoyn_interfacedescription* iface, QC_BOOL secure)
+                                              alljoyn_interfacedescription* iface, QCC_BOOL secure)
 {
-    bool secureBool = (secure == QC_TRUE ? true : false);
+    bool secureBool = (secure == QCC_TRUE ? true : false);
     ajn::InterfaceDescription* ifaceObj = NULL;
     QStatus ret = ((ajn::BusAttachmentC*)bus)->CreateInterface(name, ifaceObj, secureBool);
     *iface = (alljoyn_interfacedescription)ifaceObj;
@@ -161,15 +161,15 @@ QStatus alljoyn_busattachment_canceladvertisename(alljoyn_busattachment bus, con
 
 QStatus alljoyn_busattachment_enablepeersecurity(alljoyn_busattachment bus, const char* authMechanisms,
                                                  alljoyn_authlistener listener, const char* keyStoreFileName,
-                                                 QC_BOOL isShared)
+                                                 QCC_BOOL isShared)
 {
     return ((ajn::BusAttachmentC*)bus)->EnablePeerSecurity(authMechanisms, (ajn::AuthListener*)listener, keyStoreFileName,
-                                                           (isShared == QC_TRUE ? true : false));
+                                                           (isShared == QCC_TRUE ? true : false));
 }
 
-QC_BOOL alljoyn_busattachment_ispeersecurityenabled(alljoyn_busattachment bus)
+QCC_BOOL alljoyn_busattachment_ispeersecurityenabled(alljoyn_busattachment bus)
 {
-    return (((ajn::BusAttachmentC*)bus)->IsPeerSecurityEnabled() == true ? QC_TRUE : QC_FALSE);
+    return (((ajn::BusAttachmentC*)bus)->IsPeerSecurityEnabled() == true ? QCC_TRUE : QCC_FALSE);
 }
 
 QStatus alljoyn_busattachment_createinterfacesfromxml(alljoyn_busattachment bus, const char* xml)
@@ -188,19 +188,19 @@ QStatus alljoyn_busattachment_deleteinterface(alljoyn_busattachment bus, alljoyn
     return ((ajn::BusAttachmentC*)bus)->DeleteInterface(*((ajn::InterfaceDescription*)iface));
 }
 
-QC_BOOL alljoyn_busattachment_isstarted(alljoyn_busattachment bus)
+QCC_BOOL alljoyn_busattachment_isstarted(alljoyn_busattachment bus)
 {
-    return (((ajn::BusAttachmentC*)bus)->IsStarted() == true ? QC_TRUE : QC_FALSE);
+    return (((ajn::BusAttachmentC*)bus)->IsStarted() == true ? QCC_TRUE : QCC_FALSE);
 }
 
-QC_BOOL alljoyn_busattachment_isstopping(alljoyn_busattachment bus)
+QCC_BOOL alljoyn_busattachment_isstopping(alljoyn_busattachment bus)
 {
-    return (((ajn::BusAttachmentC*)bus)->IsStopping() == true ? QC_TRUE : QC_FALSE);
+    return (((ajn::BusAttachmentC*)bus)->IsStopping() == true ? QCC_TRUE : QCC_FALSE);
 }
 
-QC_BOOL alljoyn_busattachment_isconnected(const alljoyn_busattachment bus)
+QCC_BOOL alljoyn_busattachment_isconnected(const alljoyn_busattachment bus)
 {
-    return (((const ajn::BusAttachmentC*)bus)->IsConnected() == true ? QC_TRUE : QC_FALSE);
+    return (((const ajn::BusAttachmentC*)bus)->IsConnected() == true ? QCC_TRUE : QCC_FALSE);
 }
 
 QStatus alljoyn_busattachment_disconnect(alljoyn_busattachment bus, const char* connectSpec)
@@ -287,8 +287,8 @@ QStatus alljoyn_busattachment_removematch(alljoyn_busattachment bus, const char*
 QStatus alljoyn_busattachment_setsessionlistener(alljoyn_busattachment bus, alljoyn_sessionid sessionId,
                                                  alljoyn_sessionlistener listener)
 {
-	if(listener == NULL)
-		return ((ajn::BusAttachmentC*)bus)->SetSessionListener(sessionId, NULL);
+    if (listener == NULL)
+        return ((ajn::BusAttachmentC*)bus)->SetSessionListener(sessionId, NULL);
     return ((ajn::BusAttachmentC*)bus)->SetSessionListener(sessionId, (ajn::SessionListener*)listener);
 }
 
@@ -302,11 +302,11 @@ QStatus alljoyn_busattachment_setlinktimeout(alljoyn_busattachment bus, alljoyn_
     return ((ajn::BusAttachmentC*)bus)->SetLinkTimeout(sessionid, *linkTimeout);
 }
 
-QStatus alljoyn_busattachment_namehasowner(alljoyn_busattachment bus, const char* name, QC_BOOL* hasOwner)
+QStatus alljoyn_busattachment_namehasowner(alljoyn_busattachment bus, const char* name, QCC_BOOL* hasOwner)
 {
     bool result;
     QStatus ret = ((ajn::BusAttachmentC*)bus)->NameHasOwner(name, result);
-    *hasOwner = (result == true ? QC_TRUE : QC_FALSE);
+    *hasOwner = (result == true ? QCC_TRUE : QCC_FALSE);
     return ret;
 }
 

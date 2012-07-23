@@ -45,7 +45,7 @@ class AuthListenerCallbackC : public AuthListener {
     {
         assert(callbacks.request_credentials != NULL && "request_credentials callback must be specified");
         bool ret = (callbacks.request_credentials(context, authMechanism, peerName, authCount, userName,
-                                                  credMask, (alljoyn_credentials)(&credentials)) == QC_TRUE ? true : false);
+                                                  credMask, (alljoyn_credentials)(&credentials)) == QCC_TRUE ? true : false);
         return ret;
     }
 
@@ -53,7 +53,7 @@ class AuthListenerCallbackC : public AuthListener {
     {
         bool ret = AuthListener::VerifyCredentials(authMechanism, peerName, credentials);
         if (callbacks.verify_credentials != NULL) {
-            ret = (callbacks.verify_credentials(context, authMechanism, peerName, (alljoyn_credentials)(&credentials)) == QC_TRUE ? true : false);
+            ret = (callbacks.verify_credentials(context, authMechanism, peerName, (alljoyn_credentials)(&credentials)) == QCC_TRUE ? true : false);
         }
         return ret;
     }
@@ -68,7 +68,7 @@ class AuthListenerCallbackC : public AuthListener {
     virtual void AuthenticationComplete(const char* authMechanism, const char* peerName, bool success)
     {
         assert(callbacks.authentication_complete != NULL && "authentication_complete callback must be specified");
-        callbacks.authentication_complete(context, authMechanism, peerName, (success == true ? QC_TRUE : QC_FALSE));
+        callbacks.authentication_complete(context, authMechanism, peerName, (success == true ? QCC_TRUE : QCC_FALSE));
     }
   private:
     alljoyn_authlistener_callbacks callbacks;
@@ -107,9 +107,9 @@ void alljoyn_credentials_destroy(alljoyn_credentials cred)
     delete (ajn::AuthListener::Credentials*)cred;
 }
 
-QC_BOOL alljoyn_credentials_isset(const alljoyn_credentials cred, uint16_t creds)
+QCC_BOOL alljoyn_credentials_isset(const alljoyn_credentials cred, uint16_t creds)
 {
-    return ((ajn::AuthListener::Credentials*)cred)->IsSet(creds) == true ? QC_TRUE : QC_FALSE;
+    return ((ajn::AuthListener::Credentials*)cred)->IsSet(creds) == true ? QCC_TRUE : QCC_FALSE;
 }
 
 void alljoyn_credentials_setpassword(alljoyn_credentials cred, const char* pwd)

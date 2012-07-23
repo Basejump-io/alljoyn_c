@@ -350,7 +350,7 @@ extern AJ_API alljoyn_msgarg alljoyn_msgarg_copy(const alljoyn_msgarg source);
  *
  * @return  Returns true if the two message args have the same signatures and values.
  */
-extern AJ_API QC_BOOL alljoyn_msgarg_equal(alljoyn_msgarg lhv, alljoyn_msgarg rhv);
+extern AJ_API QCC_BOOL alljoyn_msgarg_equal(alljoyn_msgarg lhv, alljoyn_msgarg rhv);
 
 
 
@@ -447,7 +447,7 @@ extern AJ_API const char* alljoyn_msgarg_array_signature(alljoyn_msgarg values, 
  *
  * @return  true if this arg has the specified signature, otherwise returns false.
  */
-extern AJ_API QC_BOOL alljoyn_msgarg_hassignature(alljoyn_msgarg arg, const char* signature);
+extern AJ_API QCC_BOOL alljoyn_msgarg_hassignature(alljoyn_msgarg arg, const char* signature);
 
 /**
  * Helper function for accessing dictionary elements. The MsgArg must be an array of dictionary
@@ -529,7 +529,7 @@ extern AJ_API void alljoyn_msgarg_stabilize(alljoyn_msgarg arg);
 extern AJ_API QStatus alljoyn_msgarg_array_set_offset(alljoyn_msgarg args, size_t argOffset, size_t* numArgs, const char* signature, ...);
 
 extern AJ_API uint8_t alljoyn_msgarg_as_uint8(const alljoyn_msgarg args, size_t idx);
-extern AJ_API QC_BOOL alljoyn_msgarg_as_bool(const alljoyn_msgarg args, size_t idx);
+extern AJ_API QCC_BOOL alljoyn_msgarg_as_bool(const alljoyn_msgarg args, size_t idx);
 extern AJ_API int16_t alljoyn_msgarg_as_int16(const alljoyn_msgarg args, size_t idx);
 extern AJ_API uint16_t alljoyn_msgarg_as_uint16(const alljoyn_msgarg args, size_t idx);
 extern AJ_API int32_t alljoyn_msgarg_as_int32(const alljoyn_msgarg args, size_t idx);

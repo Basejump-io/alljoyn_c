@@ -151,10 +151,10 @@ alljoyn_msgarg alljoyn_msgarg_copy(const alljoyn_msgarg source)
     return (alljoyn_msgarg) ret;
 }
 
-QC_BOOL alljoyn_msgarg_equal(alljoyn_msgarg lhv, alljoyn_msgarg rhv)
+QCC_BOOL alljoyn_msgarg_equal(alljoyn_msgarg lhv, alljoyn_msgarg rhv)
 {
     if (!lhv || !rhv) {
-        return QC_FALSE;
+        return QCC_FALSE;
     }
     return (*(ajn::MsgArgC*)lhv) == (*(ajn::MsgArgC*)rhv);
 }
@@ -240,10 +240,10 @@ const char* alljoyn_msgarg_array_signature(alljoyn_msgarg values, size_t numValu
     return ((ajn::MsgArgC*)values)->Signature((ajn::MsgArgC*)values, numValues).c_str();
 }
 
-QC_BOOL alljoyn_msgarg_hassignature(alljoyn_msgarg arg, const char* signature)
+QCC_BOOL alljoyn_msgarg_hassignature(alljoyn_msgarg arg, const char* signature)
 {
     if (!arg) {
-        return QC_FALSE;
+        return QCC_FALSE;
     }
     return ((ajn::MsgArgC*)arg)->HasSignature(signature);
 }
@@ -346,8 +346,8 @@ _IMPLEMENT_MSGARG_TYPE_ACCESSOR_S(int64);
 _IMPLEMENT_MSGARG_TYPE_ACCESSOR_S(uint64);
 
 _IMPLEMENT_MSGARG_TYPE_ACCESSOR(uint8_t, uint8_t, v_byte);
+_IMPLEMENT_MSGARG_TYPE_ACCESSOR(QCC_BOOL, bool, v_bool);
 _IMPLEMENT_MSGARG_TYPE_ACCESSOR(uint8_t, uint8, v_byte);
-_IMPLEMENT_MSGARG_TYPE_ACCESSOR(QC_BOOL, bool, v_bool);
 _IMPLEMENT_MSGARG_TYPE_ACCESSOR(double, double, v_double);
 
 #undef _IMPLEMENT_MSGARG_TYPE_ACCESSOR

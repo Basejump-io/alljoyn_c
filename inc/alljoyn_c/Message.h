@@ -96,7 +96,7 @@ extern AJ_API void alljoyn_message_destroy(alljoyn_message msg);
  *
  * @return  Return true if this is a broadcast signal.
  */
-extern AJ_API QC_BOOL alljoyn_message_isbroadcastsignal(alljoyn_message msg);
+extern AJ_API QCC_BOOL alljoyn_message_isbroadcastsignal(alljoyn_message msg);
 
 /**
  * Messages broadcast to all devices are global broadcast messages.
@@ -105,7 +105,7 @@ extern AJ_API QC_BOOL alljoyn_message_isbroadcastsignal(alljoyn_message msg);
  *
  * @return  Return true if this is a global broadcast message.
  */
-extern AJ_API QC_BOOL alljoyn_message_isglobalbroadcast(alljoyn_message msg);
+extern AJ_API QCC_BOOL alljoyn_message_isglobalbroadcast(alljoyn_message msg);
 
 /**
  * Returns the flags for the message.
@@ -128,7 +128,7 @@ extern AJ_API uint8_t alljoyn_message_getflags(alljoyn_message msg);
  *
  * @return Returns true if the message's TTL header indicates that is has expired.
  */
-extern AJ_API QC_BOOL alljoyn_message_isexpired(alljoyn_message msg, uint32_t* tillExpireMS);
+extern AJ_API QCC_BOOL alljoyn_message_isexpired(alljoyn_message msg, uint32_t* tillExpireMS);
 
 /**
  * Determine if the message is marked as unreliable. Unreliable messages have a non-zero
@@ -138,7 +138,7 @@ extern AJ_API QC_BOOL alljoyn_message_isexpired(alljoyn_message msg, uint32_t* t
  *
  * @return  Returns true if the message is unreliable, that is, has a non-zero time-to-live.
  */
-extern AJ_API QC_BOOL alljoyn_message_isunreliable(alljoyn_message msg);
+extern AJ_API QCC_BOOL alljoyn_message_isunreliable(alljoyn_message msg);
 
 /**
  * Determine if the message was encrypted.
@@ -147,7 +147,7 @@ extern AJ_API QC_BOOL alljoyn_message_isunreliable(alljoyn_message msg);
  *
  * @return  Returns true if the message was encrypted.
  */
-extern AJ_API QC_BOOL alljoyn_message_isencrypted(alljoyn_message msg);
+extern AJ_API QCC_BOOL alljoyn_message_isencrypted(alljoyn_message msg);
 
 /**
  * Get the name of the authentication mechanism that was used to generate the encryption key if
@@ -381,19 +381,9 @@ extern AJ_API uint32_t alljoyn_message_gettimestamp(alljoyn_message msg);
  * @param one   alljoyn_interfacedescription_member to compare to other
  * @param other alljoyn_interfacedescription_member to compare to one
  *
- * @return QC_TRUE if one == other
+ * @return QCC_TRUE if one == other
  */
-extern AJ_API QC_BOOL alljoyn_message_eql(const alljoyn_message one, const alljoyn_message other);
-
-/**
- * Set the endianess for outgoing messages. This is mainly for testing purposes.
- *
- * @param endian  Either ALLJOYN_LITTLE_ENDIAN or ALLJOYN_BIG_ENDIAN. Any other value
- *                sets the endianess to the native endianess for this platform.
- *
- *
- */
-extern AJ_API void alljoyn_message_setendianess(const char endian);
+extern AJ_API QCC_BOOL alljoyn_message_eql(const alljoyn_message one, const alljoyn_message other);
 
 #if 0
 

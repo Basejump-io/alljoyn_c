@@ -32,9 +32,9 @@ namespace ajn {
 
 class BusObjectC : public BusObject {
   public:
-    BusObjectC(alljoyn_busattachment bus, const char* path, QC_BOOL isPlaceholder, \
+    BusObjectC(alljoyn_busattachment bus, const char* path, QCC_BOOL isPlaceholder, \
                const alljoyn_busobject_callbacks* callbacks_in, const void* context_in) :
-        BusObject(*((BusAttachment*)bus), path, isPlaceholder == QC_TRUE ? true : false)
+        BusObject(*((BusAttachment*)bus), path, isPlaceholder == QCC_TRUE ? true : false)
     {
         context = context_in;
         memcpy(&callbacks, callbacks_in, sizeof(alljoyn_busobject_callbacks));
@@ -77,13 +77,12 @@ class BusObjectC : public BusObject {
         return AddInterface(*(const InterfaceDescription*)iface);
     }
 
-    QStatus AddMethodHandlerC(const alljoyn_interfacedescription_member member, alljoyn_messagereceiver_methodhandler_ptr handler, void* context)
+    QStatus AddMethodHandlerC(const alljoyn_interfacedescription_member member, alljoyn_messagereceiver_methodhandler_ptr handler)
     {
         callbackMap.insert(pair<const ajn::InterfaceDescription::Member*, alljoyn_messagereceiver_methodhandler_ptr>(
                                (const ajn::InterfaceDescription::Member*)member.internal_member, handler));
         QStatus ret = AddMethodHandler((const ajn::InterfaceDescription::Member*)member.internal_member,
-                                       static_cast<MessageReceiver::MethodHandler>(&BusObjectC::MethodHandlerRemap),
-                                       context);
+                                       static_cast<MessageReceiver::MethodHandler>(&BusObjectC::MethodHandlerRemap));
         return ret;
     }
 
@@ -181,7 +180,7 @@ struct _alljoyn_busobject_handle {
     /* Empty by design, this is just to allow the type restrictions to save coders from themselves */
 };
 
-alljoyn_busobject alljoyn_busobject_create(alljoyn_busattachment bus, const char* path, QC_BOOL isPlaceholder,
+alljoyn_busobject alljoyn_busobject_create(alljoyn_busattachment bus, const char* path, QCC_BOOL isPlaceholder,
                                            const alljoyn_busobject_callbacks* callbacks_in, const void* context_in)
 {
     return (alljoyn_busobject) new ajn::BusObjectC(bus, path, isPlaceholder, callbacks_in, context_in);
@@ -212,9 +211,9 @@ QStatus alljoyn_busobject_addinterface(alljoyn_busobject bus, const alljoyn_inte
     return ((ajn::BusObjectC*)bus)->AddInterfaceC(iface);
 }
 
-QStatus alljoyn_busobject_addmethodhandler(alljoyn_busobject bus, const alljoyn_interfacedescription_member member, alljoyn_messagereceiver_methodhandler_ptr handler, void* context)
+QStatus alljoyn_busobject_addmethodhandler(alljoyn_busobject bus, const alljoyn_interfacedescription_member member, alljoyn_messagereceiver_methodhandler_ptr handler)
 {
-    return ((ajn::BusObjectC*)bus)->AddMethodHandlerC(member, handler, context);
+    return ((ajn::BusObjectC*)bus)->AddMethodHandlerC(member, handler);
 }
 
 QStatus alljoyn_busobject_addmethodhandlers(alljoyn_busobject bus, const alljoyn_busobject_methodentry* entries, size_t numEntries)
