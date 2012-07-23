@@ -89,7 +89,7 @@ QStatus BusAttachmentC::UnregisterSignalHandlerC(alljoyn_messagereceiver_signalh
     signalCallbackMapLock.Lock(MUTEX_CONTEXT);
     ret = signalCallbackMap.equal_range(cpp_member);
 
-    for (it = ret.first; it != ret.second; ) {
+    for (it = ret.first; it != ret.second;) {
         if (signalHandler == it->second.handler && (srcPath == NULL || strcmp(it->second.sourcePath, srcPath) == 0)) {
             signalCallbackMap.erase(it++);
             return_status = ER_OK;
