@@ -407,10 +407,10 @@ TEST_F(BusObjectTest, addmethodhandler)
     foundMember = alljoyn_interfacedescription_getmember(exampleIntf, "chirp", &chirp_member);
     EXPECT_TRUE(foundMember);
 
-    status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method);
+    status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method, NULL);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
-    status = alljoyn_busobject_addmethodhandler(testObj, chirp_member, &chirp_method);
+    status = alljoyn_busobject_addmethodhandler(testObj, chirp_member, &chirp_method, NULL);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     status = alljoyn_busattachment_registerbusobject(servicebus, testObj);
@@ -646,7 +646,7 @@ TEST_F(BusObjectTest, addmethodhandler_addmethodhandlers_mix)
     status = alljoyn_busobject_addmethodhandlers(testObj, methodEntries, sizeof(methodEntries) / sizeof(methodEntries[0]));
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
-    status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method);
+    status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method, NULL);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     status = alljoyn_busattachment_registerbusobject(servicebus, testObj);

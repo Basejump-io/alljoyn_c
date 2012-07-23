@@ -29,6 +29,7 @@ else:
         gtest_env.Append(CPPDEFINES = ['WIN32', '_LIB'])
         # don't use the _DEBUG define unless the /MDd compiler flag is specified
         #gtest_env.Append(CPPDEFINES = ['WIN32', '_DEBUG', '_LIB'])
+        gtest_env.Append(CXXFLAGS = ['/EHsc'])
         
     # tr1::tuple is not avalible for android or darwin
     if(env['OS_CONF'] == 'android' or env['OS_CONF'] == 'darwin'):

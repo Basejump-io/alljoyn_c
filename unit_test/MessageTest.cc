@@ -117,7 +117,7 @@ class MessageTest : public testing::Test {
 //            { &ping_member, ping_method },
 //        };
 //        status = alljoyn_busobject_addmethodhandlers(testObj, methodEntries, sizeof(methodEntries) / sizeof(methodEntries[0]));
-        status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method);
+        status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method, NULL);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
         status = alljoyn_busattachment_registerbusobject(servicebus, testObj);

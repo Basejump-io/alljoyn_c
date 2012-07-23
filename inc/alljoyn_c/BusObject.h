@@ -137,12 +137,14 @@ extern AJ_API QStatus alljoyn_busobject_addinterface(alljoyn_busobject bus, cons
  *
  * @param member   Interface member implemented by handler.
  * @param handler  Method handler.
+ * @param context  An optional context. This is mainly intended for implementing language
+ *                 bindings and should normally be NULL.
  *
  * @return
  *      - #ER_OK if the method handler was added.
  *      - An error status otherwise
  */
-extern AJ_API QStatus alljoyn_busobject_addmethodhandler(alljoyn_busobject bus, const alljoyn_interfacedescription_member member, alljoyn_messagereceiver_methodhandler_ptr handler);
+extern AJ_API QStatus alljoyn_busobject_addmethodhandler(alljoyn_busobject bus, const alljoyn_interfacedescription_member member, alljoyn_messagereceiver_methodhandler_ptr handler, void* context);
 
 /**
  * Add a set of method handers at once.

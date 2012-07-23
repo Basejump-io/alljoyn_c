@@ -144,7 +144,7 @@ class SessionTest : public testing::Test {
         alljoyn_interfacedescription_member ping_member;
         EXPECT_TRUE(alljoyn_interfacedescription_getmember(testIntf, "ping", &ping_member));
 
-        status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method);
+        status = alljoyn_busobject_addmethodhandler(testObj, ping_member, &ping_method, NULL);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
         status = alljoyn_busattachment_registerbusobject(servicebus, testObj);
