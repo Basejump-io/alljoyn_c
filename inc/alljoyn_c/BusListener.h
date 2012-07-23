@@ -24,6 +24,7 @@
 
 #include <alljoyn_c/AjAPI.h>
 #include <alljoyn_c/TransportMask.h>
+#include <alljoyn_c/MsgArg.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -72,6 +73,11 @@ typedef void (*alljoyn_buslistener_bus_stopping_ptr)(const void* context);
 typedef void (*alljoyn_buslistener_bus_disconnected_ptr)(const void* context);
 
 /**
+ * Type for the PropertyChanged callback.
+ */
+typedef void (*alljoyn_buslistener_bus_prop_changed_ptr)(const char* interface_name, const char* prop_name, alljoyn_msgarg prop_value);
+
+/**
  * Struct containing callbacks used for creation of an alljoyn_buslistener.
  */
 typedef struct {
@@ -82,8 +88,8 @@ typedef struct {
     alljoyn_buslistener_name_owner_changed_ptr name_owner_changed;
     alljoyn_buslistener_bus_stopping_ptr bus_stopping;
     alljoyn_buslistener_bus_disconnected_ptr bus_disconnected;
+    alljoyn_buslistener_bus_prop_changed_ptr property_changed;
 } alljoyn_buslistener_callbacks;
-
 /**
  * Create a BusListener which will trigger the provided callbacks, passing along the provided context.
  *

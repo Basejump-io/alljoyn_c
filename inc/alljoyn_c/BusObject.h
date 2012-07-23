@@ -98,6 +98,23 @@ extern AJ_API void alljoyn_busobject_destroy(alljoyn_busobject bus);
  */
 extern AJ_API const char* alljoyn_busobject_getpath(alljoyn_busobject bus);
 
+
+/**
+ * Emit PropertiesChanged to signal the bus that this property has been updated
+ *
+ * @param bus       BusObject with which to emit the signal
+ * @param ifcName   The name of the interface
+ * @param propName  The name of the property being changed
+ * @param val       The new value of the property
+ * @param id        ID of the session we broadcast the signal to (0 for all)
+ */
+extern AJ_API void alljoyn_emit_property_changed(
+    alljoyn_busobject bus,
+    const char* ifcName,
+    const char* propName,
+    alljoyn_msgarg val,
+    alljoyn_sessionid id);
+
 /**
  * Get the name of this object.
  * The name is the last component of the path.

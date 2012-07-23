@@ -21,10 +21,22 @@
  ******************************************************************************/
 
 #include <alljoyn/BusListener.h>
+#include <alljoyn/MsgArg.h>
 #include <alljoyn_c/BusListener.h>
 #include <string.h>
 #include <assert.h>
 #include "DeferredCallback.h"
+
+
+static void __PropertyChanged(alljoyn_buslistener_bus_prop_changed_ptr fcn, const char* interface_name, const char* prop_name, alljoyn_msgarg prop_value)
+{
+    (*fcn)(interface_name, prop_name, prop_value);
+
+    if (prop_value) {
+        alljoyn_msgarg_destroy(prop_value);
+    }
+}
+
 
 namespace ajn {
 
@@ -101,6 +113,19 @@ class BusListenerCallbackC : BusListener {
         if (callbacks.bus_disconnected != NULL) {
             DeferredCallback_1<void, const void*>* dcb =
                 new DeferredCallback_1<void, const void*>(callbacks.bus_disconnected, context);
+            DEFERRED_CALLBACK_EXECUTE(dcb);
+        }
+    }
+
+    void PropertyChanged(const char* interface_name, const char* prop_name, MsgArg* prop_value)
+    {
+        if (callbacks.property_changed != NULL) {
+            alljoyn_msgarg msg_arg = prop_value ? alljoyn_msgarg_create_and_set(prop_value->Signature().c_str(), prop_value->v_variant.val) : NULL;
+
+            // must wrap the user function in order to properly clean up msg_arg
+            DeferredCallback_4<void, alljoyn_buslistener_bus_prop_changed_ptr, const char*, const char*, alljoyn_msgarg>* dcb =
+                new DeferredCallback_4<void, alljoyn_buslistener_bus_prop_changed_ptr, const char*, const char*, alljoyn_msgarg>(
+                    __PropertyChanged, callbacks.property_changed, interface_name, prop_name, msg_arg);
             DEFERRED_CALLBACK_EXECUTE(dcb);
         }
     }

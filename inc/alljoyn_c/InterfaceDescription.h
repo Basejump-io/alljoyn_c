@@ -74,6 +74,17 @@ typedef struct {
 extern AJ_API void alljoyn_interfacedescription_activate(alljoyn_interfacedescription iface);
 
 /**
+ * Lookup an interface annotation
+ *
+ * @param       iface   Interface on which to lookup the member
+ * @param       name    Name of the annotation to lookup
+ * @param[out]  value   The value of the annotation
+ *
+ * @return QC_FALSE if annotation does not exist, QC_TRUE otherwise.
+ */
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_getannotation(alljoyn_interfacedescription iface, const char* name, char* value);
+
+/**
  * Lookup a member description by name
  *
  * @param       iface   Interface on which to lookup the member
@@ -103,6 +114,36 @@ extern AJ_API QCC_BOOL alljoyn_interfacedescription_getmember(const alljoyn_inte
 extern AJ_API QStatus alljoyn_interfacedescription_addmember(alljoyn_interfacedescription iface, alljoyn_messagetype type,
                                                              const char* name, const char* inputSig, const char* outSig,
                                                              const char* argNames, uint8_t annotation);
+
+/**
+ * Add an annotation to a member
+ *
+ * @param iface       Interface on which to add the member.
+ * @param member      Name of member.
+ * @param name        Name of annotation
+ * @param value       Value for the annotation
+ *
+ * @return
+ *      - #ER_OK if successful
+ *      - #ER_BUS_MEMBER_ALREADY_EXISTS if member already exists
+ */
+extern AJ_API QStatus alljoyn_interfacedescription_addmemberannotation(
+    alljoyn_interfacedescription iface,
+    const char* member, const char* name, const char* value);
+
+/**
+ * Add an annotation to a member
+ *
+ * @param iface       Interface on which to add the member.
+ * @param member      Name of member.
+ * @param name        Name of annotation
+ * @param[out] value  Value for the annotation
+ *
+ * @return QC_FALSE if annotation does not exist, QC_TRUE otherwise.
+ */
+QCC_BOOL alljoyn_interfacedescription_getmemberannotation(
+    alljoyn_interfacedescription iface,
+    const char* member, const char* name, char* value);
 
 /**
  * Get all the members.
@@ -234,6 +275,32 @@ extern AJ_API size_t alljoyn_interfacedescription_getproperties(const alljoyn_in
  */
 extern AJ_API QStatus alljoyn_interfacedescription_addproperty(alljoyn_interfacedescription iface, const char* name,
                                                                const char* signature, uint8_t access);
+
+/**
+ * Add an annotation to an existing property
+ * @param iface      Interface on which to add the property.
+ * @param property   Name of property.
+ * @param name       Name of annotation
+ * @param value      value of annotation
+ * @return
+ *      - #ER_OK if successful.
+ *      - #ER_BUS_PROPERTY_ALREADY_EXISTS if the annotation can not be added to the property because it already exists.
+ */
+extern AJ_API QStatus alljoyn_interfacedescription_addpropertyannotation(
+    alljoyn_interfacedescription iface, const char* property,
+    const char* name, const char* value);
+
+/**
+ * Get the annotation value for a property
+ * @param iface      Interface on which to add the property.
+ * @param property   Name of the property
+ * @param name       Name of annotation
+ * @param[out] value      Value for the annotation
+ * @return           QCC_TRUE if found, QCC_FALSE if not found
+ */
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_getpropertyannotation(
+    alljoyn_interfacedescription iface, const char* property,
+    const char* name, char* value);
 
 /**
  * Check for existence of a property.

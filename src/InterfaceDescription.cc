@@ -53,12 +53,49 @@ QCC_BOOL alljoyn_interfacedescription_getmember(const alljoyn_interfacedescripti
     return (found_member == NULL ? QCC_FALSE : QCC_TRUE);
 }
 
+QCC_BOOL alljoyn_interfacedescription_getannotation(alljoyn_interfacedescription iface, const char* name, char* value)
+{
+    qcc::String out_val;
+    const bool b = ((ajn::InterfaceDescription*)iface)->GetAnnotation(name, out_val);
+
+    if (b) {
+        ::strcpy(value, out_val.c_str());
+        return QCC_TRUE;
+    } else {
+        *value = '\0';
+        return QCC_FALSE;
+    }
+}
+
 QStatus alljoyn_interfacedescription_addmember(alljoyn_interfacedescription iface, alljoyn_messagetype type,
                                                const char* name, const char* inputSig, const char* outSig,
                                                const char* argNames, uint8_t annotation)
 {
     return ((ajn::InterfaceDescription*)iface)->AddMember((ajn::AllJoynMessageType)type, name, inputSig, outSig,
                                                           argNames, annotation);
+}
+
+QStatus alljoyn_interfacedescription_addmemberannotation(
+    alljoyn_interfacedescription iface,
+    const char* member, const char* name, const char* value)
+{
+    return ((ajn::InterfaceDescription*)iface)->AddMemberAnnotation(member, name, value);
+}
+
+QCC_BOOL alljoyn_interfacedescription_getmemberannotation(
+    alljoyn_interfacedescription iface,
+    const char* member, const char* name, char* value)
+{
+    qcc::String out_val;
+    const bool b = ((ajn::InterfaceDescription*)iface)->GetMemberAnnotation(member, name, out_val);
+
+    if (b) {
+        ::strcpy(value, out_val.c_str());
+        return QCC_TRUE;
+    } else {
+        *value = '\0';
+        return QCC_FALSE;
+    }
 }
 
 size_t alljoyn_interfacedescription_getmembers(const alljoyn_interfacedescription iface,
@@ -200,6 +237,29 @@ QCC_BOOL alljoyn_interfacedescription_hasproperty(const alljoyn_interfacedescrip
 QCC_BOOL alljoyn_interfacedescription_hasproperties(const alljoyn_interfacedescription iface)
 {
     return (((const ajn::InterfaceDescription*)iface)->HasProperties() == true ? QCC_TRUE : QCC_FALSE);
+}
+
+QStatus alljoyn_interfacedescription_addpropertyannotation(
+    alljoyn_interfacedescription iface, const char* property,
+    const char* name, const char* value)
+{
+    return ((ajn::InterfaceDescription*)iface)->AddPropertyAnnotation(property, name, value);
+}
+
+QCC_BOOL alljoyn_interfacedescription_getpropertyannotation(
+    alljoyn_interfacedescription iface, const char* property,
+    const char* name, char* value)
+{
+    qcc::String out_val;
+    const bool b = ((ajn::InterfaceDescription*)iface)->GetPropertyAnnotation(property, name, out_val);
+
+    if (b) {
+        ::strcpy(value, out_val.c_str());
+        return QCC_TRUE;
+    } else {
+        *value = '\0';
+        return QCC_FALSE;
+    }
 }
 
 const char* alljoyn_interfacedescription_getname(const alljoyn_interfacedescription iface)

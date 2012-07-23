@@ -72,6 +72,11 @@ class BusObjectC : public BusObject {
                             flags);
     }
 
+    void EmitPropChangedC(const char* ifcName, const char* propName, alljoyn_msgarg val, alljoyn_sessionid id)
+    {
+        this->EmitPropChanged(ifcName, propName, *((ajn::MsgArg*) val), id);
+    }
+
     QStatus AddInterfaceC(const alljoyn_interfacedescription iface)
     {
         return AddInterface(*(const InterfaceDescription*)iface);
@@ -196,6 +201,17 @@ void alljoyn_busobject_destroy(alljoyn_busobject bus)
 const char* alljoyn_busobject_getpath(alljoyn_busobject bus)
 {
     return ((ajn::BusObjectC*)bus)->GetPath();
+}
+
+
+void alljoyn_emit_property_changed(
+    alljoyn_busobject bus,
+    const char* ifcName,
+    const char* propName,
+    alljoyn_msgarg val,
+    alljoyn_sessionid id)
+{
+    ((ajn::BusObjectC*)bus)->EmitPropChangedC(ifcName, propName, val, id);
 }
 
 size_t alljoyn_busobject_getname(alljoyn_busobject bus, char* buffer, size_t bufferSz)
