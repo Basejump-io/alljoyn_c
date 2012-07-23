@@ -88,16 +88,16 @@ QStatus BusAttachmentC::UnregisterSignalHandlerC(alljoyn_messagereceiver_signalh
 
     signalCallbackMapLock.Lock(MUTEX_CONTEXT);
     ret = signalCallbackMap.equal_range(cpp_member);
-    if (ret.first != ret.second) {
-        for (it = ret.first; it != ret.second; ++it) {
-            if (signalHandler == it->second.handler) {
-                if (srcPath == NULL || strcmp(it->second.sourcePath, srcPath) == 0) {
-                    signalCallbackMap.erase(it);
-                    return_status = ER_OK;
-                }
-            }
+
+    for (it = ret.first; it != ret.second; ) {
+        if (signalHandler == it->second.handler && (srcPath == NULL || strcmp(it->second.sourcePath, srcPath) == 0)) {
+            signalCallbackMap.erase(it++);
+            return_status = ER_OK;
+        } else {
+            ++it;
         }
     }
+
 
     if (signalCallbackMap.find(cpp_member) == signalCallbackMap.end()) {
         return_status = UnregisterSignalHandler(this,
@@ -111,11 +111,14 @@ QStatus BusAttachmentC::UnregisterSignalHandlerC(alljoyn_messagereceiver_signalh
 
 QStatus BusAttachmentC::UnregisterAllHandlersC() {
     std::multimap<const ajn::InterfaceDescription::Member*, signalCallbackMapEntry>::iterator it;
-    it = signalCallbackMap.begin();
+
     signalCallbackMapLock.Lock(MUTEX_CONTEXT);
-    for (it = signalCallbackMap.begin(); it != signalCallbackMap.end(); ++it) {
+    it = signalCallbackMap.begin();
+    while (it != signalCallbackMap.end()) {
         if (this == it->second.bus) {
-            signalCallbackMap.erase(it);
+            signalCallbackMap.erase(it++);
+        } else {
+            ++it;
         }
     }
 
