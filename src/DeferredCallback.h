@@ -47,7 +47,7 @@ class DeferredCallback {
     static int TriggerCallbacks()
     {
         int ret = 0;
-		while(!sPendingCallbacks.empty()) {
+        while (!sPendingCallbacks.empty()) {
             sCallbackListLock.Lock(MUTEX_CONTEXT);
             if (sPendingCallbacks.empty()) {
                 sCallbackListLock.Unlock(MUTEX_CONTEXT);
