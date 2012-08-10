@@ -47,8 +47,7 @@ class DeferredCallback {
     static int TriggerCallbacks()
     {
         int ret = 0;
-        int len = sPendingCallbacks.size();
-        for (int i = 0; i < len; i++) {        //ONLY process the current list not what gets added from the calls
+		while(!sPendingCallbacks.empty()) {
             sCallbackListLock.Lock(MUTEX_CONTEXT);
             if (sPendingCallbacks.empty()) {
                 sCallbackListLock.Unlock(MUTEX_CONTEXT);
