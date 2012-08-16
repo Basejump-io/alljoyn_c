@@ -1,2 +1,4 @@
 .sconsign.dblite
 build/
+inc/alljoyn_c/DBusStd.h
+inc/Status.h

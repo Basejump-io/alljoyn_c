@@ -35,7 +35,14 @@ env.VariantDir('$OBJDIR', 'src', duplicate = 0)
 env.VariantDir('$OBJDIR/samples', 'samples', duplicate = 0)
 
 # Install headers
-env.Install('$DISTDIR/inc/alljoyn_c', env.Glob('inc/alljoyn_c/*.h'))
+headers = env.Install('$DISTDIR/inc/alljoyn_c', env.Glob('inc/alljoyn_c/*.h'))
+
+# Install DBusStd.h in alljoyn_c inc folder and dist folder
+env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/DBusStd.h')
+headers += env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/DBusStd.h')
+
+#Install Status.h in alljoyn_c inc folder
+headers += env.Install('inc', '$DISTDIR/inc/Status.h')
 
 # Header file includes
 env.Append(CPPPATH = [env.Dir('inc')])
@@ -49,6 +56,8 @@ dlibs = env.Install('$DISTDIR/lib', libs)
 env.Append(LIBPATH = [env.Dir('$DISTDIR/lib')])
 env['ALLJOYN_C_LIB_SHARED'] = dlibs[0]
 env['ALLJOYN_C_LIB_STATIC'] = dlibs[1]
+
+env.Depends(libs, headers)
 
 # Build unit Tests
 env.SConscript('unit_test/SConscript', variant_dir='$OBJDIR/unittest', duplicate=0)

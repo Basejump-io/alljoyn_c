@@ -32,7 +32,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <alljoyn/DBusStd.h>
+#include <alljoyn_c/DBusStd.h>
 #include <alljoyn_c/BusAttachment.h>
 #include <alljoyn_c/version.h>
 #include <Status.h>

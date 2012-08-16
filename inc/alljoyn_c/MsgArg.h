@@ -502,12 +502,14 @@ extern AJ_API void alljoyn_msgarg_clear(alljoyn_msgarg arg);
 extern AJ_API void alljoyn_msgarg_stabilize(alljoyn_msgarg arg);
 
 
-/*******************************************************************************
+/*
+ *******************************************************************************
  * This set of functions were originally designed for the alljoyn_unity bindings
  * however they did not not properly map with the C++ MsgArg Class.  These calls
  * are being left in here till proper mapping between 'C' and 'unity' can be
  * completed. And can be verified that the code continues to work.
- ******************************************************************************/
+ *****************************************************************************
+ */
 
 /**
  * Set an array of MsgArgs by applying the Set() method to each MsgArg in turn.

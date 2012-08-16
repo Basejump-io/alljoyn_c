@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include "ajTestCommon.h"
 
-#include <alljoyn/DBusStd.h>
+#include <alljoyn_c/DBusStd.h>
 #include <alljoyn_c/Message.h>
 #include <alljoyn_c/BusAttachment.h>
 #include <alljoyn_c/ProxyBusObject.h>

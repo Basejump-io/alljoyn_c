@@ -16,7 +16,7 @@
 
 #include <gtest/gtest.h>
 #include <alljoyn_c/MsgArg.h>
-#include <alljoyn/MsgArg.h>
+#include <alljoyn_c/MsgArg.h>
 #include <Status.h>
 #include <qcc/Thread.h>
 #include "ajTestCommon.h"
