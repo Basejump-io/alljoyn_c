@@ -5,3 +5,4 @@ build/
 inc/alljoyn_c/DBusStdDefines.h
 inc/alljoyn_c/Status.h
 inc/qcc
+*.pdb

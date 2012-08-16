@@ -120,12 +120,11 @@ else:
         unittest_env.Append(LIBPATH = ['$ANDROID_NDK/platforms/android-$ANDROID_API_LEVEL_NDK/arch-%s/usr/lib' % env['CPU']])
     unittest_env.Prepend(LIBS = ['gtest'])
     unittest_env.Prepend(LIBS = env['ALLJOYN_C_LIB_STATIC'])
-
-
+    
     objs = [ unittest_env.Object(test_src) ]
 
     unittest_prog = unittest_env.Program('ajctest', objs)
-    unittest_env.Install('$TESTDIR/bin', unittest_prog)
+    unittest_env.Install('$C_TESTDIR/bin', unittest_prog)
     
     #install gtest utilities
-    #env.Install('$TESTDIR/bin', Dir('test_report').srcnode())
+    env.Install('$C_TESTDIR/bin', Dir('test_report').srcnode())

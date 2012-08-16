@@ -30,6 +30,10 @@ sys.path.append('../build_core/tools/scons')
 if not env.has_key('_ALLJOYNCORE_'):
     env.SConscript('../alljoyn_core/SConscript')
 
+# Make alljoyn C dist a sub-directory of the alljoyn dist.
+env['C_DISTDIR'] = env['DISTDIR'] + '/c'
+env['C_TESTDIR'] = env['TESTDIR'] + '/c'
+
 # Add support for multiple build targets in the same workset
 env.VariantDir('$OBJDIR', 'src', duplicate = 0)
 env.VariantDir('$OBJDIR/samples', 'samples', duplicate = 0)
@@ -38,28 +42,37 @@ env.VariantDir('$OBJDIR/samples', 'samples', duplicate = 0)
 returnValue = []
 
 # Install headers
-alljoyn_core_headers = env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/DBusStdDefines.h')
-alljoyn_core_headers += env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/Status.h')
+# C bindings use the following headers from alljoyn_core
+alljoyn_core_headers = env.Install('inc/alljoyn_c', '$CPP_DISTDIR/inc/alljoyn/DBusStdDefines.h')
+alljoyn_core_headers += env.Install('inc/alljoyn_c', '$CPP_DISTDIR/inc/alljoyn/Status.h')
+alljoyn_core_headers += env.Install('inc/qcc', '$CPP_DISTDIR/inc/qcc/platform.h')
+alljoyn_core_headers += env.Install('inc/qcc/${OS_GROUP}', '$CPP_DISTDIR/inc/qcc/${OS_GROUP}/platform_types.h')
+
+if env['OS_GROUP'] == 'windows' or env['OS_GROUP'] == 'win8':
+    alljoyn_core_headers += env.Install('inc/qcc/${OS_GROUP}', '$CPP_DISTDIR/inc/qcc/${OS_GROUP}/mapping.h')
 
 returnValue += alljoyn_core_headers
 
-c_headers = env.Install('$DISTDIR/inc/alljoyn_c', env.Glob('inc/alljoyn_c/*.h'))
+c_headers = env.Install('$C_DISTDIR/inc/alljoyn_c', env.Glob('inc/alljoyn_c/*.h'))
+c_headers += env.Install('$C_DISTDIR/inc/qcc', env.Glob('inc/qcc/*.h'))
+c_headers += env.Install('$C_DISTDIR/inc/qcc/${OS_GROUP}', env.Glob('inc/qcc/${OS_GROUP}/*.h'))
 returnValue += c_headers
 
+# make sure the headers from alljoyn_core have been copied into the alljoyn_c headers 
 env.Depends(c_headers, alljoyn_core_headers)
 
 # Header file includes
-env.Append(CPPPATH = [env.Dir('$DISTDIR/inc/alljoyn_c')])
+env.Append(CPPPATH = [env.Dir('inc')])
 
 # Make private headers available
 env.Append(CPPPATH = [env.Dir('src')])
 
 # AllJoyn Libraries
 libs = env.SConscript('$OBJDIR/SConscript')
-dlibs = env.Install('$DISTDIR/lib', libs)
+dlibs = env.Install('$C_DISTDIR/lib', libs)
 returnValue += dlibs
 
-env.Append(LIBPATH = [env.Dir('$DISTDIR/lib')])
+env.Append(LIBPATH = [env.Dir('$C_DISTDIR/lib')])
 # the variable dlibs contains the file nodes for the  static library and the 
 # shared library however it may contain more files such as .pdb files on windows.  
 # Search through the list and assign the static library to the ALLJOYN_C_LIB_STATIC 
@@ -75,9 +88,12 @@ env.SConscript('docs/SConscript')
 
 # Sample programs
 progs = env.SConscript('$OBJDIR/samples/SConscript')
-returnValue += env.Install('$DISTDIR/bin/samples', progs)
+returnValue += progs
 
 # Build unit Tests
 env.SConscript('unit_test/SConscript', variant_dir='$OBJDIR/unittest', duplicate=0)
+
+# don't try and build the samples till the header files are copied into place
+env.Depends(dlibs, c_headers)
 
 Return('returnValue')

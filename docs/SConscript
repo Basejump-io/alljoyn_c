@@ -1,4 +1,4 @@
-# Copyright 2011, Qualcomm Innovation Center, Inc.
+# Copyright 2011 - 2013, Qualcomm Innovation Center, Inc.
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -17,11 +17,16 @@ import os
 Import('env')
 
 docenv = env.Clone()
-docenv['ENV']['DISTDIR'] = str(env.Dir('$DISTDIR'))
+docenv['ENV']['C_DISTDIR'] = str(env.Dir('$C_DISTDIR'))
 
 # Build docs
+installDocs = []
 if docenv['DOCS'] == 'html':
     # the target directory 'docs/tmp' is never built this will cause doxygen 
     # to run every time DOCS == 'html'
-    docenv.Doxygen(source='Doxygen_html', target=Dir('tmp'))
+    generateDocs = docenv.Doxygen(source='Doxygen_html', target=[Dir('tmp'),Dir('html')])
+    installDocs = docenv.Install('$C_DISTDIR/docs', Dir('html'))
     docenv.Clean('Doxygen_html', Dir('html'))
+    docenv.Depends(installDocs, generateDocs)
+
+Return('installDocs')
