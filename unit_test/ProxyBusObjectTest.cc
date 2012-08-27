@@ -613,12 +613,14 @@ TEST_F(ProxyBusObjectTest, methodcallasync_member) {
     TearDownProxyBusObjectTestService();
 }
 
-// TODO: enable this test when ALLJOYN-1001 is resolved
-TEST_F(ProxyBusObjectTest, DISABLED_parsexml) {
+TEST_F(ProxyBusObjectTest, parsexml) {
     const char* busObjectXML =
         "<node name=\"/org/alljoyn/test/ProxyObjectTest\">"
         "  <interface name=\"org.alljoyn.test.ProxyBusObjectTest\">\n"
         "    <signal name=\"chirp\">\n"
+        "      <arg name=\"chirp\" type=\"s\"/>\n"
+        "    </signal>\n"
+        "    <signal name=\"chirp2\">\n"
         "      <arg name=\"chirp\" type=\"s\" direction=\"out\"/>\n"
         "    </signal>\n"
         "    <method name=\"ping\">\n"
@@ -647,6 +649,9 @@ TEST_F(ProxyBusObjectTest, DISABLED_parsexml) {
     const char* expectedIntrospect =
         "<interface name=\"org.alljoyn.test.ProxyBusObjectTest\">\n"
         "  <signal name=\"chirp\">\n"
+        "    <arg name=\"chirp\" type=\"s\" direction=\"out\"/>\n"
+        "  </signal>\n"
+        "  <signal name=\"chirp2\">\n"
         "    <arg name=\"chirp\" type=\"s\" direction=\"out\"/>\n"
         "  </signal>\n"
         "  <method name=\"ping\">\n"
