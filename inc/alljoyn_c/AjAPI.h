@@ -18,7 +18,7 @@
 
 /** This #define allows for redefinition to __dllexport or __dllimport on relevant platforms */
 #ifndef AJ_API
-#  ifdef QCC_OS_WINDOWS
+#  ifdef QCC_OS_GROUP_WINDOWS
 #    define AJ_API __declspec(dllexport)
 #  else
 #    define AJ_API
@@ -37,7 +37,7 @@ extern AJ_API int alljoyn_unity_deferred_callbacks_process();
 /**
  * Enable/disable main thread callback behavior.
  */
-extern AJ_API void alljoin_unity_set_deferred_callback_mainthread_only(int mainthread_only);
+extern AJ_API void alljoyn_unity_set_deferred_callback_mainthread_only(int mainthread_only);
 
 #ifdef __cplusplus
 } /* extern "C" */
