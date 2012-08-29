@@ -187,11 +187,14 @@ QCC_BOOL alljoyn_interfacedescription_getmember(const alljoyn_interfacedescripti
         member->signature = found_member->signature.c_str();
         member->returnSignature = found_member->returnSignature.c_str();
         member->argNames = found_member->argNames.c_str();
-        //TODO add back in annotations
-        //member->annotation = found_member->annotation;
+
         member->internal_member = found_member;
     }
     return (found_member == NULL ? QCC_FALSE : QCC_TRUE);
+}
+
+QStatus alljoyn_interfacedescription_addannotation(alljoyn_interfacedescription iface, const char* name, const char* value) {
+    return ((ajn::InterfaceDescription*)iface)->AddAnnotation(name, value);
 }
 
 QCC_BOOL alljoyn_interfacedescription_getannotation(alljoyn_interfacedescription iface, const char* name, char* value, size_t* value_size)
@@ -216,6 +219,50 @@ QCC_BOOL alljoyn_interfacedescription_getannotation(alljoyn_interfacedescription
         }
         return QCC_FALSE;
     }
+}
+
+size_t alljoyn_interfacedescription_getannotationscount(alljoyn_interfacedescription iface) {
+    return ((ajn::InterfaceDescription*)iface)->GetAnnotations(NULL, NULL, 0);
+}
+
+void alljoyn_interfacedescription_getannotationatindex(alljoyn_interfacedescription iface,
+                                                       size_t index,
+                                                       char* name, size_t* name_size,
+                                                       char* value, size_t* value_size) {
+    size_t annotation_size = ((ajn::InterfaceDescription*)iface)->GetAnnotations(NULL, NULL, 0);
+    qcc::String* inner_names = new qcc::String[annotation_size];
+    qcc::String* inner_values = new qcc::String[annotation_size];
+
+    ((ajn::InterfaceDescription*)iface)->GetAnnotations(inner_names, inner_values, annotation_size);
+
+    if (name == NULL) {
+        if (name_size != NULL) {
+            //size of the string plus the nul character
+            *name_size = inner_names[index].size() + 1;
+        }
+    }
+    if (value == NULL) {
+        if (value_size != NULL) {
+            //size of the string plus the nul character
+            *value_size = inner_values[index].size() + 1;
+        }
+    }
+    if (name == NULL || value == NULL) {
+        delete[] inner_names;
+        delete[] inner_values;
+        return;
+    }
+
+    strncpy(name, inner_names[index].c_str(), *name_size);
+    //make sure the string always ends in nul
+    name[*name_size - 1] = '\0';
+    strncpy(value, inner_values[index].c_str(), *value_size);
+    //make sure the string always ends in nul
+    value[*value_size - 1] = '\0';
+
+    delete[] inner_names;
+    delete[] inner_values;
+    return;
 }
 
 QStatus alljoyn_interfacedescription_addmember(alljoyn_interfacedescription iface, alljoyn_messagetype type,
@@ -276,6 +323,7 @@ size_t alljoyn_interfacedescription_getmembers(const alljoyn_interfacedescriptio
         members[i].signature = tempMembers[i]->signature.c_str();
         members[i].returnSignature = tempMembers[i]->returnSignature.c_str();
         members[i].argNames = tempMembers[i]->argNames.c_str();
+
         members[i].internal_member = tempMembers[i];
     }
 
@@ -310,6 +358,7 @@ QCC_BOOL alljoyn_interfacedescription_getmethod(alljoyn_interfacedescription ifa
         member->signature = found_member->signature.c_str();
         member->returnSignature = found_member->returnSignature.c_str();
         member->argNames = found_member->argNames.c_str();
+
         member->internal_member = found_member;
 
     } else {
@@ -336,8 +385,7 @@ QCC_BOOL alljoyn_interfacedescription_getsignal(alljoyn_interfacedescription ifa
         member->signature = found_member->signature.c_str();
         member->returnSignature = found_member->returnSignature.c_str();
         member->argNames = found_member->argNames.c_str();
-        //TODO add back annotations
-        //member->annotation = found_member->annotation;
+
         member->internal_member = found_member;
     } else {
         found_member = NULL;
@@ -353,6 +401,7 @@ QCC_BOOL alljoyn_interfacedescription_getproperty(const alljoyn_interfacedescrip
         property->name = found_prop->name.c_str();
         property->signature = found_prop->signature.c_str();
         property->access = found_prop->access;
+
         property->internal_property = found_prop;
     }
     return (found_prop == NULL ? QCC_FALSE : QCC_TRUE);

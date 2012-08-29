@@ -158,6 +158,18 @@ extern AJ_API QCC_BOOL alljoyn_interfacedescription_property_getannotation(alljo
 extern AJ_API void alljoyn_interfacedescription_activate(alljoyn_interfacedescription iface);
 
 /**
+ * Add an annotation to the interface.
+ *
+ * @param name       Name of annotation.
+ * @param value      Value of the annotation
+ * @return
+ *      - #ER_OK if successful.
+ *      - #ER_BUS_PROPERTY_ALREADY_EXISTS if the property can not be added
+ *                                        because it already exists.
+ */
+extern AJ_API QStatus alljoyn_interfacedescription_addannotation(alljoyn_interfacedescription iface, const char* name, const char* value);
+
+/**
  * Lookup an interface annotation
  *
  * @param       iface   Interface on which to lookup the member
@@ -169,6 +181,38 @@ extern AJ_API void alljoyn_interfacedescription_activate(alljoyn_interfacedescri
  * @return QC_FALSE if annotation does not exist, QC_TRUE otherwise.
  */
 extern AJ_API QCC_BOOL alljoyn_interfacedescription_getannotation(alljoyn_interfacedescription iface, const char* name, char* value, size_t* value_size);
+
+
+/**
+ * find out the amount of annotations the alljoyn_interfacedescription has
+ *
+ * The number of the annotation is only valid as long as no annotations have
+ * been removed or added to the interface.  For this reason this function should
+ * only be used after calling alljoyn_interfacedescription_activate.
+ *
+ * @param[in] iface The alljoyn_interfacedescription that we want the annotations count from
+ *
+ * @return the number of annotations
+ */
+extern AJ_API size_t alljoyn_interfacedescription_getannotationscount(alljoyn_interfacedescription iface);
+
+/**
+ * Obtain the name and value for the annotation index.
+ * The order of the annotation is only valid as long as no new annotations are
+ * removed or added to the interface.  For this reason this function should
+ * only be used after calling alljoyn_interfacedescription_activate.
+ *
+ * @param[in] iface the alljoyn interfacedescription that we want to read annotations from
+ * @param[in] index  the index of the annotation of interest
+ * @param[out] name   the name of the annotation
+ * @param[in,out] name_size the size of the name string if name==NULL this will return the size of the name string plus nul character
+ * @param[out] value  the value of the annotation
+ * @param[in,out] value_size the size of the value string if value == NULL this will return the size of the value string plus nul character
+ */
+extern AJ_API void alljoyn_interfacedescription_getannotationatindex(alljoyn_interfacedescription iface,
+                                                                     size_t index,
+                                                                     char* name, size_t* name_size,
+                                                                     char* value, size_t* value_size);
 
 /**
  * Lookup a member description by name
