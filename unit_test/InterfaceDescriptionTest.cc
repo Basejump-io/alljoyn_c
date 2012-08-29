@@ -591,6 +591,52 @@ TEST(InterfaceDescriptionTest, alljoyn_interfacedescription_property_eql)
     EXPECT_FALSE(alljoyn_interfacedescription_property_eql(propa, propb));
 }
 
+TEST(InterfaceDescriptionTest, interface_annotations)
+{
+    QStatus status = ER_OK;
+    alljoyn_busattachment bus = NULL;
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
+    ASSERT_TRUE(bus != NULL);
+    alljoyn_interfacedescription testIntf = NULL;
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addannotation(testIntf, "org.alljoyn.test.annotation", "foo");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_interfacedescription_activate(testIntf);
+
+    size_t annotation_count = alljoyn_interfacedescription_getannotationscount(testIntf);
+    EXPECT_EQ((size_t)1, annotation_count);
+    size_t name_size;
+    size_t value_size;
+    alljoyn_interfacedescription_getannotationatindex(testIntf, 0, NULL, &name_size, NULL, &value_size);
+    EXPECT_EQ((size_t)28, name_size); //the size of 'org.alljoyn.test.annotation' + nul
+    EXPECT_EQ((size_t)4, value_size); //the size of 'foo' + nul {'f', 'o', 'o', '\0'}
+
+    char* name = (char*)malloc(sizeof(char) * name_size);
+    char* value = (char*)malloc(sizeof(char) * value_size);
+
+    alljoyn_interfacedescription_getannotationatindex(testIntf, 0, name, &name_size, value, &value_size);
+
+
+    EXPECT_STREQ("org.alljoyn.test.annotation", name);
+    EXPECT_STREQ("foo", value);
+
+    free(name);
+    free(value);
+
+    alljoyn_interfacedescription_getannotation(testIntf, "org.alljoyn.test.annotation", NULL, &value_size);
+    EXPECT_LT(0, value_size);
+
+    value = (char*)malloc(sizeof(char) * value_size);
+    QCC_BOOL success = alljoyn_interfacedescription_getannotation(testIntf, "org.alljoyn.test.annotation", value, &value_size);
+    EXPECT_TRUE(success);
+
+    EXPECT_STREQ("foo", value);
+
+    free(value);
+
+    alljoyn_busattachment_destroy(bus);
+}
 
 TEST(InterfaceDescriptionTest, method_annotations)
 {
