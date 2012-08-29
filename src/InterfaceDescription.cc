@@ -35,9 +35,9 @@ size_t alljoyn_interfacedescription_member_getannotationscount(alljoyn_interface
 }
 
 void alljoyn_interfacedescription_member_getannotationatindex(alljoyn_interfacedescription_member member,
-                                                                            size_t index,
-                                                                            char* name, size_t* name_size,
-                                                                            char* value, size_t* value_size)
+                                                              size_t index,
+                                                              char* name, size_t* name_size,
+                                                              char* value, size_t* value_size)
 {
     size_t annotation_size = ((ajn::InterfaceDescription::Member*)member.internal_member)->GetAnnotations(NULL, NULL, 0);
     qcc::String* inner_names = new qcc::String[annotation_size];
@@ -57,7 +57,7 @@ void alljoyn_interfacedescription_member_getannotationatindex(alljoyn_interfaced
             *value_size = inner_values[index].size() + 1;
         }
     }
-    if(name == NULL || value == NULL) {
+    if (name == NULL || value == NULL) {
         delete[] inner_names;
         delete[] inner_values;
         return;
@@ -106,9 +106,9 @@ size_t alljoyn_interfacedescription_property_getannotationscount(alljoyn_interfa
 }
 
 void alljoyn_interfacedescription_property_getannotationatindex(alljoyn_interfacedescription_property property,
-                                                                            size_t index,
-                                                                            char* name, size_t* name_size,
-                                                                            char* value, size_t* value_size)
+                                                                size_t index,
+                                                                char* name, size_t* name_size,
+                                                                char* value, size_t* value_size)
 {
     size_t annotation_size = ((ajn::InterfaceDescription::Property*)property.internal_property)->GetAnnotations(NULL, NULL, 0);
     qcc::String* inner_names = new qcc::String[annotation_size];
@@ -128,7 +128,7 @@ void alljoyn_interfacedescription_property_getannotationatindex(alljoyn_interfac
             *value_size = inner_values[index].size() + 1;
         }
     }
-    if(name == NULL || value == NULL) {
+    if (name == NULL || value == NULL) {
         delete[] inner_names;
         delete[] inner_values;
         return;

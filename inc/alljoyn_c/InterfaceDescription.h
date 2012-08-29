@@ -77,9 +77,9 @@ extern AJ_API size_t alljoyn_interfacedescription_member_getannotationscount(all
  * @param[in] member the alljoyn interfacedescription member that we want to read annotations from
  * @param[in] index  the index of the annotation of interest
  * @param[out] name   the name of the annotation
- * @param[in,out] name_size the size of the name string if name==NULL this will return the size of the name string
+ * @param[in,out] name_size the size of the name string if name==NULL this will return the size of the name string plus nul character
  * @param[out] value  the value of the annotation
- * @param[in,out] value_size the size of the value string if value == NULL this will return the size of the value string
+ * @param[in,out] value_size the size of the value string if value == NULL this will return the size of the value string plus nul character
  */
 extern AJ_API void alljoyn_interfacedescription_member_getannotationatindex(alljoyn_interfacedescription_member member,
                                                                             size_t index,
@@ -92,7 +92,7 @@ extern AJ_API void alljoyn_interfacedescription_member_getannotationatindex(allj
  *
  * @param[in] name   Name of the annotation to look for
  * @param[out] value  Value to compare with
- * @param[in,out] value_size size of the value string.
+ * @param[in,out] value_size size of the value string if value == NULL it will return the size of the value string plus nul character
  * @return    true iff annotations[name] == value
  */
 extern AJ_API QCC_BOOL alljoyn_interfacedescription_member_getannotation(alljoyn_interfacedescription_member member, const char* name, char* value, size_t* value_size);
@@ -113,7 +113,7 @@ typedef struct {
  * only be used after calling alljoyn_interfacedescription_activate.
  *
  * @param[in] property The alljoyn interfacedescription property that we want the
-   *                   annotations count from
+ *                   annotations count from
  * @return the number of annotations
  */
 extern AJ_API size_t alljoyn_interfacedescription_property_getannotationscount(alljoyn_interfacedescription_property property);
@@ -127,14 +127,14 @@ extern AJ_API size_t alljoyn_interfacedescription_property_getannotationscount(a
  * @param[in] property the alljoyn interfacedescription property that we want to read annotations from
  * @param[in] index  the index of the annotation of interest
  * @param[out] name   the name of the annotation
- * @param[in,out] name_size the size of the name string if name==NULL this will return the size of the name string
+ * @param[in,out] name_size the size of the name string if name==NULL this will return the size of the name string plus nul character
  * @param[out] value  the value of the annotation
- * @param[in,out] value_size the size of the value string if value == NULL this will return the size of the value string
+ * @param[in,out] value_size the size of the value string if value == NULL this will return the size of the value string plus nul character
  */
 extern AJ_API void alljoyn_interfacedescription_property_getannotationatindex(alljoyn_interfacedescription_property property,
-                                                                            size_t index,
-                                                                            char* name, size_t* name_size,
-                                                                            char* value, size_t* value_size);
+                                                                              size_t index,
+                                                                              char* name, size_t* name_size,
+                                                                              char* value, size_t* value_size);
 
 /**
  * Activate this interface. An interface must be activated before it can be used. Activating an
@@ -150,7 +150,7 @@ extern AJ_API void alljoyn_interfacedescription_activate(alljoyn_interfacedescri
  * @param       iface   Interface on which to lookup the member
  * @param       name    Name of the annotation to lookup
  * @param[out]  value   The value of the annotation
- * @param[in,out] value_size return the size of the string if value == NULL or
+ * @param[in,out] value_size return the size of the string if value == NULL plus nul character or
  *                           specifies the max size of value if value != NULL.
  *
  * @return QC_FALSE if annotation does not exist, QC_TRUE otherwise.
@@ -212,7 +212,7 @@ extern AJ_API QStatus alljoyn_interfacedescription_addmemberannotation(
  * @param name        Name of annotation
  * @param[out] value  Value for the annotation
  * @param[in,out] value_size The size value.  If value == NULL returns the size
- *                           of the string  so a new char* can be allocated.
+ *                           of the string plus nul character  so a new char* can be allocated.
  *                           If value != NULL specifies the size of value.
  *
  * @return QC_FALSE if annotation does not exist, QC_TRUE otherwise.
@@ -376,12 +376,12 @@ extern AJ_API QStatus alljoyn_interfacedescription_addpropertyannotation(alljoyn
  * @param property   Name of the property
  * @param name       Name of annotation
  * @param[out] value      Value for the annotation use NULL to obtain the size of the string in value
- * @param str_size[in,out] the size of the char* value
+ * @param str_size[in,out] the size of the char* value if value == NULL return the size of the value string plus nul character
  *
  * @code
  * size_t str_size;
  * alljoyn_interfacedescription_getpropertyannotation(iface, "myProperty", "org.freedesktop.DBus.Property.EmitsChangedSignal", NULL, &str_size);
- * char* value = malloc(sizeof(char) * str_size);
+ * char* value = (char*)malloc(sizeof(char) * str_size);
  * QCC_BOOL success = alljoyn_interfacedescription_getpropertyannotation(iface, "myProperty", "org.freedesktop.DBus.Property.EmitsChangedSignal", value, &str_size);
  * if (success == QCC_TRUE) {
  *    \/* code that does something with the value *\/
