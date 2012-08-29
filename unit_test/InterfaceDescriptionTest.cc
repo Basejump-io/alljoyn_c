@@ -630,6 +630,29 @@ TEST(InterfaceDescriptionTest, method_annotations)
     free(name);
     free(value);
 
+    alljoyn_interfacedescription_member_getannotation(method_member, "one", NULL, &value_size);
+    EXPECT_LT(0, value_size);
+
+    value = (char*)malloc(sizeof(char) * value_size);
+    QCC_BOOL success = alljoyn_interfacedescription_member_getannotation(method_member, "one", value, &value_size);
+    EXPECT_TRUE(success);
+
+    EXPECT_STREQ("black_cat", value);
+
+    free(value);
+
+    alljoyn_interfacedescription_getmemberannotation(testIntf, "ping", "one", NULL, &value_size);
+    EXPECT_LT(0, value_size);
+
+    value = (char*)malloc(sizeof(char) * value_size);
+
+    success = alljoyn_interfacedescription_getmemberannotation(testIntf, "ping", "one", value, &value_size);
+    EXPECT_TRUE(success);
+
+    EXPECT_STREQ("black_cat", value);
+
+    free(value);
+
     alljoyn_busattachment_destroy(bus);
 }
 
@@ -672,6 +695,29 @@ TEST(InterfaceDescriptionTest, signal_annotations)
     free(name);
     free(value);
 
+    alljoyn_interfacedescription_member_getannotation(signal_member, "two", NULL, &value_size);
+    EXPECT_LT(0, value_size);
+
+    value = (char*)malloc(sizeof(char) * value_size);
+    QCC_BOOL success = alljoyn_interfacedescription_member_getannotation(signal_member, "two", value, &value_size);
+    EXPECT_TRUE(success);
+
+    EXPECT_STREQ("apples", value);
+
+    free(value);
+
+    alljoyn_interfacedescription_getmemberannotation(testIntf, "chirp", "two", NULL, &value_size);
+    EXPECT_LT(0, value_size);
+
+    value = (char*)malloc(sizeof(char) * value_size);
+
+    success = alljoyn_interfacedescription_getmemberannotation(testIntf, "chirp", "two", value, &value_size);
+    EXPECT_TRUE(success);
+
+    EXPECT_STREQ("apples", value);
+
+    free(value);
+
     alljoyn_busattachment_destroy(bus);
 }
 
@@ -711,6 +757,18 @@ TEST(InterfaceDescriptionTest, property_annotations)
     EXPECT_STREQ("people", value);
 
     free(name);
+    free(value);
+
+    alljoyn_interfacedescription_getpropertyannotation(testIntf, "prop", "three", NULL, &value_size);
+    EXPECT_LT(0, value_size);
+
+    value = (char*)malloc(sizeof(char) * value_size);
+
+    QCC_BOOL success = alljoyn_interfacedescription_getpropertyannotation(testIntf, "prop", "three", value, &value_size);
+    EXPECT_TRUE(success);
+
+    EXPECT_STREQ("people", value);
+
     free(value);
 
     alljoyn_busattachment_destroy(bus);
@@ -811,7 +869,7 @@ TEST(InterfaceDescriptionTest, multiple_annotations)
     size_t name_size;
     size_t value_size;
 
-    for(size_t i = 0; i < annotation_count; i++) {
+    for (size_t i = 0; i < annotation_count; i++) {
         alljoyn_interfacedescription_member_getannotationatindex(method_member, i, NULL, &name_size, NULL, &value_size);
         char* name = (char*)malloc(sizeof(char) * name_size);
         char* value = (char*)malloc(sizeof(char) * value_size);
@@ -837,7 +895,7 @@ TEST(InterfaceDescriptionTest, multiple_annotations)
                     strcmp("org.alljoyn.test.five", name) == 0 && strcmp("luck", value) == 0 ||
                     strcmp("org.alljoyn.test.six", name) == 0 && strcmp("bad", value) == 0 ||
                     strcmp("org.freedesktop.DBus.Method.NoReply", name) == 0 && strcmp("true", value) == 0)
-                    << "Expected annotation not found : " << name << " = " << value << "\n";
+        << "Expected annotation not found : " << name << " = " << value << "\n";
 
         free(name);
         free(value);
