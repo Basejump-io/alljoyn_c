@@ -174,12 +174,19 @@ alljoyn_sessionid alljoyn_message_getsessionid(alljoyn_message msg)
     return (alljoyn_sessionid)msg->msg->GetSessionId();
 }
 
-const char* alljoyn_message_geterrorname(alljoyn_message msg, const char* errorMessage)
+const char* alljoyn_message_geterrorname(alljoyn_message msg, char* errorMessage, size_t* errorMessage_size)
 {
-    const char* ret;
-    qcc::String* str;
-    ret = msg->msg->GetErrorName(str);
-    errorMessage = str->c_str();
+    qcc::String* str = new qcc::String("");
+    const char* ret = msg->msg->GetErrorName(str);
+    if (errorMessage == NULL) {
+        *errorMessage_size = str->size();
+        delete str;
+        return ret;
+    }
+    strncpy(errorMessage, str->c_str(), *errorMessage_size);
+    //Make sure the string is always nul terminated.
+    errorMessage[*errorMessage_size - 1] = '\0';
+    delete str;
     return ret;
 }
 

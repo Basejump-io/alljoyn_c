@@ -30,6 +30,122 @@ struct _alljoyn_interfacedescription_handle {
     /* Empty by design, this is just to allow the type restrictions to save coders from themselves */
 };
 
+size_t alljoyn_interfacedescription_member_getannotationscount(alljoyn_interfacedescription_member member) {
+    return ((ajn::InterfaceDescription::Member*)member.internal_member)->GetAnnotations(NULL, NULL, 0);
+}
+
+void alljoyn_interfacedescription_member_getannotationatindex(alljoyn_interfacedescription_member member,
+                                                                            size_t index,
+                                                                            char* name, size_t* name_size,
+                                                                            char* value, size_t* value_size)
+{
+    size_t annotation_size = ((ajn::InterfaceDescription::Member*)member.internal_member)->GetAnnotations(NULL, NULL, 0);
+    qcc::String* inner_names = new qcc::String[annotation_size];
+    qcc::String* inner_values = new qcc::String[annotation_size];
+
+    ((ajn::InterfaceDescription::Member*)member.internal_member)->GetAnnotations(inner_names, inner_values, annotation_size);
+
+    if (name == NULL) {
+        if (name_size != NULL) {
+            //size of the string plus the nul character
+            *name_size = inner_names[index].size() + 1;
+        }
+    }
+    if (value == NULL) {
+        if (value_size != NULL) {
+            //size of the string plus the nul character
+            *value_size = inner_values[index].size() + 1;
+        }
+    }
+    if(name == NULL || value == NULL) {
+        delete[] inner_names;
+        delete[] inner_values;
+        return;
+    }
+
+    strncpy(name, inner_names[index].c_str(), *name_size);
+    //make sure the string always ends in nul
+    name[*name_size - 1] = '\0';
+    strncpy(value, inner_values[index].c_str(), *value_size);
+    //make sure the string always ends in nul
+    value[*value_size - 1] = '\0';
+
+    delete[] inner_names;
+    delete[] inner_values;
+    return;
+}
+
+QCC_BOOL alljoyn_interfacedescription_member_getannotation(alljoyn_interfacedescription_member member, const char* name, char* value, size_t* value_size)
+{
+    qcc::String out_val;
+    bool b = ((ajn::InterfaceDescription::Member*)member.internal_member)->GetAnnotation(name, out_val);
+
+    if (value == NULL) {
+        if (value_size != NULL) {
+            //size of the string plus the nul character
+            *value_size = out_val.size() + 1;
+        }
+        return QCC_FALSE;
+    }
+    if (b) {
+        ::strncpy(value, out_val.c_str(), *value_size);
+        //make sure string always ends in a nul character.
+        value[*value_size - 1] = '\0';
+        return QCC_TRUE;
+    } else {
+        //return empty string
+        if (*value_size > 0) {
+            *value = '\0';
+        }
+        return QCC_FALSE;
+    }
+}
+
+size_t alljoyn_interfacedescription_property_getannotationscount(alljoyn_interfacedescription_property property) {
+    return ((ajn::InterfaceDescription::Property*)property.internal_property)->GetAnnotations(NULL, NULL, 0);
+}
+
+void alljoyn_interfacedescription_property_getannotationatindex(alljoyn_interfacedescription_property property,
+                                                                            size_t index,
+                                                                            char* name, size_t* name_size,
+                                                                            char* value, size_t* value_size)
+{
+    size_t annotation_size = ((ajn::InterfaceDescription::Property*)property.internal_property)->GetAnnotations(NULL, NULL, 0);
+    qcc::String* inner_names = new qcc::String[annotation_size];
+    qcc::String* inner_values = new qcc::String[annotation_size];
+
+    ((ajn::InterfaceDescription::Property*)property.internal_property)->GetAnnotations(inner_names, inner_values, annotation_size);
+
+    if (name == NULL) {
+        if (name_size != NULL) {
+            //size of the string plus the nul character
+            *name_size = inner_names[index].size() + 1;
+        }
+    }
+    if (value == NULL) {
+        if (value_size != NULL) {
+            //size of the string plus the nul character
+            *value_size = inner_values[index].size() + 1;
+        }
+    }
+    if(name == NULL || value == NULL) {
+        delete[] inner_names;
+        delete[] inner_values;
+        return;
+    }
+
+    strncpy(name, inner_names[index].c_str(), *name_size);
+    //make sure the string always ends in nul
+    name[*name_size - 1] = '\0';
+    strncpy(value, inner_values[index].c_str(), *value_size);
+    //make sure the string always ends in nul
+    value[*value_size - 1] = '\0';
+
+    delete[] inner_names;
+    delete[] inner_values;
+    return;
+}
+
 void alljoyn_interfacedescription_activate(alljoyn_interfacedescription iface)
 {
     ((ajn::InterfaceDescription*)iface)->Activate();
@@ -53,16 +169,26 @@ QCC_BOOL alljoyn_interfacedescription_getmember(const alljoyn_interfacedescripti
     return (found_member == NULL ? QCC_FALSE : QCC_TRUE);
 }
 
-QCC_BOOL alljoyn_interfacedescription_getannotation(alljoyn_interfacedescription iface, const char* name, char* value)
+QCC_BOOL alljoyn_interfacedescription_getannotation(alljoyn_interfacedescription iface, const char* name, char* value, size_t* value_size)
 {
     qcc::String out_val;
     const bool b = ((ajn::InterfaceDescription*)iface)->GetAnnotation(name, out_val);
 
+    if (value == NULL) {
+        //size of the string plus the nul character
+        *value_size = out_val.size() + 1;
+        return QCC_FALSE;
+    }
     if (b) {
-        ::strcpy(value, out_val.c_str());
+        ::strncpy(value, out_val.c_str(), *value_size);
+        //make sure string always ends in a nul character.
+        value[*value_size - 1] = '\0';
         return QCC_TRUE;
     } else {
-        *value = '\0';
+        //return empty string
+        if (*value_size > 0) {
+            *value = '\0';
+        }
         return QCC_FALSE;
     }
 }
@@ -75,25 +201,36 @@ QStatus alljoyn_interfacedescription_addmember(alljoyn_interfacedescription ifac
                                                           argNames, annotation);
 }
 
-QStatus alljoyn_interfacedescription_addmemberannotation(
-    alljoyn_interfacedescription iface,
-    const char* member, const char* name, const char* value)
+QStatus alljoyn_interfacedescription_addmemberannotation(alljoyn_interfacedescription iface,
+                                                         const char* member,
+                                                         const char* name,
+                                                         const char* value)
 {
     return ((ajn::InterfaceDescription*)iface)->AddMemberAnnotation(member, name, value);
 }
 
-QCC_BOOL alljoyn_interfacedescription_getmemberannotation(
-    alljoyn_interfacedescription iface,
-    const char* member, const char* name, char* value)
+QCC_BOOL alljoyn_interfacedescription_getmemberannotation(alljoyn_interfacedescription iface,
+                                                          const char* member,
+                                                          const char* name,
+                                                          char* value,
+                                                          size_t* value_size)
 {
     qcc::String out_val;
     const bool b = ((ajn::InterfaceDescription*)iface)->GetMemberAnnotation(member, name, out_val);
 
+    if (value == NULL) {
+        //size of the string plus the nul character
+        *value_size = out_val.size() + 1;
+        return QCC_FALSE;
+    }
     if (b) {
-        ::strcpy(value, out_val.c_str());
+        ::strncpy(value, out_val.c_str(), *value_size);
+        value[*value_size - 1] = '\0';
         return QCC_TRUE;
     } else {
-        *value = '\0';
+        if (*value_size > 0) {
+            *value = '\0';
+        }
         return QCC_FALSE;
     }
 }
@@ -114,8 +251,6 @@ size_t alljoyn_interfacedescription_getmembers(const alljoyn_interfacedescriptio
         members[i].signature = tempMembers[i]->signature.c_str();
         members[i].returnSignature = tempMembers[i]->returnSignature.c_str();
         members[i].argNames = tempMembers[i]->argNames.c_str();
-        //TODO add back in annotations
-        //members[i].annotation = tempMembers[i]->annotation;
         members[i].internal_member = tempMembers[i];
     }
 
@@ -150,9 +285,8 @@ QCC_BOOL alljoyn_interfacedescription_getmethod(alljoyn_interfacedescription ifa
         member->signature = found_member->signature.c_str();
         member->returnSignature = found_member->returnSignature.c_str();
         member->argNames = found_member->argNames.c_str();
-        //TODO add back annotations
-        //member->annotation = found_member->annotation;
         member->internal_member = found_member;
+
     } else {
         found_member = NULL;
     }
@@ -239,25 +373,53 @@ QCC_BOOL alljoyn_interfacedescription_hasproperties(const alljoyn_interfacedescr
     return (((const ajn::InterfaceDescription*)iface)->HasProperties() == true ? QCC_TRUE : QCC_FALSE);
 }
 
-QStatus alljoyn_interfacedescription_addpropertyannotation(
-    alljoyn_interfacedescription iface, const char* property,
-    const char* name, const char* value)
+QStatus alljoyn_interfacedescription_addpropertyannotation(alljoyn_interfacedescription iface,
+                                                           const char* property,
+                                                           const char* name,
+                                                           const char* value)
 {
     return ((ajn::InterfaceDescription*)iface)->AddPropertyAnnotation(property, name, value);
 }
 
-QCC_BOOL alljoyn_interfacedescription_getpropertyannotation(
-    alljoyn_interfacedescription iface, const char* property,
-    const char* name, char* value)
+QCC_BOOL alljoyn_interfacedescription_getpropertyannotation(alljoyn_interfacedescription iface,
+                                                            const char* property,
+                                                            const char* name,
+                                                            char* value,
+                                                            size_t* str_size)
 {
+    if (iface == NULL) {
+        return QCC_FALSE;
+    }
+    if (property == NULL) {
+        return QCC_FALSE;
+    }
+    if (name == NULL) {
+        return QCC_FALSE;
+    }
+
+
     qcc::String out_val;
     const bool b = ((ajn::InterfaceDescription*)iface)->GetPropertyAnnotation(property, name, out_val);
 
+    //Return the size of the string so memory can be allocated for the string
+    if (value == NULL) {
+        //size of the string plus the nul character
+        if (str_size != NULL) {
+            *str_size = out_val.size() + 1;
+        }
+        return QCC_FALSE;
+    }
+
     if (b) {
-        ::strcpy(value, out_val.c_str());
+        ::strncpy(value, out_val.c_str(), *str_size);
+        //make sure the string is always nul terminated.
+        value[*str_size - 1] = '\0';
         return QCC_TRUE;
     } else {
-        *value = '\0';
+        //we must have at least enough space for the nul character.
+        if (*str_size > 0) {
+            *value = '\0';
+        }
         return QCC_FALSE;
     }
 }
@@ -279,9 +441,10 @@ size_t alljoyn_interfacedescription_introspect(const alljoyn_interfacedescriptio
      */
     if (str) {
         strncpy(str, s.c_str(), buf);
-        str[buf] = '\0'; //prevent sting not being null terminated.
+        str[buf - 1] = '\0'; //prevent string not being null terminated.
     }
-    return s.size();
+    //size of the string plus the nul character
+    return s.size() + 1;
 }
 
 QCC_BOOL alljoyn_interfacedescription_issecure(const alljoyn_interfacedescription iface)

@@ -55,8 +55,10 @@ TEST(InterfaceDescriptionTest, getmember) {
     EXPECT_STREQ("s", member.signature);
     EXPECT_STREQ("s", member.returnSignature);
     EXPECT_STREQ("in,out", member.argNames);
-    //TODO fix annotations
-    //EXPECT_EQ(0, member.annotation);
+
+    size_t annotation_count;
+    annotation_count = alljoyn_interfacedescription_member_getannotationscount(member);
+    EXPECT_EQ((size_t)0, annotation_count);
 
     alljoyn_interfacedescription_member member2;
     EXPECT_TRUE(alljoyn_interfacedescription_getmember(testIntf, "chirp", &member2));
@@ -67,8 +69,9 @@ TEST(InterfaceDescriptionTest, getmember) {
     EXPECT_STREQ("s", member2.signature);
     EXPECT_STREQ("", member2.returnSignature);
     EXPECT_STREQ("chirp", member2.argNames);
-    //TODO fix annotations
-    //EXPECT_EQ(0, member2.annotation);
+
+    annotation_count = alljoyn_interfacedescription_member_getannotationscount(member2);
+    EXPECT_EQ((size_t)0, annotation_count);
 
     alljoyn_busattachment_destroy(bus);
 }
@@ -104,8 +107,10 @@ TEST(InterfaceDescriptionTest, getmembers) {
     EXPECT_STREQ("s", member[0].signature);
     EXPECT_STREQ("", member[0].returnSignature);
     EXPECT_STREQ("chirp", member[0].argNames);
-    //TODO fix annotations
-    //EXPECT_EQ(0, member[0].annotation);
+
+    size_t annotation_count;
+    annotation_count = alljoyn_interfacedescription_member_getannotationscount(member[0]);
+    EXPECT_EQ((size_t)0, annotation_count);
 
     EXPECT_EQ(testIntf, member[1].iface);
     EXPECT_EQ(ALLJOYN_MESSAGE_METHOD_CALL, member[1].memberType);
@@ -113,8 +118,9 @@ TEST(InterfaceDescriptionTest, getmembers) {
     EXPECT_STREQ("s", member[1].signature);
     EXPECT_STREQ("s", member[1].returnSignature);
     EXPECT_STREQ("in,out", member[1].argNames);
-    //TODO fix annotations
-    //EXPECT_EQ(0, member[1].annotation);
+
+    annotation_count = alljoyn_interfacedescription_member_getannotationscount(member[1]);
+    EXPECT_EQ((size_t)0, annotation_count);
 
     alljoyn_busattachment_destroy(bus);
 }
@@ -365,8 +371,10 @@ TEST(InterfaceDescriptionTest, getmethod) {
     EXPECT_STREQ("ss", member.signature);
     EXPECT_STREQ("b", member.returnSignature);
     EXPECT_STREQ("string1,string2,bool", member.argNames);
-    //TODO fix annotations
-    //EXPECT_EQ(0, member.annotation);
+
+    size_t annotation_count;
+    annotation_count = alljoyn_interfacedescription_member_getannotationscount(member);
+    EXPECT_EQ((size_t)0, annotation_count);
 
     EXPECT_FALSE(alljoyn_interfacedescription_getmethod(testIntf, "invalid", &member));
 
@@ -427,8 +435,10 @@ TEST(InterfaceDescriptionTest, getsignal) {
     EXPECT_STREQ("s", member.signature);
     EXPECT_STREQ("", member.returnSignature);
     EXPECT_STREQ("string", member.argNames);
-    //TODO fix annotations
-    //EXPECT_EQ(0, member.annotation);
+
+    size_t annotation_count;
+    annotation_count = alljoyn_interfacedescription_member_getannotationscount(member);
+    EXPECT_EQ((size_t)0, annotation_count);
 
     EXPECT_FALSE(alljoyn_interfacedescription_getsignal(testIntf, "invalid", &member));
 
@@ -579,4 +589,258 @@ TEST(InterfaceDescriptionTest, alljoyn_interfacedescription_property_eql)
     EXPECT_TRUE(alljoyn_interfacedescription_property_eql(propa, propa2));
 
     EXPECT_FALSE(alljoyn_interfacedescription_property_eql(propa, propb));
+}
+
+
+TEST(InterfaceDescriptionTest, method_annotations)
+{
+    QStatus status = ER_OK;
+    alljoyn_busattachment bus = NULL;
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
+    ASSERT_TRUE(bus != NULL);
+    alljoyn_interfacedescription testIntf = NULL;
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", 0);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmemberannotation(testIntf, "ping", "one", "black_cat");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_interfacedescription_activate(testIntf);
+
+    alljoyn_interfacedescription_member method_member;
+    EXPECT_TRUE(alljoyn_interfacedescription_getmember(testIntf, "ping", &method_member));
+
+    size_t annotation_count = alljoyn_interfacedescription_member_getannotationscount(method_member);
+    EXPECT_EQ((size_t)1, annotation_count);
+    size_t name_size;
+    size_t value_size;
+    alljoyn_interfacedescription_member_getannotationatindex(method_member, 0, NULL, &name_size, NULL, &value_size);
+    EXPECT_EQ((size_t)4, name_size); //the size of 'one' {'o', 'n', 'e', '\0'}
+    EXPECT_EQ((size_t)10, value_size); //the size of black_cat + nul
+
+    char* name = (char*)malloc(sizeof(char) * name_size);
+    char* value = (char*)malloc(sizeof(char) * value_size);
+
+    alljoyn_interfacedescription_member_getannotationatindex(method_member, 0, name, &name_size, value, &value_size);
+
+
+    EXPECT_STREQ("one", name);
+    EXPECT_STREQ("black_cat", value);
+
+    free(name);
+    free(value);
+
+    alljoyn_busattachment_destroy(bus);
+}
+
+
+TEST(InterfaceDescriptionTest, signal_annotations)
+{
+    QStatus status = ER_OK;
+    alljoyn_busattachment bus = NULL;
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
+    ASSERT_TRUE(bus != NULL);
+    alljoyn_interfacedescription testIntf = NULL;
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_SIGNAL, "chirp", "s", NULL, "chirp", 0);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmemberannotation(testIntf, "chirp", "two", "apples");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_interfacedescription_activate(testIntf);
+
+    alljoyn_interfacedescription_member signal_member;
+    EXPECT_TRUE(alljoyn_interfacedescription_getmember(testIntf, "chirp", &signal_member));
+
+    size_t annotation_count = alljoyn_interfacedescription_member_getannotationscount(signal_member);
+    EXPECT_EQ((size_t)1, annotation_count);
+    size_t name_size;
+    size_t value_size;
+    alljoyn_interfacedescription_member_getannotationatindex(signal_member, 0, NULL, &name_size, NULL, &value_size);
+    EXPECT_EQ((size_t)4, name_size); //the size of 'two' {'t', 'w', 'o', '\0'}
+    EXPECT_EQ((size_t)7, value_size); //the size of 'apples' + nul
+
+    char* name = (char*)malloc(sizeof(char) * name_size);
+    char* value = (char*)malloc(sizeof(char) * value_size);
+
+    alljoyn_interfacedescription_member_getannotationatindex(signal_member, 0, name, &name_size, value, &value_size);
+
+
+    EXPECT_STREQ("two", name);
+    EXPECT_STREQ("apples", value);
+
+    free(name);
+    free(value);
+
+    alljoyn_busattachment_destroy(bus);
+}
+
+TEST(InterfaceDescriptionTest, property_annotations)
+{
+    QStatus status = ER_OK;
+    alljoyn_busattachment bus = NULL;
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
+    ASSERT_TRUE(bus != NULL);
+    alljoyn_interfacedescription testIntf = NULL;
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addproperty(testIntf, "prop", "s", ALLJOYN_PROP_ACCESS_READ);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addpropertyannotation(testIntf, "prop", "three", "people");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_interfacedescription_activate(testIntf);
+
+    alljoyn_interfacedescription_property property;
+    EXPECT_TRUE(alljoyn_interfacedescription_getproperty(testIntf, "prop", &property));
+
+    size_t annotation_count = alljoyn_interfacedescription_property_getannotationscount(property);
+    EXPECT_EQ((size_t)1, annotation_count);
+    size_t name_size;
+    size_t value_size;
+    alljoyn_interfacedescription_property_getannotationatindex(property, 0, NULL, &name_size, NULL, &value_size);
+    EXPECT_EQ((size_t)6, name_size); //the size of 'three' {'t', 'h', 'r', 'e', 'e', '\0'}
+    EXPECT_EQ((size_t)7, value_size); //the size of 'people' + nul
+
+    char* name = (char*)malloc(sizeof(char) * name_size);
+    char* value = (char*)malloc(sizeof(char) * value_size);
+
+    alljoyn_interfacedescription_property_getannotationatindex(property, 0, name, &name_size, value, &value_size);
+
+
+    EXPECT_STREQ("three", name);
+    EXPECT_STREQ("people", value);
+
+    free(name);
+    free(value);
+
+    alljoyn_busattachment_destroy(bus);
+}
+
+/*
+ * check to see that we are still backward compatible with the annotation flags
+ */
+TEST(InterfaceDescriptionTest, annotation_flags)
+{
+    QStatus status = ER_OK;
+    alljoyn_busattachment bus = NULL;
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
+    ASSERT_TRUE(bus != NULL);
+    alljoyn_interfacedescription testIntf = NULL;
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", ALLJOYN_MEMBER_ANNOTATE_NO_REPLY);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_SIGNAL, "chirp", "s", NULL, "chirp", ALLJOYN_MEMBER_ANNOTATE_DEPRECATED);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_interfacedescription_activate(testIntf);
+
+    alljoyn_interfacedescription_member method_member;
+    EXPECT_TRUE(alljoyn_interfacedescription_getmember(testIntf, "ping", &method_member));
+
+    size_t annotation_count = alljoyn_interfacedescription_member_getannotationscount(method_member);
+    EXPECT_EQ((size_t)1, annotation_count);
+    size_t name_size;
+    size_t value_size;
+    alljoyn_interfacedescription_member_getannotationatindex(method_member, 0, NULL, &name_size, NULL, &value_size);
+
+    char* name = (char*)malloc(sizeof(char) * name_size);
+    char* value = (char*)malloc(sizeof(char) * value_size);
+
+    alljoyn_interfacedescription_member_getannotationatindex(method_member, 0, name, &name_size, value, &value_size);
+
+
+    EXPECT_STREQ("org.freedesktop.DBus.Method.NoReply", name);
+    EXPECT_STREQ("true", value);
+
+    free(name);
+    free(value);
+
+    alljoyn_interfacedescription_member signal_member;
+    EXPECT_TRUE(alljoyn_interfacedescription_getmember(testIntf, "chirp", &signal_member));
+
+    annotation_count = alljoyn_interfacedescription_member_getannotationscount(signal_member);
+    EXPECT_EQ((size_t)1, annotation_count);
+
+    alljoyn_interfacedescription_member_getannotationatindex(signal_member, 0, NULL, &name_size, NULL, &value_size);
+
+    name = (char*)malloc(sizeof(char) * name_size);
+    value = (char*)malloc(sizeof(char) * value_size);
+
+    alljoyn_interfacedescription_member_getannotationatindex(signal_member, 0, name, &name_size, value, &value_size);
+
+
+    EXPECT_STREQ("org.freedesktop.DBus.Deprecated", name);
+    EXPECT_STREQ("true", value);
+
+    free(name);
+    free(value);
+
+    alljoyn_busattachment_destroy(bus);
+}
+
+TEST(InterfaceDescriptionTest, multiple_annotations)
+{
+    QStatus status = ER_OK;
+    alljoyn_busattachment bus = NULL;
+    bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
+    ASSERT_TRUE(bus != NULL);
+    alljoyn_interfacedescription testIntf = NULL;
+    status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmember(testIntf, ALLJOYN_MESSAGE_METHOD_CALL, "ping", "s", "s", "in,out", ALLJOYN_MEMBER_ANNOTATE_NO_REPLY);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmemberannotation(testIntf, "ping", "org.alljoyn.test.one", "black_cat");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmemberannotation(testIntf, "ping", "org.alljoyn.test.two", "broken_mirror");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmemberannotation(testIntf, "ping", "org.alljoyn.test.three", "latter");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmemberannotation(testIntf, "ping", "org.alljoyn.test.four", "umbrella");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmemberannotation(testIntf, "ping", "org.alljoyn.test.five", "luck");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_interfacedescription_addmemberannotation(testIntf, "ping", "org.alljoyn.test.six", "bad");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_interfacedescription_activate(testIntf);
+
+    alljoyn_interfacedescription_member method_member;
+    EXPECT_TRUE(alljoyn_interfacedescription_getmember(testIntf, "ping", &method_member));
+
+    size_t annotation_count = alljoyn_interfacedescription_member_getannotationscount(method_member);
+    EXPECT_EQ((size_t)7, annotation_count); //six annotations added plus the NoReply annotation
+    size_t name_size;
+    size_t value_size;
+
+    for(size_t i = 0; i < annotation_count; i++) {
+        alljoyn_interfacedescription_member_getannotationatindex(method_member, i, NULL, &name_size, NULL, &value_size);
+        char* name = (char*)malloc(sizeof(char) * name_size);
+        char* value = (char*)malloc(sizeof(char) * value_size);
+
+        alljoyn_interfacedescription_member_getannotationatindex(method_member, i, name, &name_size, value, &value_size);
+
+        /*
+         * order that the annotations are returned is not known we only know that
+         * the key must match with the value.
+         * for windows the order returned is (this order could differ by OS or compiler)
+         * 0 : org.alljoyn.test.five = luck
+         * 1 : org.alljoyn.test.four = umbrella
+         * 2 : org.alljoyn.test.one = black_cat
+         * 3 : org.alljoyn.test.six = bad
+         * 4 : org.alljoyn.test.three = latter
+         * 5 : org.alljoyn.test.two = broken_mirror
+         * 6 : org.freedesktop.DBus.Method.NoReply = true
+         */
+        EXPECT_TRUE(strcmp("org.alljoyn.test.one", name) == 0 && strcmp("black_cat", value) == 0 ||
+                    strcmp("org.alljoyn.test.two", name) == 0 && strcmp("broken_mirror", value) == 0 ||
+                    strcmp("org.alljoyn.test.three", name) == 0 && strcmp("latter", value) == 0 ||
+                    strcmp("org.alljoyn.test.four", name) == 0 && strcmp("umbrella", value) == 0 ||
+                    strcmp("org.alljoyn.test.five", name) == 0 && strcmp("luck", value) == 0 ||
+                    strcmp("org.alljoyn.test.six", name) == 0 && strcmp("bad", value) == 0 ||
+                    strcmp("org.freedesktop.DBus.Method.NoReply", name) == 0 && strcmp("true", value) == 0)
+                    << "Expected annotation not found : " << name << " = " << value << "\n";
+
+        free(name);
+        free(value);
+    }
+    alljoyn_busattachment_destroy(bus);
 }
