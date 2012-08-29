@@ -90,6 +90,7 @@ extern AJ_API void alljoyn_interfacedescription_member_getannotationatindex(allj
  * Get this member's annotation value return the size of the value string if
  * name is NULL.
  *
+ * @param[in] member The AllJoyn InterfaceDescription member that we want the annotation from
  * @param[in] name   Name of the annotation to look for
  * @param[out] value  Value to compare with
  * @param[in,out] value_size size of the value string if value == NULL it will return the size of the value string plus nul character
@@ -135,6 +136,18 @@ extern AJ_API void alljoyn_interfacedescription_property_getannotationatindex(al
                                                                               size_t index,
                                                                               char* name, size_t* name_size,
                                                                               char* value, size_t* value_size);
+
+/**
+ * Get this member's annotation value return the size of the value string if
+ * name is NULL.
+ *
+ * @param[in] property The AllJoyn InterfaceDescription property that we want the annotation from.
+ * @param[in] name   Name of the annotation to look for
+ * @param[out] value  Value to compare with
+ * @param[in,out] value_size size of the value string if value == NULL it will return the size of the value string plus nul character
+ * @return    true iff annotations[name] == value
+ */
+extern AJ_API QCC_BOOL alljoyn_interfacedescription_property_getannotation(alljoyn_interfacedescription_property property, const char* name, char* value, size_t* value_size);
 
 /**
  * Activate this interface. An interface must be activated before it can be used. Activating an

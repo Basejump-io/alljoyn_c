@@ -146,6 +146,31 @@ void alljoyn_interfacedescription_property_getannotationatindex(alljoyn_interfac
     return;
 }
 
+QCC_BOOL alljoyn_interfacedescription_property_getannotation(alljoyn_interfacedescription_property property, const char* name, char* value, size_t* value_size)
+{
+    qcc::String out_val;
+    bool b = ((ajn::InterfaceDescription::Property*)property.internal_property)->GetAnnotation(name, out_val);
+
+    if (value == NULL) {
+        if (value_size != NULL) {
+            //size of the string plus the nul character
+            *value_size = out_val.size() + 1;
+        }
+        return QCC_FALSE;
+    }
+    if (b) {
+        ::strncpy(value, out_val.c_str(), *value_size);
+        //make sure string always ends in a nul character.
+        value[*value_size - 1] = '\0';
+        return QCC_TRUE;
+    } else {
+        //return empty string
+        if (*value_size > 0) {
+            *value = '\0';
+        }
+        return QCC_FALSE;
+    }
+}
 void alljoyn_interfacedescription_activate(alljoyn_interfacedescription iface)
 {
     ((ajn::InterfaceDescription*)iface)->Activate();
