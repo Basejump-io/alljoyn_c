@@ -759,12 +759,23 @@ TEST(InterfaceDescriptionTest, property_annotations)
     free(name);
     free(value);
 
+    alljoyn_interfacedescription_property_getannotation(property, "three", NULL, &value_size);
+    EXPECT_LT(0, value_size);
+
+    value = (char*)malloc(sizeof(char) * value_size);
+    QCC_BOOL success = alljoyn_interfacedescription_property_getannotation(property, "three", value, &value_size);
+    EXPECT_TRUE(success);
+
+    EXPECT_STREQ("people", value);
+
+    free(value);
+
     alljoyn_interfacedescription_getpropertyannotation(testIntf, "prop", "three", NULL, &value_size);
     EXPECT_LT(0, value_size);
 
     value = (char*)malloc(sizeof(char) * value_size);
 
-    QCC_BOOL success = alljoyn_interfacedescription_getpropertyannotation(testIntf, "prop", "three", value, &value_size);
+    success = alljoyn_interfacedescription_getpropertyannotation(testIntf, "prop", "three", value, &value_size);
     EXPECT_TRUE(success);
 
     EXPECT_STREQ("people", value);
