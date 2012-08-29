@@ -325,12 +325,15 @@ extern AJ_API alljoyn_sessionid alljoyn_message_getsessionid(alljoyn_message msg
  * @param[out] errorMessage
  *                      - Return the error message string stored
  *                      - leave errorMessage unchanged if error message string not found
+ * @param[in,out] errorMessage_size size of the errorMessage string if errorMessage == NULL
+ *                                  this will be changed to the size of the string so a buffer
+ *                                  can be allocated to hold the string.
  *
  * @return
  *      - If error detected return error name stored in the AllJoyn header field
  *      - NULL if error not detected
  */
-extern AJ_API const char* alljoyn_message_geterrorname(alljoyn_message msg, const char* errorMessage);
+extern AJ_API const char* alljoyn_message_geterrorname(alljoyn_message msg, char* errorMessage, size_t* errorMessage_size);
 
 /**
  * Returns an XML string representation of the message
