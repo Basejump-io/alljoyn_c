@@ -195,6 +195,11 @@ TEST_F(MessageTest, getarg__getargs_parseargs) {
     TearDownMessageTestService();
 }
 
+/*
+ * The alljoyn_message_description and alljoyn_message_tostring function are some
+ * of the few functions that behave differently with the release variant vs.
+ * the debug variant.
+ */
 TEST_F(MessageTest, message_properties) {
     SetUpMessageTestService();
 
@@ -246,6 +251,23 @@ TEST_F(MessageTest, message_properties) {
     EXPECT_EQ((uint32_t)0, alljoyn_message_getcompressiontoken(reply));
     EXPECT_EQ((alljoyn_sessionid)0, alljoyn_message_getsessionid(reply));
 
+#if NDEBUG
+    char* str;
+    size_t buf;
+    buf = alljoyn_message_tostring(reply, NULL, 0);
+    buf++;
+    str = (char*)malloc(sizeof(char) * buf);
+    alljoyn_message_tostring(reply, str, buf);
+    qcc::String strTest = str;
+    free(str);
+
+    buf = alljoyn_message_description(reply, NULL, 0);
+    buf++;
+    str = (char*)malloc(sizeof(char) * buf);
+    alljoyn_message_description(reply, str, buf);
+    EXPECT_STREQ("", str);
+    free(str);
+#else
     char* str;
     size_t buf;
     buf = alljoyn_message_tostring(reply, NULL, 0);
@@ -265,6 +287,6 @@ TEST_F(MessageTest, message_properties) {
     /* this call to description should return 'METHID_RET[<reply serial>](s)' */
     EXPECT_EQ((size_t)0, strTest.find_first_of("METHOD_RET["));
     free(str);
-
+#endif
     TearDownMessageTestService();
 }

@@ -257,9 +257,10 @@ extern AJ_API QStatus alljoyn_interfacedescription_addmember(alljoyn_interfacede
  *      - #ER_OK if successful
  *      - #ER_BUS_MEMBER_ALREADY_EXISTS if member already exists
  */
-extern AJ_API QStatus alljoyn_interfacedescription_addmemberannotation(
-    alljoyn_interfacedescription iface,
-    const char* member, const char* name, const char* value);
+extern AJ_API QStatus alljoyn_interfacedescription_addmemberannotation(alljoyn_interfacedescription iface,
+                                                                       const char* member,
+                                                                       const char* name,
+                                                                       const char* value);
 
 /**
  * Add an annotation to a member
