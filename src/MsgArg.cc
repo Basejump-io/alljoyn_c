@@ -202,9 +202,9 @@ size_t alljoyn_msgarg_tostring(alljoyn_msgarg arg, char* str, size_t buf, size_t
      */
     if (str) {
         strncpy(str, s.c_str(), buf);
-        str[buf] = '\0'; //prevent sting not being null terminated.
+        str[buf - 1] = '\0'; //prevent sting not being null terminated.
     }
-    return s.size();
+    return s.size() + 1;
 }
 
 size_t alljoyn_msgarg_array_tostring(const alljoyn_msgarg args, size_t numArgs, char* str, size_t buf, size_t indent)
@@ -219,9 +219,9 @@ size_t alljoyn_msgarg_array_tostring(const alljoyn_msgarg args, size_t numArgs, 
      */
     if (str) {
         strncpy(str, s.c_str(), buf);
-        str[buf] = '\0'; //prevent sting not being null terminated.
+        str[buf - 1] = '\0'; //prevent sting not being null terminated.
     }
-    return s.size();
+    return s.size() + 1;
 }
 
 const char* alljoyn_msgarg_signature(alljoyn_msgarg arg)

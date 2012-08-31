@@ -255,14 +255,12 @@ TEST_F(MessageTest, message_properties) {
     char* str;
     size_t buf;
     buf = alljoyn_message_tostring(reply, NULL, 0);
-    buf++;
     str = (char*)malloc(sizeof(char) * buf);
     alljoyn_message_tostring(reply, str, buf);
     qcc::String strTest = str;
     free(str);
 
     buf = alljoyn_message_description(reply, NULL, 0);
-    buf++;
     str = (char*)malloc(sizeof(char) * buf);
     alljoyn_message_description(reply, str, buf);
     EXPECT_STREQ("", str);
@@ -271,7 +269,6 @@ TEST_F(MessageTest, message_properties) {
     char* str;
     size_t buf;
     buf = alljoyn_message_tostring(reply, NULL, 0);
-    buf++;
     str = (char*)malloc(sizeof(char) * buf);
     alljoyn_message_tostring(reply, str, buf);
     qcc::String strTest = str;
@@ -280,7 +277,6 @@ TEST_F(MessageTest, message_properties) {
     free(str);
 
     buf = alljoyn_message_description(reply, NULL, 0);
-    buf++;
     str = (char*)malloc(sizeof(char) * buf);
     alljoyn_message_description(reply, str, buf);
     strTest = str;

@@ -275,11 +275,11 @@ extern AJ_API QStatus alljoyn_interfacedescription_addmemberannotation(alljoyn_i
  *
  * @return QC_FALSE if annotation does not exist, QC_TRUE otherwise.
  */
-QCC_BOOL alljoyn_interfacedescription_getmemberannotation(alljoyn_interfacedescription iface,
-                                                          const char* member,
-                                                          const char* name,
-                                                          char* value,
-                                                          size_t* value_size);
+QCC_BOOL AJ_API alljoyn_interfacedescription_getmemberannotation(alljoyn_interfacedescription iface,
+                                                                 const char* member,
+                                                                 const char* name,
+                                                                 char* value,
+                                                                 size_t* value_size);
 
 /**
  * Get all the members.

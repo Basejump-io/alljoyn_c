@@ -119,7 +119,7 @@ extern AJ_API void alljoyn_emit_property_changed(
  * Get the name of this object.
  * The name is the last component of the path.
  *
- * If the buffer is NULL or the bufferSz is 0, the length of the name will be returned.
+ * If the buffer is NULL or the bufferSz is 0, the length of the name + nul will be returned.
  *
  * @param bus       BusObject on which to get the name.
  * @param buffer    A buffer into which to copy the name.

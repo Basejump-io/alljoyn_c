@@ -45,31 +45,23 @@ void alljoyn_interfacedescription_member_getannotationatindex(alljoyn_interfaced
 
     ((ajn::InterfaceDescription::Member*)member.internal_member)->GetAnnotations(inner_names, inner_values, annotation_size);
 
-    if (name == NULL) {
-        if (name_size != NULL) {
-            //size of the string plus the nul character
-            *name_size = inner_names[index].size() + 1;
+    if (name != NULL && value != NULL) {
+        if (name_size > 0) {
+            strncpy(name, inner_names[index].c_str(), *name_size);
+            //make sure the string always ends in nul
+            name[*name_size - 1] = '\0';
+        }
+
+        if (value_size > 0) {
+            strncpy(value, inner_values[index].c_str(), *value_size);
+            //make sure the string always ends in nul
+            value[*value_size - 1] = '\0';
         }
     }
-    if (value == NULL) {
-        if (value_size != NULL) {
-            //size of the string plus the nul character
-            *value_size = inner_values[index].size() + 1;
-        }
-    }
-    if (name == NULL || value == NULL) {
-        delete[] inner_names;
-        delete[] inner_values;
-        return;
-    }
-
-    strncpy(name, inner_names[index].c_str(), *name_size);
-    //make sure the string always ends in nul
-    name[*name_size - 1] = '\0';
-    strncpy(value, inner_values[index].c_str(), *value_size);
-    //make sure the string always ends in nul
-    value[*value_size - 1] = '\0';
-
+    //size of the string plus the nul character
+    *name_size = inner_names[index].size() + 1;
+    //size of the string plus the nul character
+    *value_size = inner_values[index].size() + 1;
     delete[] inner_names;
     delete[] inner_values;
     return;
@@ -80,25 +72,24 @@ QCC_BOOL alljoyn_interfacedescription_member_getannotation(alljoyn_interfacedesc
     qcc::String out_val;
     bool b = ((ajn::InterfaceDescription::Member*)member.internal_member)->GetAnnotation(name, out_val);
 
-    if (value == NULL) {
-        if (value_size != NULL) {
-            //size of the string plus the nul character
+    if (value != NULL && value_size > 0) {
+        if (b) {
+            ::strncpy(value, out_val.c_str(), *value_size);
+            //make sure string always ends in a nul character.
+            value[*value_size - 1] = '\0';
             *value_size = out_val.size() + 1;
+            return QCC_TRUE;
+        } else {
+            //return empty string
+            if (*value_size > 0) {
+                *value = '\0';
+            }
+            *value_size = out_val.size() + 1;
+            return QCC_FALSE;
         }
-        return QCC_FALSE;
     }
-    if (b) {
-        ::strncpy(value, out_val.c_str(), *value_size);
-        //make sure string always ends in a nul character.
-        value[*value_size - 1] = '\0';
-        return QCC_TRUE;
-    } else {
-        //return empty string
-        if (*value_size > 0) {
-            *value = '\0';
-        }
-        return QCC_FALSE;
-    }
+    *value_size = out_val.size() + 1;
+    return QCC_FALSE;
 }
 
 size_t alljoyn_interfacedescription_property_getannotationscount(alljoyn_interfacedescription_property property) {
@@ -116,31 +107,23 @@ void alljoyn_interfacedescription_property_getannotationatindex(alljoyn_interfac
 
     ((ajn::InterfaceDescription::Property*)property.internal_property)->GetAnnotations(inner_names, inner_values, annotation_size);
 
-    if (name == NULL) {
-        if (name_size != NULL) {
-            //size of the string plus the nul character
-            *name_size = inner_names[index].size() + 1;
+    if (name != NULL && value != NULL) {
+        if (name_size > 0) {
+            strncpy(name, inner_names[index].c_str(), *name_size);
+            //make sure the string always ends in nul
+            name[*name_size - 1] = '\0';
+        }
+
+        if (value_size > 0) {
+            strncpy(value, inner_values[index].c_str(), *value_size);
+            //make sure the string always ends in nul
+            value[*value_size - 1] = '\0';
         }
     }
-    if (value == NULL) {
-        if (value_size != NULL) {
-            //size of the string plus the nul character
-            *value_size = inner_values[index].size() + 1;
-        }
-    }
-    if (name == NULL || value == NULL) {
-        delete[] inner_names;
-        delete[] inner_values;
-        return;
-    }
-
-    strncpy(name, inner_names[index].c_str(), *name_size);
-    //make sure the string always ends in nul
-    name[*name_size - 1] = '\0';
-    strncpy(value, inner_values[index].c_str(), *value_size);
-    //make sure the string always ends in nul
-    value[*value_size - 1] = '\0';
-
+    //size of the string plus the nul character
+    *name_size = inner_names[index].size() + 1;
+    //size of the string plus the nul character
+    *value_size = inner_values[index].size() + 1;
     delete[] inner_names;
     delete[] inner_values;
     return;
@@ -151,25 +134,24 @@ QCC_BOOL alljoyn_interfacedescription_property_getannotation(alljoyn_interfacede
     qcc::String out_val;
     bool b = ((ajn::InterfaceDescription::Property*)property.internal_property)->GetAnnotation(name, out_val);
 
-    if (value == NULL) {
-        if (value_size != NULL) {
-            //size of the string plus the nul character
+    if (value != NULL && value_size > 0) {
+        if (b) {
+            ::strncpy(value, out_val.c_str(), *value_size);
+            //make sure string always ends in a nul character.
+            value[*value_size - 1] = '\0';
             *value_size = out_val.size() + 1;
+            return QCC_TRUE;
+        } else {
+            //return empty string
+            if (*value_size > 0) {
+                *value = '\0';
+            }
+            *value_size = out_val.size() + 1;
+            return QCC_FALSE;
         }
-        return QCC_FALSE;
     }
-    if (b) {
-        ::strncpy(value, out_val.c_str(), *value_size);
-        //make sure string always ends in a nul character.
-        value[*value_size - 1] = '\0';
-        return QCC_TRUE;
-    } else {
-        //return empty string
-        if (*value_size > 0) {
-            *value = '\0';
-        }
-        return QCC_FALSE;
-    }
+    *value_size = out_val.size() + 1;
+    return QCC_FALSE;
 }
 void alljoyn_interfacedescription_activate(alljoyn_interfacedescription iface)
 {
@@ -202,23 +184,24 @@ QCC_BOOL alljoyn_interfacedescription_getannotation(alljoyn_interfacedescription
     qcc::String out_val;
     const bool b = ((ajn::InterfaceDescription*)iface)->GetAnnotation(name, out_val);
 
-    if (value == NULL) {
-        //size of the string plus the nul character
-        *value_size = out_val.size() + 1;
-        return QCC_FALSE;
-    }
-    if (b) {
-        ::strncpy(value, out_val.c_str(), *value_size);
-        //make sure string always ends in a nul character.
-        value[*value_size - 1] = '\0';
-        return QCC_TRUE;
-    } else {
-        //return empty string
-        if (*value_size > 0) {
-            *value = '\0';
+    if (value != NULL && value_size > 0) {
+        if (b) {
+            ::strncpy(value, out_val.c_str(), *value_size);
+            //make sure string always ends in a nul character.
+            value[*value_size - 1] = '\0';
+            *value_size = out_val.size() + 1;
+            return QCC_TRUE;
+        } else {
+            //return empty string
+            if (*value_size > 0) {
+                *value = '\0';
+            }
+            *value_size = out_val.size() + 1;
+            return QCC_FALSE;
         }
-        return QCC_FALSE;
     }
+    *value_size = out_val.size() + 1;
+    return QCC_FALSE;
 }
 
 size_t alljoyn_interfacedescription_getannotationscount(alljoyn_interfacedescription iface) {
@@ -235,31 +218,23 @@ void alljoyn_interfacedescription_getannotationatindex(alljoyn_interfacedescript
 
     ((ajn::InterfaceDescription*)iface)->GetAnnotations(inner_names, inner_values, annotation_size);
 
-    if (name == NULL) {
-        if (name_size != NULL) {
-            //size of the string plus the nul character
-            *name_size = inner_names[index].size() + 1;
+    if (name != NULL && value != NULL) {
+        if (name_size > 0) {
+            strncpy(name, inner_names[index].c_str(), *name_size);
+            //make sure the string always ends in nul
+            name[*name_size - 1] = '\0';
+        }
+
+        if (value_size > 0) {
+            strncpy(value, inner_values[index].c_str(), *value_size);
+            //make sure the string always ends in nul
+            value[*value_size - 1] = '\0';
         }
     }
-    if (value == NULL) {
-        if (value_size != NULL) {
-            //size of the string plus the nul character
-            *value_size = inner_values[index].size() + 1;
-        }
-    }
-    if (name == NULL || value == NULL) {
-        delete[] inner_names;
-        delete[] inner_values;
-        return;
-    }
-
-    strncpy(name, inner_names[index].c_str(), *name_size);
-    //make sure the string always ends in nul
-    name[*name_size - 1] = '\0';
-    strncpy(value, inner_values[index].c_str(), *value_size);
-    //make sure the string always ends in nul
-    value[*value_size - 1] = '\0';
-
+    //size of the string plus the nul character
+    *name_size = inner_names[index].size() + 1;
+    //size of the string plus the nul character
+    *value_size = inner_values[index].size() + 1;
     delete[] inner_names;
     delete[] inner_values;
     return;
@@ -290,21 +265,24 @@ QCC_BOOL alljoyn_interfacedescription_getmemberannotation(alljoyn_interfacedescr
     qcc::String out_val;
     const bool b = ((ajn::InterfaceDescription*)iface)->GetMemberAnnotation(member, name, out_val);
 
-    if (value == NULL) {
-        //size of the string plus the nul character
-        *value_size = out_val.size() + 1;
-        return QCC_FALSE;
-    }
-    if (b) {
-        ::strncpy(value, out_val.c_str(), *value_size);
-        value[*value_size - 1] = '\0';
-        return QCC_TRUE;
-    } else {
-        if (*value_size > 0) {
-            *value = '\0';
+    if (value != NULL && value_size > 0) {
+        if (b) {
+            ::strncpy(value, out_val.c_str(), *value_size);
+            //make sure string always ends in a nul character.
+            value[*value_size - 1] = '\0';
+            *value_size = out_val.size() + 1;
+            return QCC_TRUE;
+        } else {
+            //return empty string
+            if (*value_size > 0) {
+                *value = '\0';
+            }
+            *value_size = out_val.size() + 1;
+            return QCC_FALSE;
         }
-        return QCC_FALSE;
     }
+    *value_size = out_val.size() + 1;
+    return QCC_FALSE;
 }
 
 size_t alljoyn_interfacedescription_getmembers(const alljoyn_interfacedescription iface,
@@ -459,7 +437,7 @@ QCC_BOOL alljoyn_interfacedescription_getpropertyannotation(alljoyn_interfacedes
                                                             const char* property,
                                                             const char* name,
                                                             char* value,
-                                                            size_t* str_size)
+                                                            size_t* value_size)
 {
     if (iface == NULL) {
         return QCC_FALSE;
@@ -476,26 +454,24 @@ QCC_BOOL alljoyn_interfacedescription_getpropertyannotation(alljoyn_interfacedes
     const bool b = ((ajn::InterfaceDescription*)iface)->GetPropertyAnnotation(property, name, out_val);
 
     //Return the size of the string so memory can be allocated for the string
-    if (value == NULL) {
-        //size of the string plus the nul character
-        if (str_size != NULL) {
-            *str_size = out_val.size() + 1;
+    if (value != NULL && value_size > 0) {
+        if (b) {
+            ::strncpy(value, out_val.c_str(), *value_size);
+            //make sure string always ends in a nul character.
+            value[*value_size - 1] = '\0';
+            *value_size = out_val.size() + 1;
+            return QCC_TRUE;
+        } else {
+            //return empty string
+            if (*value_size > 0) {
+                *value = '\0';
+            }
+            *value_size = out_val.size() + 1;
+            return QCC_FALSE;
         }
-        return QCC_FALSE;
     }
-
-    if (b) {
-        ::strncpy(value, out_val.c_str(), *str_size);
-        //make sure the string is always nul terminated.
-        value[*str_size - 1] = '\0';
-        return QCC_TRUE;
-    } else {
-        //we must have at least enough space for the nul character.
-        if (*str_size > 0) {
-            *value = '\0';
-        }
-        return QCC_FALSE;
-    }
+    *value_size = out_val.size() + 1;
+    return QCC_FALSE;
 }
 
 const char* alljoyn_interfacedescription_getname(const alljoyn_interfacedescription iface)

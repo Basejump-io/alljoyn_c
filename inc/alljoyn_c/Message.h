@@ -325,9 +325,10 @@ extern AJ_API alljoyn_sessionid alljoyn_message_getsessionid(alljoyn_message msg
  * @param[out] errorMessage
  *                      - Return the error message string stored
  *                      - leave errorMessage unchanged if error message string not found
- * @param[in,out] errorMessage_size size of the errorMessage string if errorMessage == NULL
- *                                  this will be changed to the size of the string so a buffer
- *                                  can be allocated to hold the string.
+ * @param[in,out] errorMessage_size size of the errorMessage string (including the terminating nul byte)
+ *                                  if errorMessage == NULL this will be changed to the
+ *                                  size of the string so a buffer can be allocated to
+ *                                  hold the string.
  *
  * @return
  *      - If error detected return error name stored in the AllJoyn header field
@@ -343,7 +344,7 @@ extern AJ_API const char* alljoyn_message_geterrorname(alljoyn_message msg, char
  *                  representation of the alljoyn_message
  * @param[in]  buf  The size of the char* array that will hold the string
  *
- * @return  The number of characters (excluding the terminating null byte) which
+ * @return  The number of characters (including the terminating nul byte) which
  *          would have been written to the final string if enough space
  *          available.  Thus returning a value of buf or larger means the output
  *          was truncated.
@@ -359,7 +360,7 @@ extern AJ_API size_t alljoyn_message_tostring(alljoyn_message msg, char* str, si
  *                 message
  * @param[in]  buf  The size of the char* array that will hold the string
  *
- * @return  The number of characters (excluding the terminating null byte) which
+ * @return  The number of characters (including the terminating nul byte) which
  *          would have been written to the final string if enough space
  *          available.  Thus returning a value of buf or larger means the output
  *          was truncated.
