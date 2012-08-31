@@ -427,7 +427,7 @@ extern AJ_API size_t alljoyn_msgarg_array_tostring(const alljoyn_msgarg args, si
  *
  * @return The signature string for this MsgArg
  */
-extern AJ_API const char* alljoyn_msgarg_signature(alljoyn_msgarg arg);
+extern AJ_API size_t alljoyn_msgarg_signature(alljoyn_msgarg arg, char* str, size_t buf);
 
 /**
  * Returns a string representation of the signature of an array of message args.
@@ -437,7 +437,7 @@ extern AJ_API const char* alljoyn_msgarg_signature(alljoyn_msgarg arg);
  *
  * @return The signature string for the message args.
  */
-extern AJ_API const char* alljoyn_msgarg_array_signature(alljoyn_msgarg values, size_t numValues);
+extern AJ_API size_t alljoyn_msgarg_array_signature(alljoyn_msgarg values, size_t numValues, char* str, size_t buf);
 
 /**
  * Checks the signature of this arg.
