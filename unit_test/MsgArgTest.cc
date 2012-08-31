@@ -532,7 +532,11 @@ TEST(MsgArgTest, tostring) {
 
 TEST(MsgArgTest, signature) {
     alljoyn_msgarg arg1 = alljoyn_msgarg_create_and_set("i", 42);
-    EXPECT_STREQ("i", alljoyn_msgarg_signature(arg1));
+    size_t buf = alljoyn_msgarg_signature(arg1, NULL, 0);
+    char* val = (char*)malloc(sizeof(char) * buf);
+    alljoyn_msgarg_signature(arg1, val, buf);
+    EXPECT_STREQ("i", val);
+    free(val);
 
     QStatus status = ER_OK;
     alljoyn_msgarg arg2;
@@ -540,7 +544,11 @@ TEST(MsgArgTest, signature) {
     size_t numArgs = 4;
     status = alljoyn_msgarg_array_set(arg2, &numArgs, "issi", 1, "two", "three", 4);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
-    EXPECT_STREQ("issi", alljoyn_msgarg_array_signature(arg2, 4));
+    buf = alljoyn_msgarg_array_signature(arg2, 4, NULL, 0);
+    val = (char*)malloc(sizeof(char) * buf);
+    alljoyn_msgarg_array_signature(arg2, 4, val, buf);
+    EXPECT_STREQ("issi", val);
+    free(val);
 
     alljoyn_msgarg_destroy(arg1);
     alljoyn_msgarg_destroy(arg2);
@@ -685,8 +693,18 @@ TEST(MsgArgTest, null_pointer_test) {
     EXPECT_EQ(ER_BAD_ARG_1, status) << "  Actual Status: " << QCC_StatusText(status);
 
     EXPECT_EQ((size_t)0, alljoyn_msgarg_tostring(arg, NULL, 0, 0));
-    EXPECT_TRUE(NULL == alljoyn_msgarg_signature(arg));
-    EXPECT_TRUE(NULL == alljoyn_msgarg_array_signature(arg_array, numArgs));
+    size_t buf = alljoyn_msgarg_signature(arg, NULL, 0);
+    char* val = (char*)malloc(sizeof(char) * buf);
+    alljoyn_msgarg_signature(arg, val, buf);
+    EXPECT_TRUE(0 == buf);
+    free(val);
+
+    buf = alljoyn_msgarg_array_signature(arg_array, numArgs, NULL, 0);
+    val = (char*)malloc(sizeof(char) * buf);
+    alljoyn_msgarg_array_signature(arg_array, numArgs, val, buf);
+    EXPECT_TRUE(0 == buf);
+    free(val);
+
     EXPECT_FALSE(alljoyn_msgarg_hassignature(arg, "i"));
     EXPECT_NO_FATAL_FAILURE(status = alljoyn_msgarg_getdictelement(arg, "{ii}", 1, &i));
     EXPECT_EQ(ER_BAD_ARG_1, status) << "  Actual Status: " << QCC_StatusText(status);

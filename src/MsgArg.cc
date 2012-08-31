@@ -224,20 +224,39 @@ size_t alljoyn_msgarg_array_tostring(const alljoyn_msgarg args, size_t numArgs, 
     return s.size() + 1;
 }
 
-const char* alljoyn_msgarg_signature(alljoyn_msgarg arg)
+size_t alljoyn_msgarg_signature(alljoyn_msgarg arg, char* str, size_t buf)
 {
     if (!arg) {
-        return NULL;
+        return (size_t)0;
     }
-    return ((ajn::MsgArgC*)arg)->Signature().c_str();
+    qcc::String s = ((ajn::MsgArgC*)arg)->Signature();
+    /*
+     * it is ok to send in NULL for str when the user is only interested in the
+     * size of the resulting string.
+     */
+    if (str) {
+        strncpy(str, s.c_str(), buf);
+        str[buf - 1] = '\0'; //prevent sting not being null terminated.
+    }
+    return s.size() + 1;
 }
 
-const char* alljoyn_msgarg_array_signature(alljoyn_msgarg values, size_t numValues)
+size_t alljoyn_msgarg_array_signature(alljoyn_msgarg values, size_t numValues, char* str, size_t buf)
 {
     if (!values) {
-        return NULL;
+        return (size_t)0;
     }
-    return ((ajn::MsgArgC*)values)->Signature((ajn::MsgArgC*)values, numValues).c_str();
+    qcc::String s = ((ajn::MsgArgC*)values)->Signature((ajn::MsgArgC*)values, numValues).c_str();
+    /*
+     * it is ok to send in NULL for str when the user is only interested in the
+     * size of the resulting string.
+     */
+    if (str) {
+        strncpy(str, s.c_str(), buf);
+        str[buf - 1] = '\0'; //prevent sting not being null terminated.
+    }
+    return s.size() + 1;
+
 }
 
 QCC_BOOL alljoyn_msgarg_hassignature(alljoyn_msgarg arg, const char* signature)

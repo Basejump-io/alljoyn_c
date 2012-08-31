@@ -178,7 +178,13 @@ TEST_F(MessageTest, getarg__getargs_parseargs) {
     size_t numArgs;
     alljoyn_message_getargs(reply, &numArgs, &output);
     EXPECT_EQ((size_t)1, numArgs);
-    EXPECT_STREQ("s", alljoyn_msgarg_signature(alljoyn_msgarg_array_element(output, 0)));
+    alljoyn_msgarg arg = alljoyn_msgarg_array_element(output, 0);
+    size_t buf = alljoyn_msgarg_signature(arg, NULL, 0);
+    char* val = (char*)malloc(sizeof(char) * buf);
+    alljoyn_msgarg_signature(arg, val, buf);
+    EXPECT_STREQ("s", val);
+    free(val);
+
     status = alljoyn_msgarg_get(alljoyn_msgarg_array_element(output, 0), "s", &str);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     EXPECT_STREQ("AllJoyn", str);
