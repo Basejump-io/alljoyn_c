@@ -396,7 +396,7 @@ extern AJ_API QStatus alljoyn_msgarg_array_get(const alljoyn_msgarg args, size_t
  * @param[in]  buf    The size of the char* array that will hold the string
  * @param[in]  indent Number of spaces to indent the generated xml (default value 0)
  *
- * @return  The number of characters (excluding the terminating null byte) which
+ * @return  The number of characters (including the terminating nul byte) which
  *          would have been written to the final string if enough space
  *          available.  Thus returning a value of buf or larger means the output
  *          was truncated.
@@ -413,7 +413,7 @@ extern AJ_API size_t alljoyn_msgarg_tostring(alljoyn_msgarg arg, char* str, size
  * @param[in]  buf      The size of the char* array that will hold the string
  * @param[in]  indent   Number of spaces to indent the generated xml (default value 0)
  *
- * @return  The number of characters (excluding the terminating null byte) which
+ * @return  The number of characters (including the terminating nul byte) which
  *          would have been written to the final string if enough space is
  *          available.  Thus returning a value of buf or larger means the output
  *          was truncated.

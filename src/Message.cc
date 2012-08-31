@@ -178,14 +178,14 @@ const char* alljoyn_message_geterrorname(alljoyn_message msg, char* errorMessage
 {
     qcc::String* str = new qcc::String("");
     const char* ret = msg->msg->GetErrorName(str);
-    if (errorMessage == NULL) {
-        *errorMessage_size = str->size();
-        delete str;
-        return ret;
+
+    if (errorMessage != NULL && errorMessage_size > 0) {
+        strncpy(errorMessage, str->c_str(), *errorMessage_size);
+        //Make sure the string is always nul terminated.
+        errorMessage[*errorMessage_size - 1] = '\0';
     }
-    strncpy(errorMessage, str->c_str(), *errorMessage_size);
-    //Make sure the string is always nul terminated.
-    errorMessage[*errorMessage_size - 1] = '\0';
+    //string plus nul character
+    *errorMessage_size = str->size() + 1;
     delete str;
     return ret;
 }
@@ -201,9 +201,10 @@ size_t alljoyn_message_tostring(alljoyn_message msg, char* str, size_t buf) {
      */
     if (str) {
         strncpy(str, s.c_str(), buf);
-        str[buf] = '\0'; //prevent sting not being null terminated.
+        str[buf - 1] = '\0'; //prevent sting not being null terminated.
     }
-    return s.size();
+    //string plus nul character
+    return s.size() + 1;
 }
 
 size_t alljoyn_message_description(alljoyn_message msg, char* str, size_t buf)
@@ -218,9 +219,10 @@ size_t alljoyn_message_description(alljoyn_message msg, char* str, size_t buf)
      */
     if (str) {
         strncpy(str, s.c_str(), buf);
-        str[buf] = '\0'; //prevent sting not being null terminated.
+        str[buf - 1] = '\0'; //prevent sting not being null terminated.
     }
-    return s.size();
+    //string plus nul character
+    return s.size() + 1;
 }
 
 uint32_t alljoyn_message_gettimestamp(alljoyn_message msg)

@@ -218,10 +218,11 @@ size_t alljoyn_busobject_getname(alljoyn_busobject bus, char* buffer, size_t buf
 {
     qcc::String name = ((ajn::BusObjectC*)bus)->GetName();
     if (buffer != NULL && bufferSz > 0) {
+        strncpy(buffer, name.c_str(), bufferSz);
+        //prevent sting not being nul terminated.
         buffer[bufferSz - 1] = '\0';
-        strncpy(buffer, name.c_str(), bufferSz - 1);
     }
-    return name.length();
+    return name.length() + 1;
 }
 
 QStatus alljoyn_busobject_addinterface(alljoyn_busobject bus, const alljoyn_interfacedescription iface)

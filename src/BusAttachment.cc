@@ -314,8 +314,11 @@ QStatus alljoyn_busattachment_getpeerguid(alljoyn_busattachment bus, const char*
     QStatus ret = ((ajn::BusAttachmentC*)bus)->GetPeerGUID(name, guidStr);
     if (guid != NULL) {
         strncpy(guid, guidStr.c_str(), *guidSz);
+        //prevent sting not being null terminated.
+        guid[*guidSz - 1] = '\0';
     }
-    *guidSz = guidStr.length();
+    //size of the string plus the nul character
+    *guidSz = guidStr.length() + 1;
     return ret;
 }
 
