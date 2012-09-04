@@ -625,7 +625,7 @@ TEST(InterfaceDescriptionTest, interface_annotations)
     free(value);
 
     alljoyn_interfacedescription_getannotation(testIntf, "org.alljoyn.test.annotation", NULL, &value_size);
-    EXPECT_LT(0, value_size);
+    EXPECT_LT((size_t)0, value_size);
 
     value = (char*)malloc(sizeof(char) * value_size);
     QCC_BOOL success = alljoyn_interfacedescription_getannotation(testIntf, "org.alljoyn.test.annotation", value, &value_size);
@@ -677,7 +677,7 @@ TEST(InterfaceDescriptionTest, method_annotations)
     free(value);
 
     alljoyn_interfacedescription_member_getannotation(method_member, "one", NULL, &value_size);
-    EXPECT_LT(0, value_size);
+    EXPECT_LT((size_t)0, value_size);
 
     value = (char*)malloc(sizeof(char) * value_size);
     QCC_BOOL success = alljoyn_interfacedescription_member_getannotation(method_member, "one", value, &value_size);
@@ -688,7 +688,7 @@ TEST(InterfaceDescriptionTest, method_annotations)
     free(value);
 
     alljoyn_interfacedescription_getmemberannotation(testIntf, "ping", "one", NULL, &value_size);
-    EXPECT_LT(0, value_size);
+    EXPECT_LT((size_t)0, value_size);
 
     value = (char*)malloc(sizeof(char) * value_size);
 
@@ -742,7 +742,7 @@ TEST(InterfaceDescriptionTest, signal_annotations)
     free(value);
 
     alljoyn_interfacedescription_member_getannotation(signal_member, "two", NULL, &value_size);
-    EXPECT_LT(0, value_size);
+    EXPECT_LT((size_t)0, value_size);
 
     value = (char*)malloc(sizeof(char) * value_size);
     QCC_BOOL success = alljoyn_interfacedescription_member_getannotation(signal_member, "two", value, &value_size);
@@ -753,7 +753,7 @@ TEST(InterfaceDescriptionTest, signal_annotations)
     free(value);
 
     alljoyn_interfacedescription_getmemberannotation(testIntf, "chirp", "two", NULL, &value_size);
-    EXPECT_LT(0, value_size);
+    EXPECT_LT((size_t)0, value_size);
 
     value = (char*)malloc(sizeof(char) * value_size);
 
@@ -806,7 +806,7 @@ TEST(InterfaceDescriptionTest, property_annotations)
     free(value);
 
     alljoyn_interfacedescription_property_getannotation(property, "three", NULL, &value_size);
-    EXPECT_LT(0, value_size);
+    EXPECT_LT((size_t)0, value_size);
 
     value = (char*)malloc(sizeof(char) * value_size);
     QCC_BOOL success = alljoyn_interfacedescription_property_getannotation(property, "three", value, &value_size);
@@ -817,7 +817,7 @@ TEST(InterfaceDescriptionTest, property_annotations)
     free(value);
 
     alljoyn_interfacedescription_getpropertyannotation(testIntf, "prop", "three", NULL, &value_size);
-    EXPECT_LT(0, value_size);
+    EXPECT_LT((size_t)0, value_size);
 
     value = (char*)malloc(sizeof(char) * value_size);
 
@@ -945,13 +945,13 @@ TEST(InterfaceDescriptionTest, multiple_annotations)
          * 5 : org.alljoyn.test.two = broken_mirror
          * 6 : org.freedesktop.DBus.Method.NoReply = true
          */
-        EXPECT_TRUE(strcmp("org.alljoyn.test.one", name) == 0 && strcmp("black_cat", value) == 0 ||
-                    strcmp("org.alljoyn.test.two", name) == 0 && strcmp("broken_mirror", value) == 0 ||
-                    strcmp("org.alljoyn.test.three", name) == 0 && strcmp("latter", value) == 0 ||
-                    strcmp("org.alljoyn.test.four", name) == 0 && strcmp("umbrella", value) == 0 ||
-                    strcmp("org.alljoyn.test.five", name) == 0 && strcmp("luck", value) == 0 ||
-                    strcmp("org.alljoyn.test.six", name) == 0 && strcmp("bad", value) == 0 ||
-                    strcmp("org.freedesktop.DBus.Method.NoReply", name) == 0 && strcmp("true", value) == 0)
+        EXPECT_TRUE((strcmp("org.alljoyn.test.one", name) == 0 && strcmp("black_cat", value) == 0) ||
+                    (strcmp("org.alljoyn.test.two", name) == 0 && strcmp("broken_mirror", value) == 0) ||
+                    (strcmp("org.alljoyn.test.three", name) == 0 && strcmp("latter", value) == 0) ||
+                    (strcmp("org.alljoyn.test.four", name) == 0 && strcmp("umbrella", value) == 0) ||
+                    (strcmp("org.alljoyn.test.five", name) == 0 && strcmp("luck", value) == 0) ||
+                    (strcmp("org.alljoyn.test.six", name) == 0 && strcmp("bad", value) == 0) ||
+                    (strcmp("org.freedesktop.DBus.Method.NoReply", name) == 0 && strcmp("true", value) == 0))
         << "Expected annotation not found : " << name << " = " << value << "\n";
 
         free(name);

@@ -442,7 +442,7 @@ extern AJ_API QStatus alljoyn_interfacedescription_addpropertyannotation(alljoyn
  * char* value = (char*)malloc(sizeof(char) * str_size);
  * QCC_BOOL success = alljoyn_interfacedescription_getpropertyannotation(iface, "myProperty", "org.freedesktop.DBus.Property.EmitsChangedSignal", value, &str_size);
  * if (success == QCC_TRUE) {
- *    \/* code that does something with the value *\/
+ *    \/\/ code that does something with the value
  * }
  * free(value);
  * @endcode
