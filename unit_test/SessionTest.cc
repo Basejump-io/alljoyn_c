@@ -282,7 +282,9 @@ TEST_F(SessionTest, joinsessionasync) {
     status = alljoyn_busattachment_joinsessionasync(bus, OBJECT_NAME, SESSION_PORT, NULL, opts, &joinsessionhandler, (void*)dave);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     for (size_t i = 0; i < 200; ++i) {
-        if (sessionjoined_flag) {
+        // we can not break till both session flags have been set or we have a
+        // race condition that one of the two values have not been set.
+        if (sessionjoined_flag && joinsessionhandler_flag) {
             break;
         }
         qcc::Sleep(5);
