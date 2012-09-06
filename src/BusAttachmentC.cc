@@ -20,6 +20,7 @@
 #include <alljoyn_c/InterfaceDescription.h>
 #include <qcc/Mutex.h>
 #include <stdio.h>
+#include "DeferredCallback.h"
 
 using namespace std;
 using namespace qcc;
@@ -156,7 +157,9 @@ void BusAttachmentC::SignalHandlerRemap(const InterfaceDescription::Member* memb
              */
             if (it->second.sourcePath == NULL || strcmp(it->second.sourcePath, srcPath) == 0) {
                 alljoyn_messagereceiver_signalhandler_ptr remappedHandler = it->second.handler;
-                remappedHandler(&c_member, srcPath, (alljoyn_message) & message);
+                DeferredCallback_3<void, const alljoyn_interfacedescription_member*, const char*, alljoyn_message>* dcb = 
+                    new DeferredCallback_3<void, const alljoyn_interfacedescription_member*, const char*, alljoyn_message>(remappedHandler, &c_member, srcPath, (alljoyn_message) & message);
+                DEFERRED_CALLBACK_EXECUTE(dcb);
             }
         }
     }
