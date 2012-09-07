@@ -174,7 +174,7 @@ class BusObjectC : public BusObject {
 
         /* Look up the C callback via map and invoke */
         alljoyn_messagereceiver_methodhandler_ptr remappedHandler = callbackMap[member];
-        DeferredCallback_3<void, alljoyn_busobject, const alljoyn_interfacedescription_member*, alljoyn_message>* dcb = 
+        DeferredCallback_3<void, alljoyn_busobject, const alljoyn_interfacedescription_member*, alljoyn_message>* dcb =
             new DeferredCallback_3<void, alljoyn_busobject, const alljoyn_interfacedescription_member*, alljoyn_message>(remappedHandler, (alljoyn_busobject) this, &c_member, (alljoyn_message) & message);
         DEFERRED_CALLBACK_EXECUTE(dcb);
     }
