@@ -51,7 +51,6 @@ class MsgArgC : public MsgArg {
      */
     MsgArgC(AllJoynTypeId typeId) : MsgArg(typeId) { }
 
-    void SetOwnershipDeepC();
     static QStatus MsgArgUtilsSetVC(MsgArg* args, size_t& numArgs, const char* signature, va_list* argp);
 
     static QStatus VBuildArgsC(const char*& signature, size_t sigLen, MsgArg* arg, size_t maxArgs, va_list* argp, size_t* count = NULL);
