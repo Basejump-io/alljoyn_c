@@ -98,10 +98,20 @@ void cat_method(alljoyn_busobject bus, const alljoyn_interfacedescription_member
 {
     QStatus status;
     alljoyn_msgarg outArg;
+    char* str1;
+    char* str2;
     /* Concatenate the two input strings and reply with the result. */
     char result[256] = { 0 };
-    strncat(result, alljoyn_msgarg_as_string(alljoyn_message_getarg(msg, 0), 0), sizeof(result));
-    strncat(result, alljoyn_msgarg_as_string(alljoyn_message_getarg(msg, 1), 0), sizeof(result));
+    status = alljoyn_msgarg_get(alljoyn_message_getarg(msg, 0), "s", &str1);
+    if (ER_OK != status) {
+        printf("Ping: Error reading alljoyn_message\n");
+    }
+    status = alljoyn_msgarg_get(alljoyn_message_getarg(msg, 1), "s", &str2);
+    if (ER_OK != status) {
+        printf("Ping: Error reading alljoyn_message\n");
+    }
+    strncat(result, str1, sizeof(result));
+    strncat(result, str2, sizeof(result));
 
     outArg = alljoyn_msgarg_create_and_set("s", result);
     status = alljoyn_busobject_methodreply_args(bus, msg, outArg, 1);

@@ -280,8 +280,10 @@ int main(int argc, char** argv, char** envArg)
 
         status = alljoyn_proxybusobject_methodcall(remoteObj, INTERFACE_NAME, "Ping", inputs, 1, reply, 5000, 0);
         if (ER_OK == status) {
+            char* ping_str;
+            status = alljoyn_msgarg_get(alljoyn_message_getarg(reply, 0), "s", &ping_str);
             printf("%s.%s ( path=%s) returned \"%s\"\n", INTERFACE_NAME, "Ping",
-                   OBJECT_PATH, alljoyn_msgarg_as_string(alljoyn_message_getarg(reply, 0), 0));
+                   OBJECT_PATH, ping_str);
         } else {
             printf("MethodCall on %s.%s failed\n", INTERFACE_NAME, "Ping");
         }

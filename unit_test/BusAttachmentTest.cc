@@ -90,16 +90,24 @@ char sourcePath2[256];
 void registersignalHandler_Handler(const alljoyn_interfacedescription_member* member,
                                    const char* srcPath,
                                    alljoyn_message message) {
+    QStatus status = ER_FAIL;
     EXPECT_STREQ(sourcePath1, srcPath);
-    EXPECT_STREQ("AllJoyn", alljoyn_msgarg_as_string(alljoyn_message_getarg(message, 0), 0));
+    char* str;
+    status = alljoyn_msgarg_get(alljoyn_message_getarg(message, 0), "s", &str);
+    EXPECT_EQ(ER_OK, status);
+    EXPECT_STREQ("AllJoyn", str);
     registersignalhandler_flag = true;
 }
 
 void registersignalHandler_Handler2(const alljoyn_interfacedescription_member* member,
                                     const char* srcPath,
                                     alljoyn_message message) {
+    QStatus status = ER_FAIL;
     EXPECT_STREQ(sourcePath2, srcPath);
-    EXPECT_STREQ("AllJoyn", alljoyn_msgarg_as_string(alljoyn_message_getarg(message, 0), 0));
+    char* str;
+    status = alljoyn_msgarg_get(alljoyn_message_getarg(message, 0), "s", &str);
+    EXPECT_EQ(ER_OK, status);
+    EXPECT_STREQ("AllJoyn", str);
     registersignalhandler_flag2 = true;
 }
 
@@ -616,15 +624,23 @@ char sourcePath4[256];
 void registersignalHandler_Handler3(const alljoyn_interfacedescription_member* member,
                                     const char* srcPath,
                                     alljoyn_message message) {
+    QStatus status = ER_FAIL;
     EXPECT_STREQ(sourcePath3, srcPath);
-    EXPECT_STREQ("AllJoyn", alljoyn_msgarg_as_string(alljoyn_message_getarg(message, 0), 0));
+    char* str;
+    status = alljoyn_msgarg_get(alljoyn_message_getarg(message, 0), "s", &str);
+    EXPECT_EQ(ER_OK, status);
+    EXPECT_STREQ("AllJoyn", str);
     registersignalhandler_flag3 = true;
 }
 
 void registersignalHandler_Handler4(const alljoyn_interfacedescription_member* member,
                                     const char* srcPath,
                                     alljoyn_message message) {
+    QStatus status = ER_FAIL;
     EXPECT_STREQ(sourcePath4, srcPath);
-    EXPECT_STREQ("AllJoyn", alljoyn_msgarg_as_string(alljoyn_message_getarg(message, 0), 0));
+    char* str;
+    status = alljoyn_msgarg_get(alljoyn_message_getarg(message, 0), "s", &str);
+    EXPECT_EQ(ER_OK, status);
+    EXPECT_STREQ("AllJoyn", str);
     registersignalhandler_flag4 = true;
 }

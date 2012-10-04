@@ -199,8 +199,9 @@ int main(int argc, char** argv, char** envArg)
         }
         status = alljoyn_proxybusobject_methodcall(remoteObj, INTERFACE_NAME, "cat", inputs, 2, reply, 5000, 0);
         if (ER_OK == status) {
-            printf("%s.%s ( path=%s) returned \"%s\"\n", INTERFACE_NAME, "cat",
-                   OBJECT_PATH, alljoyn_msgarg_as_string(alljoyn_message_getarg(reply, 0), 0));
+            char* cat_str;
+            status = alljoyn_msgarg_get(alljoyn_message_getarg(reply, 0), "s", &cat_str);
+            printf("%s.%s ( path=%s) returned \"%s\"\n", INTERFACE_NAME, "cat", OBJECT_PATH, cat_str);
         } else {
             printf("MethodCall on %s.%s failed\n", INTERFACE_NAME, "cat");
         }
