@@ -35,12 +35,12 @@ env.VariantDir('$OBJDIR', 'src', duplicate = 0)
 env.VariantDir('$OBJDIR/samples', 'samples', duplicate = 0)
 
 # Install headers
+dbus_header = env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/DBusStd.h')
 headers = env.Install('$DISTDIR/inc/alljoyn_c', env.Glob('inc/alljoyn_c/*.h'))
-
+env.Depends(headers, dbus_header)
 # Install DBusStd.h in alljoyn_c inc folder and dist folder
-env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/DBusStd.h')
-headers += env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/DBusStd.h')
 
+#headers += env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/DBusStd.h')
 #Install Status.h in alljoyn_c inc folder
 headers += env.Install('inc', '$DISTDIR/inc/Status.h')
 
