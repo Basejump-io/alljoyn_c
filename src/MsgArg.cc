@@ -350,6 +350,82 @@ QStatus alljoyn_msgarg_array_set_offset(alljoyn_msgarg args, size_t argOffset, s
     return status;
 }
 
+
+QStatus alljoyn_msgarg_set_uint8(alljoyn_msgarg arg, uint8_t y) {
+    return alljoyn_msgarg_set(arg, "y", y);
+}
+QStatus alljoyn_msgarg_set_bool(alljoyn_msgarg arg, QCC_BOOL b) {
+    return alljoyn_msgarg_set(arg, "b", b);
+}
+QStatus alljoyn_msgarg_set_int16(alljoyn_msgarg arg, int16_t n) {
+    return alljoyn_msgarg_set(arg, "n", n);
+}
+QStatus alljoyn_msgarg_set_uint16(alljoyn_msgarg arg, uint16_t q) {
+    return alljoyn_msgarg_set(arg, "q", q);
+}
+QStatus alljoyn_msgarg_set_int32(alljoyn_msgarg arg, int32_t i) {
+    return alljoyn_msgarg_set(arg, "i", i);
+}
+QStatus alljoyn_msgarg_set_uint32(alljoyn_msgarg arg, uint32_t u) {
+    return alljoyn_msgarg_set(arg, "u", u);
+}
+QStatus alljoyn_msgarg_set_int64(alljoyn_msgarg arg, int64_t x) {
+    return alljoyn_msgarg_set(arg, "x", x);
+}
+QStatus alljoyn_msgarg_set_uint64(alljoyn_msgarg arg, uint64_t t) {
+    return alljoyn_msgarg_set(arg, "t", t);
+}
+QStatus alljoyn_msgarg_set_double(alljoyn_msgarg arg, double d) {
+    return alljoyn_msgarg_set(arg, "d", d);
+}
+QStatus alljoyn_msgarg_set_string(alljoyn_msgarg arg, const char* s) {
+    return alljoyn_msgarg_set(arg, "s", s);
+}
+QStatus alljoyn_msgarg_set_objectpath(alljoyn_msgarg arg, const char* o) {
+    return alljoyn_msgarg_set(arg, "o", o);
+}
+QStatus alljoyn_msgarg_set_signature(alljoyn_msgarg arg, const char* g) {
+    return alljoyn_msgarg_set(arg, "g", g);
+}
+
+
+extern AJ_API QStatus alljoyn_msgarg_get_uint8(const alljoyn_msgarg arg, uint8_t* y){
+    return alljoyn_msgarg_get(arg, "y", y);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_bool(const alljoyn_msgarg arg, uint8_t* b){
+    return alljoyn_msgarg_get(arg, "b", b);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_int16(const alljoyn_msgarg arg, int16_t* n){
+    return alljoyn_msgarg_get(arg, "n", n);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_uint16(const alljoyn_msgarg arg, uint16_t* q){
+    return alljoyn_msgarg_get(arg, "q", q);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_int32(const alljoyn_msgarg arg, int32_t* i){
+    return alljoyn_msgarg_get(arg, "i", i);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_uint32(const alljoyn_msgarg arg, uint32_t* u){
+    return alljoyn_msgarg_get(arg, "u", u);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_int64(const alljoyn_msgarg arg, int64_t* x){
+    return alljoyn_msgarg_get(arg, "x", x);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_uint64(const alljoyn_msgarg arg, uint64_t* t){
+    return alljoyn_msgarg_get(arg, "t", t);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_double(const alljoyn_msgarg arg, double* d){
+    return alljoyn_msgarg_get(arg, "d", d);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_string(const alljoyn_msgarg arg, char* s){
+    return alljoyn_msgarg_get(arg, "s", s);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_objectpath(const alljoyn_msgarg arg, char* o){
+    return alljoyn_msgarg_get(arg, "o", o);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_signature(const alljoyn_msgarg arg, char* g){
+    return alljoyn_msgarg_get(arg, "g", g);
+}
+
 #define _IMPLEMENT_MSGARG_TYPE_ACCESSOR(rt, nt, mt) \
     rt alljoyn_msgarg_as_ ## nt(const alljoyn_msgarg args, size_t idx) \
     { \

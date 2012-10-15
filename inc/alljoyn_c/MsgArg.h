@@ -530,6 +530,50 @@ extern AJ_API void alljoyn_msgarg_stabilize(alljoyn_msgarg arg);
  */
 extern AJ_API QStatus alljoyn_msgarg_array_set_offset(alljoyn_msgarg args, size_t argOffset, size_t* numArgs, const char* signature, ...);
 
+/*
+ * MsgArg set functions for each of the basic data types
+ */
+extern AJ_API QStatus alljoyn_msgarg_set_uint8(alljoyn_msgarg arg, uint8_t y);
+extern AJ_API QStatus alljoyn_msgarg_set_bool(alljoyn_msgarg arg, QCC_BOOL b);
+extern AJ_API QStatus alljoyn_msgarg_set_int16(alljoyn_msgarg arg, int16_t n);
+extern AJ_API QStatus alljoyn_msgarg_set_uint16(alljoyn_msgarg arg, uint16_t q);
+extern AJ_API QStatus alljoyn_msgarg_set_int32(alljoyn_msgarg arg, int32_t i);
+extern AJ_API QStatus alljoyn_msgarg_set_uint32(alljoyn_msgarg arg, uint32_t u);
+extern AJ_API QStatus alljoyn_msgarg_set_int64(alljoyn_msgarg arg, int64_t x);
+extern AJ_API QStatus alljoyn_msgarg_set_uint64(alljoyn_msgarg arg, uint64_t t);
+extern AJ_API QStatus alljoyn_msgarg_set_double(alljoyn_msgarg arg, double d);
+extern AJ_API QStatus alljoyn_msgarg_set_string(alljoyn_msgarg arg, const char* s);
+extern AJ_API QStatus alljoyn_msgarg_set_objectpath(alljoyn_msgarg arg, const char* o);
+extern AJ_API QStatus alljoyn_msgarg_set_signature(alljoyn_msgarg arg, const char* g);
+
+/*
+ * MsgArg get functions for each of the basic data types
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_uint8(const alljoyn_msgarg arg, uint8_t* y);
+extern AJ_API QStatus alljoyn_msgarg_get_bool(const alljoyn_msgarg arg, uint8_t* b);
+extern AJ_API QStatus alljoyn_msgarg_get_int16(const alljoyn_msgarg arg, int16_t* n);
+extern AJ_API QStatus alljoyn_msgarg_get_uint16(const alljoyn_msgarg arg, uint16_t* q);
+extern AJ_API QStatus alljoyn_msgarg_get_int32(const alljoyn_msgarg arg, int32_t* i);
+extern AJ_API QStatus alljoyn_msgarg_get_uint32(const alljoyn_msgarg arg, uint32_t* u);
+extern AJ_API QStatus alljoyn_msgarg_get_int64(const alljoyn_msgarg arg, int64_t* x);
+extern AJ_API QStatus alljoyn_msgarg_get_uint64(const alljoyn_msgarg arg, uint64_t* t);
+extern AJ_API QStatus alljoyn_msgarg_get_double(const alljoyn_msgarg arg, double* d);
+extern AJ_API QStatus alljoyn_msgarg_get_string(const alljoyn_msgarg arg, char* s);
+extern AJ_API QStatus alljoyn_msgarg_get_objectpath(const alljoyn_msgarg arg, char* o);
+extern AJ_API QStatus alljoyn_msgarg_get_signature(const alljoyn_msgarg arg, char* g);
+
+
+extern AJ_API uint8_t alljoyn_msgarg_as_uint8(const alljoyn_msgarg args, size_t idx);
+extern AJ_API QCC_BOOL alljoyn_msgarg_as_bool(const alljoyn_msgarg args, size_t idx);
+extern AJ_API int16_t alljoyn_msgarg_as_int16(const alljoyn_msgarg args, size_t idx);
+extern AJ_API uint16_t alljoyn_msgarg_as_uint16(const alljoyn_msgarg args, size_t idx);
+extern AJ_API int32_t alljoyn_msgarg_as_int32(const alljoyn_msgarg args, size_t idx);
+extern AJ_API uint32_t alljoyn_msgarg_as_uint32(const alljoyn_msgarg args, size_t idx);
+extern AJ_API int64_t alljoyn_msgarg_as_int64(const alljoyn_msgarg args, size_t idx);
+extern AJ_API uint64_t alljoyn_msgarg_as_uint64(const alljoyn_msgarg args, size_t idx);
+extern AJ_API double alljoyn_msgarg_as_double(const alljoyn_msgarg args, size_t idx);
+extern AJ_API const char* alljoyn_msgarg_as_string(const alljoyn_msgarg args, size_t idx);
+extern AJ_API const char* alljoyn_msgarg_as_objpath(const alljoyn_msgarg args, size_t idx);
 extern AJ_API alljoyn_msgarg alljoyn_msgarg_as_variant(const alljoyn_msgarg args, size_t idx);
 extern AJ_API void alljoyn_msgarg_as_signature(const alljoyn_msgarg args, size_t idx,
                                                uint8_t* out_len, const char** out_sig);
