@@ -80,7 +80,7 @@ typedef struct {
  * @param isPlaceholder  Place-holder objects are created by the bus itself and serve only
  *                       as parent objects (in the object path sense) to other objects.
  */
-extern AJ_API alljoyn_busobject alljoyn_busobject_create(alljoyn_busattachment bus, const char* path, QCC_BOOL isPlaceholder,
+extern AJ_API alljoyn_busobject alljoyn_busobject_create(const char* path, QCC_BOOL isPlaceholder,
                                                          const alljoyn_busobject_callbacks* callbacks_in, const void* context_in);
 
 /**

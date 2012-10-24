@@ -145,7 +145,10 @@ TEST(BusAttachmentTest, registersignalhandler_basic) {
         NULL
     };
 
-    alljoyn_busobject testObj = alljoyn_busobject_create(bus, "/org/alljoyn/test/signal", QCC_FALSE, &busObjCbs, NULL);
+    alljoyn_busobject testObj = alljoyn_busobject_create("/org/alljoyn/test/signal", QCC_FALSE, &busObjCbs, NULL);
+
+    status = alljoyn_busattachment_registerbusobject(bus, testObj);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     status = alljoyn_busobject_addinterface(testObj, testIntf);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -218,7 +221,10 @@ TEST(BusAttachmentTest, registersignalhandler_multiple_signals) {
         NULL
     };
 
-    alljoyn_busobject testObj = alljoyn_busobject_create(bus, sourcePath1, QCC_FALSE, &busObjCbs, NULL);
+    alljoyn_busobject testObj = alljoyn_busobject_create(sourcePath1, QCC_FALSE, &busObjCbs, NULL);
+
+    status = alljoyn_busattachment_registerbusobject(bus, testObj);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     status = alljoyn_busobject_addinterface(testObj, testIntf);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -295,7 +301,10 @@ TEST(BusAttachmentTest, unregistersignalhandler) {
         NULL
     };
 
-    alljoyn_busobject testObj = alljoyn_busobject_create(bus, sourcePath1, QCC_FALSE, &busObjCbs, NULL);
+    alljoyn_busobject testObj = alljoyn_busobject_create(sourcePath1, QCC_FALSE, &busObjCbs, NULL);
+
+    status = alljoyn_busattachment_registerbusobject(bus, testObj);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     status = alljoyn_busobject_addinterface(testObj, testIntf);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -393,8 +402,14 @@ TEST(BusAttachmentTest, register_unregister_signalhandler_with_sourcePath) {
         NULL
     };
 
-    alljoyn_busobject testObjA = alljoyn_busobject_create(bus, sourcePath1, QCC_FALSE, &busObjCbs, NULL);
-    alljoyn_busobject testObjB = alljoyn_busobject_create(bus, sourcePath2, QCC_FALSE, &busObjCbs, NULL);
+    alljoyn_busobject testObjA = alljoyn_busobject_create(sourcePath1, QCC_FALSE, &busObjCbs, NULL);
+    alljoyn_busobject testObjB = alljoyn_busobject_create(sourcePath2, QCC_FALSE, &busObjCbs, NULL);
+
+    status = alljoyn_busattachment_registerbusobject(bus, testObjA);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    status = alljoyn_busattachment_registerbusobject(bus, testObjB);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     status = alljoyn_busobject_addinterface(testObjA, testIntf);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -560,7 +575,10 @@ TEST(BusAttachmentTest, unregisterallhandlers) {
         NULL
     };
 
-    alljoyn_busobject testObj = alljoyn_busobject_create(bus, sourcePath1, QCC_FALSE, &busObjCbs, NULL);
+    alljoyn_busobject testObj = alljoyn_busobject_create(sourcePath1, QCC_FALSE, &busObjCbs, NULL);
+
+    status = alljoyn_busattachment_registerbusobject(bus, testObj);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     status = alljoyn_busobject_addinterface(testObj, testIntf);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);

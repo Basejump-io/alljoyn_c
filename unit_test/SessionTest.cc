@@ -135,7 +135,7 @@ class SessionTest : public testing::Test {
             NULL, /* BusObject Registered CB */
             NULL  /* BusObject Unregistered CB */
         };
-        alljoyn_busobject testObj = alljoyn_busobject_create(servicebus, OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
+        alljoyn_busobject testObj = alljoyn_busobject_create(OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
 
         status = alljoyn_busobject_addinterface(testObj, testIntf);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);

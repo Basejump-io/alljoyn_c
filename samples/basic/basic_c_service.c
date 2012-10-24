@@ -182,7 +182,7 @@ int main(int argc, char** argv, char** envArg)
     }
 
     /* Set up bus object */
-    testObj = alljoyn_busobject_create(g_msgBus, OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
+    testObj = alljoyn_busobject_create(OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
     exampleIntf = alljoyn_busattachment_getinterface(g_msgBus, INTERFACE_NAME);
     assert(exampleIntf);
     alljoyn_busobject_addinterface(testObj, exampleIntf);
