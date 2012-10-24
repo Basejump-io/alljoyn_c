@@ -315,7 +315,7 @@ TEST(InterfaceDescriptionTest, hasproperties) {
 }
 
 TEST(InterfaceDescriptionTest, getname) {
-    QStatus status = ER_OK;
+    QStatus status;
     alljoyn_busattachment bus = NULL;
     bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;

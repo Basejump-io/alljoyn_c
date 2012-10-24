@@ -34,7 +34,7 @@ class BusObjectC : public BusObject {
   public:
     BusObjectC(alljoyn_busattachment bus, const char* path, QCC_BOOL isPlaceholder, \
                const alljoyn_busobject_callbacks* callbacks_in, const void* context_in) :
-        BusObject(*((BusAttachment*)bus), path, isPlaceholder == QCC_TRUE ? true : false)
+        BusObject(path, isPlaceholder == QCC_TRUE ? true : false)
     {
         context = context_in;
         memcpy(&callbacks, callbacks_in, sizeof(alljoyn_busobject_callbacks));
