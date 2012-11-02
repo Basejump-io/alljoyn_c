@@ -147,10 +147,10 @@ TEST(BusAttachmentTest, registersignalhandler_basic) {
 
     alljoyn_busobject testObj = alljoyn_busobject_create("/org/alljoyn/test/signal", QCC_FALSE, &busObjCbs, NULL);
 
-    status = alljoyn_busattachment_registerbusobject(bus, testObj);
+    status = alljoyn_busobject_addinterface(testObj, testIntf);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
-    status = alljoyn_busobject_addinterface(testObj, testIntf);
+    status = alljoyn_busattachment_registerbusobject(bus, testObj);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     alljoyn_interfacedescription_member my_signal_member;
