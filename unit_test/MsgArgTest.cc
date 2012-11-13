@@ -206,6 +206,8 @@ TEST(MsgArgTest, arrays_of_scalars) {
     QStatus status = ER_OK;
     /* Array of BYTE */
     uint8_t ay[] = { 9, 19, 29, 39, 49 };
+    /* Array of QCC_BOOL */
+    static QCC_BOOL ab[] = { QCC_FALSE, QCC_FALSE, QCC_TRUE, QCC_TRUE, QCC_TRUE, QCC_FALSE };
     /* Array of INT16 */
     static int16_t an[] = { -9, -99, 999, 9999 };
     /* Array of INT32 */
@@ -231,6 +233,20 @@ TEST(MsgArgTest, arrays_of_scalars) {
         EXPECT_EQ(sizeof(ay) / sizeof(ay[0]), lay);
         for (size_t i = 0; i < lay; ++i) {
             EXPECT_EQ(ay[i], pay[i]);
+        }
+    }
+    {
+        alljoyn_msgarg arg = alljoyn_msgarg_create();
+        status = alljoyn_msgarg_set(arg, "ab", sizeof(ab) / sizeof(ab[0]), ab);
+        EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+        QCC_BOOL* pab;
+        size_t lab;
+        status = alljoyn_msgarg_get(arg, "ab", &lab, &pab);
+        EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+        EXPECT_EQ(sizeof(ab) / sizeof(ab[0]), lab);
+        for (size_t i = 0; i < lab; ++i) {
+            EXPECT_EQ(ab[i], pab[i]) << "i = " << i << " ab[i] = " << ((ab[i]) ? "true" : "false")
+                                     << " pab[i] = " << ((pab[i]) ? "true" : "false");
         }
     }
     {

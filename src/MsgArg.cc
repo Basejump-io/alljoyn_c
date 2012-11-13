@@ -336,9 +336,10 @@ void alljoyn_msgarg_stabilize(alljoyn_msgarg arg)
 
 /*******************************************************************************
  * This set of functions were originally designed for the alljoyn_unity bindings
- * however they did not not properly map with the C++ MsgArg Class.  These calls
- * are being left in here till proper mapping between 'C' and 'unity' can be
- * completed. And can be verified that the code continues to work.
+ * however they did not not properly map with the C++ MsgArg Class.
+ *
+ * No Functions below this point should be used by any code except for the
+ * AllJoyn Unity Extension. The functions could be changed at any time.
  ******************************************************************************/
 
 QStatus alljoyn_msgarg_array_set_offset(alljoyn_msgarg args, size_t argOffset, size_t* numArgs, const char* signature, ...)
@@ -425,6 +426,93 @@ extern AJ_API QStatus alljoyn_msgarg_get_objectpath(const alljoyn_msgarg arg, ch
 extern AJ_API QStatus alljoyn_msgarg_get_signature(const alljoyn_msgarg arg, char* g) {
     return alljoyn_msgarg_get(arg, "g", g);
 }
+
+/*
+ * MsgArg set function for arrays of each basic data type
+ */
+extern AJ_API QStatus alljoyn_msgarg_set_uint8_array(alljoyn_msgarg arg, size_t length, uint8_t* ay) {
+    return alljoyn_msgarg_set(arg, "ay", length, ay);
+}
+extern AJ_API QStatus alljoyn_msgarg_set_bool_array(alljoyn_msgarg arg, size_t length, QCC_BOOL* ab) {
+    return alljoyn_msgarg_set(arg, "ab", length, ab);
+}
+extern AJ_API QStatus alljoyn_msgarg_set_int16_array(alljoyn_msgarg arg, size_t length, int16_t* an) {
+    return alljoyn_msgarg_set(arg, "an", length, an);
+}
+extern AJ_API QStatus alljoyn_msgarg_set_uint16_array(alljoyn_msgarg arg, size_t length, uint16_t* aq) {
+    return alljoyn_msgarg_set(arg, "aq", length, aq);
+}
+extern AJ_API QStatus alljoyn_msgarg_set_int32_array(const alljoyn_msgarg arg, size_t length, int32_t* ai) {
+    return alljoyn_msgarg_set(arg, "ai", length, ai);
+}
+extern AJ_API QStatus alljoyn_msgarg_set_uint32_array(alljoyn_msgarg arg, size_t length, uint32_t* au) {
+    return alljoyn_msgarg_set(arg, "au", length, au);
+}
+extern AJ_API QStatus alljoyn_msgarg_set_int64_array(alljoyn_msgarg arg, size_t length, int64_t* ax) {
+    return alljoyn_msgarg_set(arg, "ax", length, ax);
+}
+extern AJ_API QStatus alljoyn_msgarg_set_uint64_array(alljoyn_msgarg arg, size_t length, uint64_t* at) {
+    return alljoyn_msgarg_set(arg, "at", length, at);
+}
+extern AJ_API QStatus alljoyn_msgarg_set_double_array(alljoyn_msgarg arg, size_t length, double* ad) {
+    return alljoyn_msgarg_set(arg, "ad", length, ad);
+}
+extern AJ_API QStatus alljoyn_msgarg_set_string_array(alljoyn_msgarg arg, size_t length, const char** as) {
+    QStatus status = alljoyn_msgarg_set(arg, "as", length, as);
+    alljoyn_msgarg_stabilize(arg);
+    return status;
+}
+extern AJ_API QStatus alljoyn_msgarg_set_objectpath_array(alljoyn_msgarg arg, size_t length, const char** ao) {
+    QStatus status = alljoyn_msgarg_set(arg, "ao", length, ao);
+    alljoyn_msgarg_stabilize(arg);
+    return status;
+}
+extern AJ_API QStatus alljoyn_msgarg_set_signature_array(alljoyn_msgarg arg, size_t length, const char** ag) {
+    QStatus status = alljoyn_msgarg_set(arg, "ag", length, ag);
+    alljoyn_msgarg_stabilize(arg);
+    return status;
+}
+
+/*
+ * MsgArg get funtion for arrays of each basic data type
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_uint8_array(const alljoyn_msgarg arg, size_t* length, uint8_t* ay) {
+    return alljoyn_msgarg_get(arg, "ay", length, ay);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_bool_array(const alljoyn_msgarg arg, size_t* length, uint8_t* ab) {
+    return alljoyn_msgarg_get(arg, "ab", length, ab);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_int16_array(const alljoyn_msgarg arg, size_t* length, int16_t* an) {
+    return alljoyn_msgarg_get(arg, "an", length, an);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_uint16_array(const alljoyn_msgarg arg, size_t* length, uint16_t* aq) {
+    return alljoyn_msgarg_get(arg, "aq", length, aq);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_int32_array(const alljoyn_msgarg arg, size_t* length,  int32_t* ai) {
+    return alljoyn_msgarg_get(arg, "ai", length, ai);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_uint32_array(const alljoyn_msgarg arg, size_t* length, uint32_t* au) {
+    return alljoyn_msgarg_get(arg, "au", length, au);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_int64_array(const alljoyn_msgarg arg, size_t* length, int64_t* ax) {
+    return alljoyn_msgarg_get(arg, "ax", length, ax);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_uint64_array(const alljoyn_msgarg arg, size_t* length, uint64_t* at) {
+    return alljoyn_msgarg_get(arg, "at", length, at);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_double_array(const alljoyn_msgarg arg, size_t* length, double* ad) {
+    return alljoyn_msgarg_get(arg, "ad", length, ad);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_string_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* as) {
+    return alljoyn_msgarg_get(arg, "as", length, as);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_objectpath_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* ao) {
+    return alljoyn_msgarg_get(arg, "ao", length, ao);
+}
+extern AJ_API QStatus alljoyn_msgarg_get_signature_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* ag) {
+    return alljoyn_msgarg_get(arg, "ag", length, ag);
+}
+
 
 #define _IMPLEMENT_MSGARG_TYPE_ACCESSOR(rt, nt, mt) \
     rt alljoyn_msgarg_as_ ## nt(const alljoyn_msgarg args, size_t idx) \
