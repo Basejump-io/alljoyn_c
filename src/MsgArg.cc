@@ -151,6 +151,11 @@ alljoyn_msgarg alljoyn_msgarg_copy(const alljoyn_msgarg source)
     return (alljoyn_msgarg) ret;
 }
 
+void alljoyn_msgarg_clone(alljoyn_msgarg destination, const alljoyn_msgarg source)
+{
+    (*(ajn::MsgArgC*)destination) = *(ajn::MsgArgC*)source;
+}
+
 QCC_BOOL alljoyn_msgarg_equal(alljoyn_msgarg lhv, alljoyn_msgarg rhv)
 {
     if (!lhv || !rhv) {
@@ -351,6 +356,28 @@ QStatus alljoyn_msgarg_array_set_offset(alljoyn_msgarg args, size_t argOffset, s
     return status;
 }
 
+QStatus alljoyn_msgarg_set_and_stabilize(alljoyn_msgarg arg, const char* signature, ...) {
+    if (!arg) {
+        return ER_BAD_ARG_1;
+    }
+    va_list argp;
+    va_start(argp, signature);
+    QStatus status = ER_OK;
+
+    ((ajn::MsgArgC*)arg)->Clear();
+    size_t sigLen = (signature ? strlen(signature) : 0);
+    if ((sigLen < 1) || (sigLen > 255)) {
+        status = ER_BUS_BAD_SIGNATURE;
+    } else {
+        status = ((ajn::MsgArgC*)arg)->VBuildArgsC(signature, sigLen, ((ajn::MsgArgC*)arg), 1, &argp);
+        if ((status == ER_OK) && (*signature != 0)) {
+            status = ER_BUS_NOT_A_COMPLETE_TYPE;
+        }
+    }
+    va_end(argp);
+    ((ajn::MsgArgC*)arg)->Stabilize();
+    return status;
+}
 
 QStatus alljoyn_msgarg_set_uint8(alljoyn_msgarg arg, uint8_t y) {
     return alljoyn_msgarg_set(arg, "y", y);
@@ -393,7 +420,7 @@ QStatus alljoyn_msgarg_set_signature(alljoyn_msgarg arg, const char* g) {
 extern AJ_API QStatus alljoyn_msgarg_get_uint8(const alljoyn_msgarg arg, uint8_t* y) {
     return alljoyn_msgarg_get(arg, "y", y);
 }
-extern AJ_API QStatus alljoyn_msgarg_get_bool(const alljoyn_msgarg arg, uint8_t* b) {
+extern AJ_API QStatus alljoyn_msgarg_get_bool(const alljoyn_msgarg arg, QCC_BOOL* b) {
     return alljoyn_msgarg_get(arg, "b", b);
 }
 extern AJ_API QStatus alljoyn_msgarg_get_int16(const alljoyn_msgarg arg, int16_t* n) {
@@ -479,8 +506,9 @@ extern AJ_API QStatus alljoyn_msgarg_set_signature_array(alljoyn_msgarg arg, siz
 extern AJ_API QStatus alljoyn_msgarg_get_uint8_array(const alljoyn_msgarg arg, size_t* length, uint8_t* ay) {
     return alljoyn_msgarg_get(arg, "ay", length, ay);
 }
-extern AJ_API QStatus alljoyn_msgarg_get_bool_array(const alljoyn_msgarg arg, size_t* length, uint8_t* ab) {
-    return alljoyn_msgarg_get(arg, "ab", length, ab);
+extern AJ_API QStatus alljoyn_msgarg_get_bool_array(const alljoyn_msgarg arg, size_t* length, QCC_BOOL* ab) {
+    QStatus status = alljoyn_msgarg_get(arg, "ab", length, ab);
+    return status;
 }
 extern AJ_API QStatus alljoyn_msgarg_get_int16_array(const alljoyn_msgarg arg, size_t* length, int16_t* an) {
     return alljoyn_msgarg_get(arg, "an", length, an);
@@ -513,6 +541,21 @@ extern AJ_API QStatus alljoyn_msgarg_get_signature_array(const alljoyn_msgarg ar
     return alljoyn_msgarg_get(arg, "ag", length, ag);
 }
 
+extern AJ_API size_t alljoyn_msgarg_get_array_numberofelements(const alljoyn_msgarg arg) {
+    assert(ALLJOYN_ARRAY == ((ajn::MsgArgC*)arg)->typeId);
+    return ((ajn::MsgArgC*)arg)->v_array.GetNumElements();
+}
+
+extern AJ_API void   alljoyn_msgarg_get_array_element(const alljoyn_msgarg arg, size_t index, alljoyn_msgarg* element) {
+    assert(ALLJOYN_ARRAY == ((ajn::MsgArgC*)arg)->typeId);
+    assert(index < ((ajn::MsgArgC*)arg)->v_array.GetNumElements());
+    *element = (alljoyn_msgarg) & (((ajn::MsgArgC*)arg)->v_array.GetElements()[index]);
+}
+
+extern AJ_API const char* alljoyn_msgarg_get_array_elementsignature(const alljoyn_msgarg arg, size_t index) {
+    assert(ALLJOYN_ARRAY == ((ajn::MsgArgC*)arg)->typeId);
+    return ((ajn::MsgArgC*)arg)->v_array.GetElemSig();
+}
 
 #define _IMPLEMENT_MSGARG_TYPE_ACCESSOR(rt, nt, mt) \
     rt alljoyn_msgarg_as_ ## nt(const alljoyn_msgarg args, size_t idx) \

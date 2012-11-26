@@ -249,7 +249,7 @@ extern AJ_API QStatus alljoyn_msgarg_set(alljoyn_msgarg arg, const char* signatu
  *  - @c 'd'  A pointer to a double (64 bits)
  *  - @c 'g'  A pointer to a char*  (character string is valid for the lifetime of the MsgArg)
  *  - @c 'h'  A pointer to a qcc::SocketFd
- *  - @c 'i'  A pointer to a uint16_t
+ *  - @c 'i'  A pointer to a uint32_t
  *  - @c 'n'  A pointer to an int16_t
  *  - @c 'o'  A pointer to a char*  (character string is valid for the lifetime of the MsgArg)
  *  - @c 'q'  A pointer to a uint16_t
@@ -342,6 +342,15 @@ extern AJ_API QStatus alljoyn_msgarg_get(alljoyn_msgarg arg, const char* signatu
  */
 extern AJ_API alljoyn_msgarg alljoyn_msgarg_copy(const alljoyn_msgarg source);
 
+/*
+ * Copy the contents of the source MsgArg into the Destination MsgArg. If the
+ * destination already contains information it will be cleared before the source
+ * MsgArg is copied in.
+ *
+ * @param destination the MsgArg will hold the copy
+ * @param source      the MsgArg to be copied
+ */
+extern AJ_API void alljoyn_msgarg_clone(alljoyn_msgarg destination, const alljoyn_msgarg source);
 /**
  * Equality operator.
  *
@@ -423,19 +432,31 @@ extern AJ_API size_t alljoyn_msgarg_array_tostring(const alljoyn_msgarg args, si
 /**
  * Returns a string for the signature of this value
  *
- * @param arg the argument to read the signature from
+ * @param[in] arg the argument to read the signature from
+ * @param[out] str a string containing the signature of the MsgArg use NULL pointer
+ *            to find string size.
+ * @param[in] buf The size of the char* array that will hold the string
  *
- * @return The signature string for this MsgArg
+ * @return  The number of characters (including the terminating nul byte) which
+ *          would have been written to the final string if enough space is
+ *          available.  Thus returning a value of buf or larger means the output
+ *          was truncated.
  */
 extern AJ_API size_t alljoyn_msgarg_signature(alljoyn_msgarg arg, char* str, size_t buf);
 
 /**
  * Returns a string representation of the signature of an array of message args.
  *
- * @param values     A pointer to an array of message arg values
- * @param numValues  Length of the array
+ * @param[int] values     A pointer to an array of message arg values
+ * @param[in] numValues  Length of the array
+ * @param[out] str        a string containing the signature of the MsgArg use NULL
+ *                   pointer to find string size.
+ * @param[in] buf        The size of the char* array that will hold the string
  *
- * @return The signature string for the message args.
+ * @return  The number of characters (including the terminating nul byte) which
+ *          would have been written to the final string if enough space is
+ *          available.  Thus returning a value of buf or larger means the output
+ *          was truncated.
  */
 extern AJ_API size_t alljoyn_msgarg_array_signature(alljoyn_msgarg values, size_t numValues, char* str, size_t buf);
 
@@ -518,7 +539,7 @@ extern AJ_API void alljoyn_msgarg_stabilize(alljoyn_msgarg arg);
  * @param args        An array of MsgArgs to set.
  * @param argOffset   Offset from the start of the MsgArg array.
  * @param numArgs     [in,out] On input the number of args to set. On output the number of MsgArgs
- *                    that were set. There must be at least enought MsgArgs to completely
+ *                    that were set. There must be at least enough MsgArgs to completely
  *                    initialize the signature.
  *                    there should at least enough.
  * @param signature   The signature for MsgArg values
@@ -531,6 +552,21 @@ extern AJ_API void alljoyn_msgarg_stabilize(alljoyn_msgarg arg);
  */
 extern AJ_API QStatus alljoyn_msgarg_array_set_offset(alljoyn_msgarg args, size_t argOffset, size_t* numArgs, const char* signature, ...);
 
+/*
+ * This function is identical to alljoyn_msgarg_set except after the the values
+ * in the message arg have been set the MsgArg will be stabilized.
+ * This is useful when the call is made from a manage language like C sharp where
+ * objects like strings may be garbage collected.
+ *
+ * @param arg         The alljoyn_msgarg being set
+ * @param signature   The signature for MsgArg value
+ * @param ...         One or more values to initialize the MsgArg.
+ *
+ * @return
+ *      - #ER_OK if the MsgArg was successfully set
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_set_and_stabilize(alljoyn_msgarg arg, const char* signature, ...);
 /*
  * MsgArg set functions for each of the basic data types
  */
@@ -551,7 +587,7 @@ extern AJ_API QStatus alljoyn_msgarg_set_signature(alljoyn_msgarg arg, const cha
  * MsgArg get functions for each of the basic data types
  */
 extern AJ_API QStatus alljoyn_msgarg_get_uint8(const alljoyn_msgarg arg, uint8_t* y);
-extern AJ_API QStatus alljoyn_msgarg_get_bool(const alljoyn_msgarg arg, uint8_t* b);
+extern AJ_API QStatus alljoyn_msgarg_get_bool(const alljoyn_msgarg arg, QCC_BOOL* b);
 extern AJ_API QStatus alljoyn_msgarg_get_int16(const alljoyn_msgarg arg, int16_t* n);
 extern AJ_API QStatus alljoyn_msgarg_get_uint16(const alljoyn_msgarg arg, uint16_t* q);
 extern AJ_API QStatus alljoyn_msgarg_get_int32(const alljoyn_msgarg arg, int32_t* i);
@@ -562,6 +598,7 @@ extern AJ_API QStatus alljoyn_msgarg_get_double(const alljoyn_msgarg arg, double
 extern AJ_API QStatus alljoyn_msgarg_get_string(const alljoyn_msgarg arg, char* s);
 extern AJ_API QStatus alljoyn_msgarg_get_objectpath(const alljoyn_msgarg arg, char* o);
 extern AJ_API QStatus alljoyn_msgarg_get_signature(const alljoyn_msgarg arg, char* g);
+
 
 /*
  * MsgArg set function for arrays of each basic data type
@@ -580,10 +617,10 @@ extern AJ_API QStatus alljoyn_msgarg_set_objectpath_array(alljoyn_msgarg arg, si
 extern AJ_API QStatus alljoyn_msgarg_set_signature_array(alljoyn_msgarg arg, size_t length, const char** ag);
 
 /*
- * MsgArg get funtion for arrays of each basic data type
+ * MsgArg get function for arrays of each basic data type
  */
 extern AJ_API QStatus alljoyn_msgarg_get_uint8_array(const alljoyn_msgarg arg, size_t* length, uint8_t* y);
-extern AJ_API QStatus alljoyn_msgarg_get_bool_array(const alljoyn_msgarg arg, size_t* length, uint8_t* b);
+extern AJ_API QStatus alljoyn_msgarg_get_bool_array(const alljoyn_msgarg arg, size_t* length, QCC_BOOL* b);
 extern AJ_API QStatus alljoyn_msgarg_get_int16_array(const alljoyn_msgarg arg, size_t* length, int16_t* n);
 extern AJ_API QStatus alljoyn_msgarg_get_uint16_array(const alljoyn_msgarg arg, size_t* length, uint16_t* q);
 extern AJ_API QStatus alljoyn_msgarg_get_int32_array(const alljoyn_msgarg arg, size_t* length, int32_t* ai);
@@ -595,6 +632,12 @@ extern AJ_API QStatus alljoyn_msgarg_get_string_array(const alljoyn_msgarg arg, 
 extern AJ_API QStatus alljoyn_msgarg_get_objectpath_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* o);
 extern AJ_API QStatus alljoyn_msgarg_get_signature_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* g);
 
+/*
+ * MsgArg get functions for Arrays of Arrays
+ */
+extern AJ_API size_t alljoyn_msgarg_get_array_numberofelements(const alljoyn_msgarg arg);
+extern AJ_API void   alljoyn_msgarg_get_array_element(const alljoyn_msgarg arg, size_t index, alljoyn_msgarg* element);
+extern AJ_API const char* alljoyn_msgarg_get_array_elementsignature(const alljoyn_msgarg arg, size_t index);
 
 extern AJ_API uint8_t alljoyn_msgarg_as_uint8(const alljoyn_msgarg args, size_t idx);
 extern AJ_API QCC_BOOL alljoyn_msgarg_as_bool(const alljoyn_msgarg args, size_t idx);
