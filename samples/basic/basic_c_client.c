@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <alljoyn_c/DBusStd.h>
+#include <alljoyn_c/DBusStdDefines.h>
 #include <alljoyn_c/BusAttachment.h>
 #include <alljoyn_c/BusObject.h>
 #include <alljoyn_c/MsgArg.h>

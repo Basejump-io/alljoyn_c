@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include "ajTestCommon.h"
 
-#include <alljoyn_c/DBusStd.h>
+#include <alljoyn_c/DBusStdDefines.h>
 #include <alljoyn_c/BusAttachment.h>
 #include <qcc/Thread.h>
 
