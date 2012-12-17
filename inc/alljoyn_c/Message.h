@@ -108,6 +108,15 @@ extern AJ_API QCC_BOOL alljoyn_message_isbroadcastsignal(alljoyn_message msg);
 extern AJ_API QCC_BOOL alljoyn_message_isglobalbroadcast(alljoyn_message msg);
 
 /**
+ * Messages sent without sessions are sessionless.
+ *
+ * @param msg  alljoyn_message we wish to determine if it is a sessionless signal.
+ *
+ * @return  Return true if this is a sessionless message.
+ */
+extern AJ_API QCC_BOOL alljoyn_message_issessionless(alljoyn_message msg);
+
+/**
  * Returns the flags for the message.
  *
  * @param msg  alljoyn_message we wish to get the flags from.

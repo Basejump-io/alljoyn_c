@@ -221,6 +221,7 @@ TEST_F(MessageTest, message_properties) {
 
     EXPECT_FALSE(alljoyn_message_isbroadcastsignal(reply));
     EXPECT_FALSE(alljoyn_message_isglobalbroadcast(reply));
+    EXPECT_FALSE(alljoyn_message_issessionless(reply));
     uint32_t timeLeft;
     EXPECT_FALSE(alljoyn_message_isexpired(reply, &timeLeft));
     EXPECT_NE((uint32_t)0, timeLeft);

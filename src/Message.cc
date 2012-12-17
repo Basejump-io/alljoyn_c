@@ -58,6 +58,11 @@ QCC_BOOL alljoyn_message_isglobalbroadcast(alljoyn_message msg)
     return msg->msg->IsGlobalBroadcast();
 }
 
+QCC_BOOL alljoyn_message_issessionless(alljoyn_message msg)
+{
+    return msg->msg->IsSessionless();
+}
+
 uint8_t alljoyn_message_getflags(alljoyn_message msg)
 {
     return msg->msg->GetFlags();
