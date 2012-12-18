@@ -72,7 +72,7 @@ QStatus alljoyn_busattachment_createinterface(alljoyn_busattachment bus,
 QStatus alljoyn_busattachment_connect(alljoyn_busattachment bus, const char* connectSpec)
 {
     // Because the second parameter to Connect is only used internally it is not exposed to the C interface.
-    return ((ajn::BusAttachmentC*)bus)->Connect(connectSpec, NULL);
+    return ((ajn::BusAttachmentC*)bus)->Connect(connectSpec);
 }
 
 void alljoyn_busattachment_registerbuslistener(alljoyn_busattachment bus, alljoyn_buslistener listener)
