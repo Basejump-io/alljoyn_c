@@ -4,7 +4,7 @@
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -35,6 +35,13 @@ alljoyn_busattachment alljoyn_busattachment_create(const char* applicationName, 
     return ((alljoyn_busattachment) new ajn::BusAttachmentC(applicationName, allowRemoteMessagesBool));
 }
 
+alljoyn_busattachment alljoyn_busattachment_create_concurrency(const char* applicationName, QCC_BOOL allowRemoteMessages, uint32_t concurrency)
+{
+    bool allowRemoteMessagesBool = (allowRemoteMessages == QCC_TRUE ? true : false);
+    return ((alljoyn_busattachment) new ajn::BusAttachmentC(applicationName, allowRemoteMessagesBool, concurrency));
+}
+
+
 void alljoyn_busattachment_destroy(alljoyn_busattachment bus)
 {
     assert(bus != NULL && "NULL parameter passed to alljoyn_destroy_busattachment.");
@@ -52,9 +59,24 @@ QStatus alljoyn_busattachment_stop(alljoyn_busattachment bus)
     return ((ajn::BusAttachmentC*)bus)->Stop();
 }
 
-extern AJ_API QStatus alljoyn_busattachment_join(alljoyn_busattachment bus)
+QStatus alljoyn_busattachment_join(alljoyn_busattachment bus)
 {
     return ((ajn::BusAttachmentC*)bus)->Join();
+}
+
+uint32_t alljoyn_busattachment_getconcurrency(alljoyn_busattachment bus)
+{
+    return ((ajn::BusAttachmentC*)bus)->GetConcurrency();
+}
+
+const char* alljoyn_busattachment_getconnectspec(alljoyn_busattachment bus)
+{
+    return ((ajn::BusAttachmentC*)bus)->GetConnectSpec().c_str();
+}
+
+void alljoyn_busattachment_enableconcurrentcallbacks(alljoyn_busattachment bus)
+{
+    return ((ajn::BusAttachmentC*)bus)->EnableConcurrentCallbacks();
 }
 
 QStatus alljoyn_busattachment_createinterface(alljoyn_busattachment bus,

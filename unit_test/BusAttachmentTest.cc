@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2012, Qualcomm Innovation Center, Inc.
+ * Copyright 2012-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -76,6 +76,59 @@ TEST(BusAttachmentTest, isstarted_isstopping) {
     status = alljoyn_busattachment_join(bus);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     EXPECT_EQ(QCC_FALSE, alljoyn_busattachment_isstarted(bus));
+    alljoyn_busattachment_destroy(bus);
+}
+
+TEST(BusAttachmentTest, getconcurrency) {
+    alljoyn_busattachment bus = NULL;
+    unsigned int concurrency = -1;
+    bus = alljoyn_busattachment_create("BusAttachmentTest", QCC_TRUE);
+
+    concurrency = alljoyn_busattachment_getconcurrency(bus);
+    //The default value for getconcurrency is 4
+    EXPECT_EQ(4u, concurrency) << "  Expected a concurrency of 4 got " << concurrency;
+
+    alljoyn_busattachment_destroy(bus);
+
+    bus = NULL;
+    concurrency = -1;
+
+    bus = alljoyn_busattachment_create_concurrency("BusAttachmentTest", QCC_TRUE, 8);
+
+    concurrency = alljoyn_busattachment_getconcurrency(bus);
+    //The default value for getconcurrency is 4
+    EXPECT_EQ(8u, concurrency) << "  Expected a concurrency of 8 got " << concurrency;
+
+    alljoyn_busattachment_destroy(bus);
+}
+
+TEST(BusAttachmentTest, getconnectspec)
+{
+    QStatus status = ER_OK;
+
+    alljoyn_busattachment bus = NULL;
+    bus = alljoyn_busattachment_create("BusAttachmentTest", QCC_TRUE);
+
+    status = alljoyn_busattachment_start(bus);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_busattachment_connect(bus, ajn::getConnectArg().c_str());
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    const char* connectspec = alljoyn_busattachment_getconnectspec(bus);
+
+    /*
+     * The BusAttachment has joined either a separate daemon or it is using
+     * the in process name service.  If the internal name service is used
+     * the connect spec will be 'null:' otherwise it will match the ConnectArg.
+     */
+    EXPECT_TRUE(strcmp(ajn::getConnectArg().c_str(), connectspec) == 0 ||
+                strcmp("null:", connectspec) == 0);
+
+    status = alljoyn_busattachment_stop(bus);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_busattachment_join(bus);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
     alljoyn_busattachment_destroy(bus);
 }
 

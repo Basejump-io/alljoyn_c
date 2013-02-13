@@ -1,4 +1,4 @@
-# Copyright 2010 - 2011, Qualcomm Innovation Center, Inc.
+# Copyright 2010 - 2013, Qualcomm Innovation Center, Inc.
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -35,12 +35,15 @@ env.VariantDir('$OBJDIR', 'src', duplicate = 0)
 env.VariantDir('$OBJDIR/samples', 'samples', duplicate = 0)
 
 # Install headers
-env.Install('$DISTDIR/inc/alljoyn_c', env.Glob('inc/alljoyn_c/*.h'))
-env.Install('$DISTDIR/inc/alljoyn_c', '$DISTDIR/inc/alljoyn/DBusStdDefines.h')
-env.Install('$DISTDIR/inc/alljoyn_c', '$DISTDIR/inc/alljoyn/Status.h')
+alljoyn_core_headers = env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/DBusStdDefines.h')
+alljoyn_core_headers += env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/Status.h')
+
+c_headers = env.Install('$DISTDIR/inc/alljoyn_c', env.Glob('inc/alljoyn_c/*.h'))
+
+env.Depends(c_headers, alljoyn_core_headers)
 
 # Header file includes
-env.Append(CPPPATH = [env.Dir('inc')])
+env.Append(CPPPATH = [env.Dir('$DISTDIR/inc/alljoyn_c')])
 
 # Make private headers available
 env.Append(CPPPATH = [env.Dir('src')])
@@ -59,4 +62,3 @@ env.SConscript('unit_test/SConscript', variant_dir='$OBJDIR/unittest', duplicate
 # Sample programs
 progs = env.SConscript('$OBJDIR/samples/SConscript')
 env.Install('$DISTDIR/bin/samples', progs)
-

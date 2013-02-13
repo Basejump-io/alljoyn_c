@@ -4,7 +4,7 @@
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -52,12 +52,37 @@ typedef void (*alljoyn_busattachment_joinsessioncb_ptr)(QStatus status, alljoyn_
 /**
  * Allocate a BusAttachment.
  *
- * @note Any BusAttachment allocated using this function must be freed using
+ * By default this will create a BusAttachment capable of handling 4 concurrent method and signal handlers.
+ * This is the recommended default value.  If for some reason your application must be able to handle a different
+ * number of concurrent methods use alljoyn_busattachment_create_concurrency.
+ *
+ * @note Any BusAttachment allocated using this function must be freed using alljoyn_busattachment_destroy
+ *
+ * @see alljoyn_busattachment_create_concurrency
+ * @see alljoyn_busattachment_destroy
  *
  * @param applicationName       Name of the application.
  * @param allowRemoteMessages   QCC_TRUE if this attachment is allowed to receive messages from remote devices.
  */
 extern AJ_API alljoyn_busattachment alljoyn_busattachment_create(const char* applicationName, QCC_BOOL allowRemoteMessages);
+
+/**
+ * Allocate a BusAttachment.
+ *
+ * This will Allocate a BusAttachment that is capable of using a different value for concurrency then
+ * the default value of 4.
+ *
+ * @note Any BusAttachment allocated using this function must be freed using alljoyn_busattachment_destroy
+ *
+ * @see alljoyn_busattachment_create
+ * @see alljoyn_busattachment_destroy
+ *
+ * @param applicationName       Name of the application.
+ * @param allowRemoteMessages   True if this attachment is allowed to receive messages from remote devices.
+ * @param concurrency           The maximum number of concurrent method and signal handlers locally executing.
+ */
+extern AJ_API alljoyn_busattachment alljoyn_busattachment_create_concurrency(const char* applicationName, QCC_BOOL allowRemoteMessages, uint32_t concurrency);
+
 
 /**
  * Free an allocated BusAttachment.
@@ -221,6 +246,34 @@ extern AJ_API QStatus alljoyn_busattachment_stop(alljoyn_busattachment bus);
  *      - Other error status codes indicating a failure
  */
 extern AJ_API QStatus alljoyn_busattachment_join(alljoyn_busattachment bus);
+
+/**
+ * Get the concurrent method and signal handler limit.
+ *
+ * @param bus    The BusAttachment on which to get the concurrent method and
+ *               signal handler limit.
+ *
+ * @return The maximum number of concurrent method and signal handlers.
+ */
+extern AJ_API uint32_t alljoyn_busattachment_getconcurrency(alljoyn_busattachment bus);
+
+/**
+ * Get the connect spec used by the BusAttachment
+ *
+ * @param bus    The BusAttachment to obtain the connect spec from.
+ *
+ * @return The string representing the connect spec used by the BusAttachment
+ */
+extern AJ_API const char* alljoyn_busattachment_getconnectspec(alljoyn_busattachment bus);
+
+/**
+ * Allow the currently executing method/signal handler to enable concurrent callbacks
+ * during the scope of the handler's execution.
+ *
+ * @param bus    The BusAttachment to enable concurrent callbacks on
+ *
+ */
+extern AJ_API void alljoyn_busattachment_enableconcurrentcallbacks(alljoyn_busattachment bus);
 /**
  * Create an interface description with a given name.
  *
@@ -234,7 +287,6 @@ extern AJ_API QStatus alljoyn_busattachment_join(alljoyn_busattachment bus);
  * @return
  *      - #ER_OK if creation was successful.
  *      - #ER_BUS_IFACE_ALREADY_EXISTS if requested interface already exists
- * @see BusAttachment::CreateInterface
  */
 extern AJ_API QStatus alljoyn_busattachment_createinterface(alljoyn_busattachment bus, const char* name,
                                                             alljoyn_interfacedescription* iface, QCC_BOOL secure);

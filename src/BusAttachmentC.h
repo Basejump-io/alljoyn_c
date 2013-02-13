@@ -5,7 +5,7 @@
  */
 
 /******************************************************************************
- * Copyright 2012, Qualcomm Innovation Center, Inc.
+ * Copyright 2012-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@ class JoinsessionCallbackContext {
  */
 class BusAttachmentC : public BusAttachment, public BusAttachment::JoinSessionAsyncCB {
   public:
-    BusAttachmentC(const char* applicationName, bool allowRemoteMessages = false) :
-        BusAttachment(applicationName, allowRemoteMessages) { }
+    BusAttachmentC(const char* applicationName, bool allowRemoteMessages = false, uint32_t concurrency = 4) :
+        BusAttachment(applicationName, allowRemoteMessages, concurrency) { }
 
     /** Destructor */
     virtual ~BusAttachmentC() {
