@@ -4,7 +4,7 @@
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,10 +29,25 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * Definition for a message arg.
+ * alljoyn_msgarg deals with the message bus types and the operations on them.
+ *
+ * alljoyn_msgargs are designed to be light-weight. An alljoyn_msgarg will normally hold references to
+ * the data (strings etc.) it wraps and will only copy that data if the alljoyn_msgarg is copied. For
+ * example no additional memory is allocated for an #ALLJOYN_STRING that references an existing
+ * const char*. If an alljoyn_msgarg is copied using the alljoyn_msgarg_copy function the destination
+ * receives a copy of the contents of the source. The alljoyn_msgarg_stabilize function can also be
+ * called to explicitly force contents of the alljoyn_msgarg to be copied into the alljoyn_msgarg.
+ */
 typedef struct _alljoyn_msgarg_handle* alljoyn_msgarg;
-//typedef struct _alljoyn_msgarg_array_handle* alljoyn_msgarg_array;
 
-
+/**
+ * Enumeration of the various message arg types.
+ * @remark Most of these map directly to the values used in the
+ * DBus wire protocol but some are specific to the AllJoyn implementation.
+ */
 typedef enum {
     ALLJOYN_INVALID          =  0,     ///< AllJoyn INVALID typeId
     ALLJOYN_ARRAY            = 'a',    ///< AllJoyn array container type
@@ -70,7 +85,7 @@ typedef enum {
 
     ALLJOYN_WILDCARD         = '*'     ///< This never appears in a signature but is used for matching arbitrary message args
 
-} AllJoynTypeId;
+} allJoyn_typeid;
 
 /**
  * Create a new message argument.
@@ -89,8 +104,10 @@ extern AJ_API alljoyn_msgarg alljoyn_msgarg_create();
  * values it is recommended to use the alljoyn_msgarg_create and alljoyn_msgarg_set
  * functions so the success of setting the value can be explicitly checked.
  *
- * @param signature   The signature for MsgArg value.
- * @param ...         One or more values to initialize the MsgArg.
+ * @param signature   The signature for alljoyn_msgarg value.
+ * @param ...         One or more values to initialize the alljoyn_msgarg.
+ *
+ * @return the created alljoyn_msgarg
  */
 extern AJ_API alljoyn_msgarg alljoyn_msgarg_create_and_set(const char* signature, ...);
 
@@ -124,7 +141,7 @@ extern AJ_API void alljoyn_msgarg_destroy(alljoyn_msgarg arg);
  * alljoyn_msgarg arg = alljoyn_msgarg_copy(args);
  * @endcode
  *
- * To make a copy of a alljoyn_msgarg that contains an array of elements requires
+ * To make a copy of an alljoyn_msgarg that contains an array of elements requires
  * a for loop.
  *
  * @code
@@ -143,23 +160,19 @@ extern AJ_API void alljoyn_msgarg_destroy(alljoyn_msgarg arg);
 extern AJ_API alljoyn_msgarg alljoyn_msgarg_array_create(size_t size);
 
 /**
- * Destroy a message argument array
- *
- * @param arg the message argument array to destory
- */
-//extern AJ_API void  alljoyn_msgarg_array_destroy(alljoyn_msgarg_array arg);
-
-/*
  * when working with an array of message arguments this will return the nth item
  * in the array.
  * @param arg   the alljoyn_msgarg that contains an array of msgargs
  * @param index the index number of the element we wish to access.
+ *
+ * @return the individual alljoyn_msgarg specified by the index
  */
 extern AJ_API alljoyn_msgarg alljoyn_msgarg_array_element(alljoyn_msgarg arg, size_t index);
 
 /**
  * Set value of a message arg from a signature and a list of values. Note that any values or
- * MsgArg pointers passed in must remain valid until this MsgArg is freed.
+ * alljoyn_msgarg pointers passed in must remain valid until this alljoyn_msgarg is freed using
+ * alljoyn_msgarg_delete.
  *
  *  - @c 'a'  The array length followed by:
  *            - If the element type is a basic type a pointer to an array of values of that type.
@@ -168,19 +181,20 @@ extern AJ_API alljoyn_msgarg alljoyn_msgarg_array_element(alljoyn_msgarg arg, si
  *              an array of const qcc::String.
  *            - If the element type is an @ref ALLJOYN_ARRAY "ARRAY", @ref ALLJOYN_STRUCT "STRUCT",
  *              @ref ALLJOYN_DICT_ENTRY "DICT_ENTRY" or @ref ALLJOYN_VARIANT "VARIANT" a pointer to an
- *              array of MsgArgs where each MsgArg has the signature specified by the element type.
+ *              array of alljoyn_msgargs where each alljoyn_msgarg has the signature specified by the
+ *              element type.
  *            - If the element type is specified using the wildcard character '*', a pointer to
- *              an  array of MsgArgs. The array element type is determined from the type of the
- *              first MsgArg in the array, all the elements must have the same type.
+ *              an  array of alljoyn_msgargs. The array element type is determined from the type of the
+ *              first alljoyn_msgarg in the array, all the elements must have the same type.
  *  - @c 'b'  A bool value
  *  - @c 'd'  A double (64 bits)
- *  - @c 'g'  A pointer to a NUL terminated string (pointer must remain valid for lifetime of the MsgArg)
+ *  - @c 'g'  A pointer to a NUL terminated string (pointer must remain valid for lifetime of the alljoyn_msgarg)
  *  - @c 'h'  A qcc::SocketFd
  *  - @c 'i'  An int (32 bits)
  *  - @c 'n'  An int (16 bits)
- *  - @c 'o'  A pointer to a NUL terminated string (pointer must remain valid for lifetime of the MsgArg)
+ *  - @c 'o'  A pointer to a NUL terminated string (pointer must remain valid for lifetime of the alljoyn_msgarg)
  *  - @c 'q'  A uint (16 bits)
- *  - @c 's'  A pointer to a NUL terminated string (pointer must remain valid for lifetime of the MsgArg)
+ *  - @c 's'  A pointer to a NUL terminated string (pointer must remain valid for lifetime of the alljoyn_msgarg)
  *  - @c 't'  A uint (64 bits)
  *  - @c 'u'  A uint (32 bits)
  *  - @c 'v'  Not allowed, the actual type must be provided.
@@ -190,7 +204,7 @@ extern AJ_API alljoyn_msgarg alljoyn_msgarg_array_element(alljoyn_msgarg arg, si
  *  - @c '(' and @c ')'  The list of values that appear between the parentheses using the notation above
  *  - @c '{' and @c '}'  A pair values using the notation above.
  *
- *  - @c '*'  A pointer to a MsgArg.
+ *  - @c '*'  A pointer to an alljoyn_msgarg.
  *
  * Examples:
  *
@@ -226,45 +240,47 @@ extern AJ_API alljoyn_msgarg alljoyn_msgarg_array_element(alljoyn_msgarg arg, si
  *     @endcode
  *
  * @param arg         The alljoyn_msgarg being set
- * @param signature   The signature for MsgArg value
- * @param ...         One or more values to initialize the MsgArg.
+ * @param signature   The signature for alljoyn_msgarg value
+ * @param ...         One or more values to initialize the alljoyn_msgarg.
  *
  * @return
- *      - #ER_OK if the MsgArg was successfully set
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
  *      - An error status otherwise
  */
 extern AJ_API QStatus alljoyn_msgarg_set(alljoyn_msgarg arg, const char* signature, ...);
 
 /**
- * Matches a signature to the MsArg and if the signature matches unpacks the component values of a MsgArg. Note that the values
- * returned are references into the MsgArg itself so unless copied will become invalid if the MsgArg is freed or goes out of scope.
- * This function resolved through variants, so if the MsgArg is a variant that references a 32 bit integer is can be unpacked
- * directly into a 32 bit integer pointer.
+ * Matches a signature to the alljoyn_msgarg and if the signature matches unpacks the component
+ * values of an alljoyn_msgarg. Note that the values returned are references into the
+ * alljoyn_msgarg itself so unless copied will become invalid if the alljoyn_msgarg is freed or
+ * goes out of scope.  This function resolves through variants, so if the alljoyn_msgarg is a
+ * variant that references a 32 bit integer it can be unpacked directly into a 32 bit integer
+ * pointer.
  *
  *  - @c 'a'  A pointer to a length of type size_t that returns the number of elements in the array followed by:
  *            - If the element type is a scalar type a pointer to a pointer of the correct type for the values.
- *            - Otherwise a pointer to a pointer to a MsgArg.
+ *            - Otherwise a pointer to a pointer to an alljoyn_msgarg.
  *
  *  - @c 'b'  A pointer to a bool
  *  - @c 'd'  A pointer to a double (64 bits)
- *  - @c 'g'  A pointer to a char*  (character string is valid for the lifetime of the MsgArg)
+ *  - @c 'g'  A pointer to a char*  (character string is valid for the lifetime of the alljoyn_msgarg)
  *  - @c 'h'  A pointer to a qcc::SocketFd
  *  - @c 'i'  A pointer to a uint32_t
  *  - @c 'n'  A pointer to an int16_t
- *  - @c 'o'  A pointer to a char*  (character string is valid for the lifetime of the MsgArg)
+ *  - @c 'o'  A pointer to a char*  (character string is valid for the lifetime of the alljoyn_msgarg)
  *  - @c 'q'  A pointer to a uint16_t
- *  - @c 's'  A pointer to a char*  (character string is valid for the lifetime of the MsgArg)
+ *  - @c 's'  A pointer to a char*  (character string is valid for the lifetime of the alljoyn_msgarg)
  *  - @c 't'  A pointer to a uint64_t
  *  - @c 'u'  A pointer to a uint32_t
- *  - @c 'v'  A pointer to a pointer to a MsgArg, matches to a variant but returns a pointer to
- *            the MsgArg of the underlying real type.
+ *  - @c 'v'  A pointer to a pointer to an alljoyn_msgarg, matches to a variant but returns a pointer to
+ *            the alljoyn_msgarg of the underlying real type.
  *  - @c 'x'  A pointer to an int64_t
  *  - @c 'y'  A pointer to a uint8_t
  *
  *  - @c '(' and @c ')'  A list of pointers as required for each of the struct members.
  *  - @c '{' and @c '}'  Pointers as required for the key and value members.
  *
- *  - @c '*' A pointer to a pointer to a MsgArg. This matches any value type.
+ *  - @c '*' A pointer to a pointer to an alljoyn_msgarg. This matches any value type.
  *
  * Examples:
  *
@@ -321,12 +337,12 @@ extern AJ_API QStatus alljoyn_msgarg_set(alljoyn_msgarg arg, const char* signatu
  *     alljoyn_msgarg_get(arg, "aq", &numVals, &vals);
  *     @endcode
  *
- * @param get         The alljoyn_msgarg we are reading reading from
- * @param signature   The signature for MsgArg value
+ * @param arg         The alljoyn_msgarg we are reading from
+ * @param signature   The signature for alljoyn_msgarg value
  * @param ...         Pointers to return the unpacked values.
  *
  * @return
- *      - #ER_OK if the signature matched and MsgArg was successfully unpacked.
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
  *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
  *      - An error status otherwise
  */
@@ -342,13 +358,13 @@ extern AJ_API QStatus alljoyn_msgarg_get(alljoyn_msgarg arg, const char* signatu
  */
 extern AJ_API alljoyn_msgarg alljoyn_msgarg_copy(const alljoyn_msgarg source);
 
-/*
- * Copy the contents of the source MsgArg into the Destination MsgArg. If the
+/**
+ * Copy the contents of the source alljoyn_msgarg into the Destination alljoyn_msgarg. If the
  * destination already contains information it will be cleared before the source
- * MsgArg is copied in.
+ * alljoyn_msgarg is copied in.
  *
- * @param destination the MsgArg will hold the copy
- * @param source      the MsgArg to be copied
+ * @param destination the alljoyn_msgarg that will hold the copy
+ * @param source      the alljoyn_msgarg to be copied
  */
 extern AJ_API void alljoyn_msgarg_clone(alljoyn_msgarg destination, const alljoyn_msgarg source);
 /**
@@ -364,33 +380,33 @@ extern AJ_API QCC_BOOL alljoyn_msgarg_equal(alljoyn_msgarg lhv, alljoyn_msgarg r
 
 
 /**
- * Set an array of MsgArgs by applying the alljoyn_msgarg_set() function to each MsgArg in turn.
+ * Set an array of alljoyn_msgargs by applying the alljoyn_msgarg_set() function to each alljoyn_msgarg in turn.
  *
- * @param args     An array of MsgArgs to set.
- * @param numArgs  [in,out] On input the size of the args array. On output the number of MsgArgs
- *                 that were set. There must be at least enough MsgArgs to completely
+ * @param args     An array of alljoyn_msgargs to set.
+ * @param numArgs  [in,out] On input the size of the args array. On output the number of alljoyn_msgargs
+ *                 that were set. There must be at least enough alljoyn_msgargs to completely
  *                 initialize the signature.
  *
- * @param signature   The signature for MsgArg values
- * @param ...         One or more values to initialize the MsgArg list.
+ * @param signature   The signature for alljoyn_msgarg values
+ * @param ...         One or more values to initialize the alljoyn_msgarg list.
  *
  * @return
- *       - #ER_OK if the MsgArgs were successfully set.
+ *       - #ER_OK if the alljoyn_msgargs were successfully set.
  *       - #ER_BUS_TRUNCATED if the signature was longer than expected.
  *       - Other error status codes indicating a failure.
  */
 extern AJ_API QStatus alljoyn_msgarg_array_set(alljoyn_msgarg args, size_t* numArgs, const char* signature, ...);
 
 /**
- * Unpack an array of MsgArgs by applying the alljoyn_msgarg_get() function to each MsgArg in turn.
+ * Unpack an array of alljoyn_msgargs by applying the alljoyn_msgarg_get() function to each alljoyn_msgarg in turn.
  *
- * @param args       An array of MsgArgs to unpack.
- * @param numArgs    The size of the MsgArgs array.
- * @param signature  The signature to match against the MsgArg values
+ * @param args       An array of alljoyn_msgargs to unpack.
+ * @param numArgs    The size of the alljoyn_msgargs array.
+ * @param signature  The signature to match against the alljoyn_msgarg values
  * @param ...         Pointers to return references to the unpacked values.
  *
  * @return
- *      - #ER_OK if the MsgArgs were successfully set.
+ *      - #ER_OK if the alljoyn_msgargs were successfully set.
  *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
  *      - Other error status codes indicating a failure.
  */
@@ -433,7 +449,7 @@ extern AJ_API size_t alljoyn_msgarg_array_tostring(const alljoyn_msgarg args, si
  * Returns a string for the signature of this value
  *
  * @param[in] arg the argument to read the signature from
- * @param[out] str a string containing the signature of the MsgArg use NULL pointer
+ * @param[out] str a string containing the signature of the alljoyn_msgarg use NULL pointer
  *            to find string size.
  * @param[in] buf The size of the char* array that will hold the string
  *
@@ -447,10 +463,10 @@ extern AJ_API size_t alljoyn_msgarg_signature(alljoyn_msgarg arg, char* str, siz
 /**
  * Returns a string representation of the signature of an array of message args.
  *
- * @param[int] values     A pointer to an array of message arg values
+ * @param[in] values    A pointer to an array of message arg values
  * @param[in] numValues  Length of the array
- * @param[out] str        a string containing the signature of the MsgArg use NULL
- *                   pointer to find string size.
+ * @param[out] str       a string containing the signature of the alljoyn_msgarg use NULL
+ *                       pointer to find string size.
  * @param[in] buf        The size of the char* array that will hold the string
  *
  * @return  The number of characters (including the terminating nul byte) which
@@ -471,11 +487,11 @@ extern AJ_API size_t alljoyn_msgarg_array_signature(alljoyn_msgarg values, size_
 extern AJ_API QCC_BOOL alljoyn_msgarg_hassignature(alljoyn_msgarg arg, const char* signature);
 
 /**
- * Helper function for accessing dictionary elements. The MsgArg must be an array of dictionary
+ * Helper function for accessing dictionary elements. The alljoyn_msgarg must be an array of dictionary
  * elements. The second parameter is the key value, this is expressed according to the rules for
- * MsgArg::Set so is either a scalar, a pointer to a string, or for 64 bit values a pointer to
+ * alljoyn_msgarg_set so is either a scalar, a pointer to a string, or for 64 bit values a pointer to
  * the value. This value is matched against the dictionary array to locate the matching element.
- * The third and subsequent parameters are unpacked according to the rules of MsgArg::Get.
+ * The third and subsequent parameters are unpacked according to the rules of alljoyn_msgarg_get.
  *
  * For example, where the key is a string and the values are structs:
  *
@@ -494,35 +510,41 @@ extern AJ_API QCC_BOOL alljoyn_msgarg_hassignature(alljoyn_msgarg arg, const cha
  * @param ...      Pointers to return unpacked key values.
  *
  * @return
- *      - #ER_OK if the dictionary signature matched and MsgArg was successfully unpacked.
- *      - #ER_BUS_NOT_A_DICTIONARY if this method is called on a MsgArg that is not a dictionary.
+ *      - #ER_OK if the dictionary signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_NOT_A_DICTIONARY if this function is called on an alljoyn_msgarg that is not a dictionary.
  *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
  *      - #ER_BUS_ELEMENT_NOT_FOUND if the key was not found in the dictionary.
  *      - An error status otherwise
  */
 extern AJ_API QStatus alljoyn_msgarg_getdictelement(alljoyn_msgarg arg, const char* elemSig, ...);
 
-
-extern AJ_API AllJoynTypeId alljoyn_msgarg_gettype(alljoyn_msgarg arg);
+/**
+ * Get the allJoyn_typeid of the alljoyn_msgarg
+ *
+ * @param arg the message argument we want to know the alljoyn_typeid of.
+ *
+ * @return the alljoyn_typeid of the alljoyn_msgarg
+ */
+extern AJ_API allJoyn_typeid alljoyn_msgarg_gettype(alljoyn_msgarg arg);
 
 /**
- * Clear the MsgArg setting the type to ALLJOYN_INVALID and freeing any memory allocated for the
- * MsgArg value.
+ * Clear the alljoyn_msgarg setting the type to ALLJOYN_INVALID and freeing any memory allocated for the
+ * alljoyn_msgarg value.
  *
  * @param arg the message argument to be cleared.
  */
 extern AJ_API void alljoyn_msgarg_clear(alljoyn_msgarg arg);
 
 /**
- * Makes a MsgArg stable by completely copying the contents into locally
- * managed memory. After a MsgArg has been stabilized any values used to
+ * Makes an alljoyn_msgarg stable by completely copying the contents into locally
+ * managed memory. After an alljoyn_msgarg has been stabilized any values used to
  * initialize or set the message arg can be freed.
  *
  * @param arg the message argument to stabilize
  */
 extern AJ_API void alljoyn_msgarg_stabilize(alljoyn_msgarg arg);
 
-
+/// @cond ALLJOYN_DEV
 /*
  *******************************************************************************
  * This set of functions were originally designed for the alljoyn_unity bindings
@@ -532,138 +554,1144 @@ extern AJ_API void alljoyn_msgarg_stabilize(alljoyn_msgarg arg);
  * AllJoyn Unity Extension. The functions could be changed at any time.
  *******************************************************************************
  */
-
 /**
- * Set an array of MsgArgs by applying the Set() method to each MsgArg in turn.
+ * Set an array of alljoyn_msgargs by applying the alljoyn_msgarg_set() function
+ * to each alljoyn_msgarg in turn.
  *
- * @param args        An array of MsgArgs to set.
- * @param argOffset   Offset from the start of the MsgArg array.
- * @param numArgs     [in,out] On input the number of args to set. On output the number of MsgArgs
- *                    that were set. There must be at least enough MsgArgs to completely
+ * @param args        An array of alljoyn_msgargs to set.
+ * @param argOffset   Offset from the start of the alljoyn_msgarg array.
+ * @param numArgs     [in,out] On input the number of args to set. On output the number of alljoyn_msgargs
+ *                    that were set. There must be at least enough alljoyn_msgargs to completely
  *                    initialize the signature.
  *                    there should at least enough.
- * @param signature   The signature for MsgArg values
- * @param ...         One or more values to initialize the MsgArg list.
+ * @param signature   The signature for alljoyn_msgarg values
+ * @param ...         One or more values to initialize the alljoyn_msgarg list.
  *
  * @return
- *       - #ER_OK if the MsgArgs were successfully set.
+ *       - #ER_OK if the alljoyn_msgargs were successfully set.
  *       - #ER_BUS_TRUNCATED if the signature was longer than expected.
  *       - Other error status codes indicating a failure.
  */
 extern AJ_API QStatus alljoyn_msgarg_array_set_offset(alljoyn_msgarg args, size_t argOffset, size_t* numArgs, const char* signature, ...);
 
-/*
+/**
  * This function is identical to alljoyn_msgarg_set except after the the values
- * in the message arg have been set the MsgArg will be stabilized.
+ * in the message arg have been set the alljoyn_msgarg will be stabilized.
  * This is useful when the call is made from a manage language like C sharp where
  * objects like strings may be garbage collected.
  *
  * @param arg         The alljoyn_msgarg being set
- * @param signature   The signature for MsgArg value
- * @param ...         One or more values to initialize the MsgArg.
+ * @param signature   The signature for alljoyn_msgarg value
+ * @param ...         One or more values to initialize the alljoyn_msgarg.
  *
  * @return
- *      - #ER_OK if the MsgArg was successfully set
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
  *      - An error status otherwise
  */
 extern AJ_API QStatus alljoyn_msgarg_set_and_stabilize(alljoyn_msgarg arg, const char* signature, ...);
-/*
+/*******************************************************************************
  * MsgArg set functions for each of the basic data types
+ *******************************************************************************/
+/**
+ * Set the value of an alljoyn_msgarg to hold an uint8 (byte).
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the uint8 (byte)
+ * @param y       a  uint8
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg walljoyn_msgargcessfully set
+ *      - An error status otherwise
  */
 extern AJ_API QStatus alljoyn_msgarg_set_uint8(alljoyn_msgarg arg, uint8_t y);
+/**
+ * Set the value of an alljoyn_msgarg to hold a QCC_BOOL.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the QCC_BOOL
+ * @param b       a QCC_BOOL
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_bool(alljoyn_msgarg arg, QCC_BOOL b);
+/**
+ * Set the value of an alljoyn_msgarg to hold an int16.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the int16
+ * @param n       an int16
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_int16(alljoyn_msgarg arg, int16_t n);
+/**
+ * Set the value of an alljoyn_msgarg to hold an uint16.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the uint16
+ * @param q       an uint16
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_uint16(alljoyn_msgarg arg, uint16_t q);
+/**
+ * Set the value of an alljoyn_msgarg to hold an int32.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the int32
+ * @param i       an int32
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_int32(alljoyn_msgarg arg, int32_t i);
+/**
+ * Set the value of an alljoyn_msgarg to hold an uint32.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the uint32
+ * @param u       an uint32
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_uint32(alljoyn_msgarg arg, uint32_t u);
+/**
+ * Set the value of an alljoyn_msgarg to hold an int64.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the int64
+ * @param x       an int64
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_int64(alljoyn_msgarg arg, int64_t x);
+/**
+ * Set the value of an alljoyn_msgarg to hold an uint64.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the uint64
+ * @param t       an uint64
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_uint64(alljoyn_msgarg arg, uint64_t t);
+/**
+ * Set the value of an alljoyn_msgarg to hold an double.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the double
+ * @param d       an double
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_double(alljoyn_msgarg arg, double d);
+/**
+ * Set the value of an alljoyn_msgarg to hold a string.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the string
+ * @param s       an string
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_string(alljoyn_msgarg arg, const char* s);
+/**
+ * Set the value of an alljoyn_msgarg to hold an object path
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the object path
+ * @param o       an object path string
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_objectpath(alljoyn_msgarg arg, const char* o);
+/**
+ * Set the value of an alljoyn_msgarg to hold a signature.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg that will hold the signature
+ * @param g       a signature string
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_signature(alljoyn_msgarg arg, const char* g);
 
-/*
+/*******************************************************************************
  * MsgArg get functions for each of the basic data types
+ *******************************************************************************/
+/**
+ * Get an uint8 (bytes) from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] y    a pointer to the uint8 (byte)
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
  */
 extern AJ_API QStatus alljoyn_msgarg_get_uint8(const alljoyn_msgarg arg, uint8_t* y);
+/**
+ * Get a QCC_BOOL from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] b    a pointer to the QCC_BOOL
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_bool(const alljoyn_msgarg arg, QCC_BOOL* b);
+/**
+ * Get an int16 from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] n    a pointer to the int16
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_int16(const alljoyn_msgarg arg, int16_t* n);
+/**
+ * Get an uint16 from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] q    a pointer to the uint16
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_uint16(const alljoyn_msgarg arg, uint16_t* q);
+/**
+ * Get an int32 from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] i    a pointer to the int32
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_int32(const alljoyn_msgarg arg, int32_t* i);
+/**
+ * Get an uint32 from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] u    a pointer to the uint32
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_uint32(const alljoyn_msgarg arg, uint32_t* u);
+/**
+ * Get an int64 from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] x    a pointer to the int64
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_int64(const alljoyn_msgarg arg, int64_t* x);
+/**
+ * Get an uint64 from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] t    a pointer to the uint64
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_uint64(const alljoyn_msgarg arg, uint64_t* t);
+/**
+ * Get a double from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] d    a pointer to the double
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_double(const alljoyn_msgarg arg, double* d);
+/**
+ * Get a string from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] s    a pointer to the string
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_string(const alljoyn_msgarg arg, char* s);
+/**
+ * Get an object path from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] o    a pointer to the object path string
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_objectpath(const alljoyn_msgarg arg, char* o);
+/**
+ * Get a signature from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg  the alljoyn_msgarg to obtain the data from
+ * @param[out] g    a pointer to the signature string
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_signature(const alljoyn_msgarg arg, char* g);
 
 
-/*
+/*******************************************************************************
  * MsgArg set function for arrays of each basic data type
+ *******************************************************************************/
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of uint8s (bytes).
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of uint8s (bytes)
+ * @param ay      a pointer to an array of uint8s (bytes)
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
  */
 extern AJ_API QStatus alljoyn_msgarg_set_uint8_array(alljoyn_msgarg arg, size_t length, uint8_t* ay);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of QCC_BOOLs.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of QCC_BOOLs
+ * @param ab      a pointer to an array of QCC_BOOLs
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_bool_array(alljoyn_msgarg arg, size_t length, QCC_BOOL* ab);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of int16s.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of int16s
+ * @param an      a pointer to an array of int16s
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_int16_array(alljoyn_msgarg arg, size_t length, int16_t* an);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of uint16s.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of uint16s
+ * @param aq      a pointer to an array of uint16s
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_uint16_array(alljoyn_msgarg arg, size_t length, uint16_t* aq);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of int32s.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of int32s
+ * @param ai      a pointer to an array of int32s
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_int32_array(alljoyn_msgarg arg, size_t length, int32_t* ai);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of uint32s.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of uint32s
+ * @param au      a pointer to an array of uint32s
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_uint32_array(alljoyn_msgarg arg, size_t length, uint32_t* au);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of int64s.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of int64s
+ * @param ax      a pointer to an array of int64s
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_int64_array(alljoyn_msgarg arg, size_t length, int64_t* ax);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of uint64s.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of uint64s
+ * @param at      a pointer to an array of uint64s
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_uint64_array(alljoyn_msgarg arg, size_t length, uint64_t* at);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of doubles.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of dobules
+ * @param ad      a pointer to an array of doubles
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_double_array(alljoyn_msgarg arg, size_t length, double* ad);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of strings.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of object paths
+ * @param as      a pointer to an array of object paths
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_string_array(alljoyn_msgarg arg, size_t length, const char** as);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of object paths.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param arg     the alljoyn_msgarg to set
+ * @param length  the size of the array of object paths
+ * @param ao      a pointer to an array of object paths
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_objectpath_array(alljoyn_msgarg arg, size_t length, const char** ao);
+/**
+ * Set the value of an alljoyn_msgarg to hold an array of signatures.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ *
+ * @param      arg     the alljoyn_msgarg to set
+ * @param[out] length  the size of the array of signatures
+ * @param[out] ag      a pointer to an array of signatures
+ *
+ * @return
+ *      - #ER_OK if the alljoyn_msgarg was successfully set
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_set_signature_array(alljoyn_msgarg arg, size_t length, const char** ag);
 
-/*
+/*******************************************************************************
  * MsgArg get function for arrays of each basic data type
+ *******************************************************************************/
+/**
+ * get an array of uint8s (bytes) from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the uint8 (byte) array
+ * @param[out] ay      a pointer to the uint8 (byte) array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
  */
-extern AJ_API QStatus alljoyn_msgarg_get_uint8_array(const alljoyn_msgarg arg, size_t* length, uint8_t* y);
-extern AJ_API QStatus alljoyn_msgarg_get_bool_array(const alljoyn_msgarg arg, size_t* length, QCC_BOOL* b);
-extern AJ_API QStatus alljoyn_msgarg_get_int16_array(const alljoyn_msgarg arg, size_t* length, int16_t* n);
-extern AJ_API QStatus alljoyn_msgarg_get_uint16_array(const alljoyn_msgarg arg, size_t* length, uint16_t* q);
+extern AJ_API QStatus alljoyn_msgarg_get_uint8_array(const alljoyn_msgarg arg, size_t* length, uint8_t* ay);
+/**
+ * get an array of QCC_BOOLs from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the QCC_BOOL array
+ * @param[out] ab      a pointer to the QCC_BOOL array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_bool_array(const alljoyn_msgarg arg, size_t* length, QCC_BOOL* ab);
+/**
+ * get an array of int16 from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the int16 array
+ * @param[out] an      a pointer to the int16 array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_int16_array(const alljoyn_msgarg arg, size_t* length, int16_t* an);
+/**
+ * get an array of uint16s from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the uint16 array
+ * @param[out] aq      a pointer to the uint16 array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_uint16_array(const alljoyn_msgarg arg, size_t* length, uint16_t* aq);
+/**
+ * get an array of int32 from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the int32 array
+ * @param[out] ai      a pointer to the int32 array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
 extern AJ_API QStatus alljoyn_msgarg_get_int32_array(const alljoyn_msgarg arg, size_t* length, int32_t* ai);
-extern AJ_API QStatus alljoyn_msgarg_get_uint32_array(const alljoyn_msgarg arg, size_t* length, uint32_t* u);
-extern AJ_API QStatus alljoyn_msgarg_get_int64_array(const alljoyn_msgarg arg, size_t* length, int64_t* x);
-extern AJ_API QStatus alljoyn_msgarg_get_uint64_array(const alljoyn_msgarg arg, size_t* length, uint64_t* t);
-extern AJ_API QStatus alljoyn_msgarg_get_double_array(const alljoyn_msgarg arg, size_t* length, double* d);
-extern AJ_API QStatus alljoyn_msgarg_get_string_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* s);
-extern AJ_API QStatus alljoyn_msgarg_get_objectpath_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* o);
-extern AJ_API QStatus alljoyn_msgarg_get_signature_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* g);
+/**
+ * get an array of uint32 from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the uint32 array
+ * @param[out] au      a pointer to the uint32 array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_uint32_array(const alljoyn_msgarg arg, size_t* length, uint32_t* au);
+/**
+ * get an array of int64s from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the int64 array
+ * @param[out] ax      a pointer to the int64 array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_int64_array(const alljoyn_msgarg arg, size_t* length, int64_t* ax);
+/**
+ * get an array of uint64s from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the uint64 array
+ * @param[out] at      a pointer to the uint64 array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_uint64_array(const alljoyn_msgarg arg, size_t* length, uint64_t* at);
+/**
+ * get an array of doubles from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the double array
+ * @param[out] ad      a pointer to the double array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_double_array(const alljoyn_msgarg arg, size_t* length, double* ad);
+/**
+ * get an array of strings from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the string array
+ * @param[out] as      a pointer to the string array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_string_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* as);
+/**
+ * get an array of object paths from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the object path array
+ * @param[out] ao      a pointer to the object path array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_objectpath_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* ao);
+/**
+ * get an array of signatures from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg     the alljoyn_msgarg to obtain the data from
+ * @param[out] length  the size of the signature array
+ * @param[out] ag      a pointer to the signature array
+ *
+ * @return
+ *      - #ER_OK if the signature matched and alljoyn_msgarg was successfully unpacked.
+ *      - #ER_BUS_SIGNATURE_MISMATCH if the signature did not match.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_msgarg_get_signature_array(const alljoyn_msgarg arg, size_t* length, alljoyn_msgarg* ag);
 
-/*
+/*******************************************************************************
  * MsgArg get functions for Arrays of Arrays
+ *******************************************************************************/
+/**
+ * How many elements are in the alljoyn array
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param arg The alljoyn_msgarg that contains the array elements
+ *
+ * @return the number of elements in the alljoyn_msgarg
  */
 extern AJ_API size_t alljoyn_msgarg_get_array_numberofelements(const alljoyn_msgarg arg);
+/**
+ * Obtain a single alljoyn_msgarg element from an array of alljoyn_msgarg elements
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      arg      The alljoyn_msgarg that contains the array element
+ * @param      index    The index value for the individual alljoyn_msgarg
+ * @param[out] element  The alljoyn_msgarg located at the index
+ */
 extern AJ_API void   alljoyn_msgarg_get_array_element(const alljoyn_msgarg arg, size_t index, alljoyn_msgarg* element);
+/**
+ * Obtrain the signature of an element inside an array of alljoyn_msgargs
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param arg     The alljoyn_msgarg that contains the signature
+ * @param index   The index value for the individual alljoyn_msgarg
+ *
+ * @return the string representing the signature of the element
+ */
 extern AJ_API const char* alljoyn_msgarg_get_array_elementsignature(const alljoyn_msgarg arg, size_t index);
 
+/*******************************************************************************
+ * alljoyn_msgarg function beleived to no longer be used by external bindings.
+ * must be investigated to verify they can be removed.
+ * TODO investgage weather the following functions are still needed
+ *******************************************************************************/
+/**
+ * Return a uint8_t (byte) from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return the uint8_t (byte) contained in the given alljoyn_msgarg
+ */
 extern AJ_API uint8_t alljoyn_msgarg_as_uint8(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return a boolean value from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return the QCC_BOOL contained in the given alljoyn_msgarg
+ */
 extern AJ_API QCC_BOOL alljoyn_msgarg_as_bool(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return a int16_t from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return the int16_t contained in the given alljoyn_msgarg
+ */
 extern AJ_API int16_t alljoyn_msgarg_as_int16(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return a uint16_t from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return the uint16_t contained in the given alljoyn_msgarg
+ */
 extern AJ_API uint16_t alljoyn_msgarg_as_uint16(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return a int32_t from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return the int32_t contained in the given alljoyn_msgarg
+ */
 extern AJ_API int32_t alljoyn_msgarg_as_int32(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return a uint32_t from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return the uint32_t contained in the given alljoyn_msgarg
+ */
 extern AJ_API uint32_t alljoyn_msgarg_as_uint32(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return a int64_t from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return the int64_t contained in the given alljoyn_msgarg
+ */
 extern AJ_API int64_t alljoyn_msgarg_as_int64(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return a uint64_t from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return the uint64_t contained in the given alljoyn_msgarg
+ */
 extern AJ_API uint64_t alljoyn_msgarg_as_uint64(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return a double from an alljoyn_msgarg
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return the double contained in the given alljoyn_msgarg
+ */
 extern AJ_API double alljoyn_msgarg_as_double(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return an alljoyn_msgarg string.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return the string held in the alljoyn_msgarg.
+ */
 extern AJ_API const char* alljoyn_msgarg_as_string(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return an alljoyn_msgarg object path type. An object path is identical to an alljoyn
+ * string except that it must contain a valid object path.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return a string indicating the object path
+ */
 extern AJ_API const char* alljoyn_msgarg_as_objpath(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return an alljoyn_msgarg variant type.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the signature
+ * @param idx   The index value for the individual alljoyn_msgarg
+ *
+ * @return an alljoyn_msgarg holding the variant type
+ */
 extern AJ_API alljoyn_msgarg alljoyn_msgarg_as_variant(const alljoyn_msgarg args, size_t idx);
+/**
+ * Return an alljoyn_msgarg signature stored in an alljoyn_msgarg.  A signature is the
+ * same as an AllJoyn string except the maximum length is 255 and the content must be a valid signature.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      args     The alljoyn_msgarg that contains the signature
+ * @param      idx      The index value for the individual alljoyn_msgarg
+ * @param[out] out_len  The length of the AllJoyn signature
+ * @param[out] out_sig  The Alljoyn signature
+ */
 extern AJ_API void alljoyn_msgarg_as_signature(const alljoyn_msgarg args, size_t idx,
                                                uint8_t* out_len, const char** out_sig);
+/**
+ * Return an Alljoyn handle.  A handle is an abstraction of a platform-specific socket
+ * or file descriptor.
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param      args          The alljoyn_msgarg that contains the AllJoyn handle
+ * @param      idx           The index value for the individual alljoyn_msgarg
+ * @param[out] out_socketFd  The AllJoyn handle (an abstraction of a platform-specific socket)
+ */
 extern AJ_API void alljoyn_msgarg_as_handle(const alljoyn_msgarg args, size_t idx,
                                             void** out_socketFd);
+/**
+ * Return an AllJoyn array value
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args  The alljoyn_msgarg that contains the array
+ * @param idx   The index value for the individual array
+ * @param[out] out_len The number of elements in the alljoyn array
+ * @param[out] out_sig This signature of the alljoyn_array
+ *
+ * @return an alljoyn_msgarg containing the array
+ */
 extern AJ_API const alljoyn_msgarg alljoyn_msgarg_as_array(const alljoyn_msgarg args, size_t idx,
                                                            size_t* out_len, const char** out_sig);
+/**
+ * Return an AllJoyn struct value
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args                 The alljoyn_msgarg that contains the struct
+ * @param idx                  The index value for the individual struct entry
+ * @param[out] out_numMembers  The number of members found in the struct
+ *
+ * @return an alljoyn_msgarg containing an AllJoyn struct
+ */
 extern AJ_API alljoyn_msgarg alljoyn_msgarg_as_struct(const alljoyn_msgarg args, size_t idx,
                                                       size_t* out_numMembers);
+/**
+ * Return the key value pair from an AllJoyn dictionary entry.
+ * The Key and the Value will be returned as an alljoyn_msgarg which can then be read
+ *
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args          The alljoyn_msgarg that contains the dictionary entry
+ * @param idx           The index value for the individual dictionary entry
+ * @param[out] out_key  The dictionary Key
+ * @param[out] out_val  The dictionary value
+ */
 extern AJ_API void alljoyn_msgarg_as_dictentry(const alljoyn_msgarg args, size_t idx,
                                                alljoyn_msgarg* out_key, alljoyn_msgarg* out_val);
+/**
+ * Return pointers to the internal elements of a scalar array.  A scalar array is an
+ * array of basic data types; excluding strings.
+ *
+ * @remark This function exists for development of other language bindings and may
+ *         be changed or removed in future updates and should not be used for reading
+ *         values from an alljoyn_msgarg.
+ * @see alljoyn_msgarg_set
+ * @see alljoyn_msgarg_get.
+ *
+ * @param args                  The alljoyn_msgarg that contains the scalar array
+ * @param idx                   The index to the array of alljoyn_msgargs that contains the scalar array
+ * @param[out] out_numElements  The size of the scalar array
+ * @param[out] out_elements     pointer to the first element in the array.
+ */
 extern AJ_API void alljoyn_msgarg_as_scalararray(const alljoyn_msgarg args, size_t idx,
                                                  size_t* out_numElements, const void** out_elements);
 
+/// @endcond
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

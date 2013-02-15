@@ -1,11 +1,11 @@
 /**
  * @file
- * This file defines the AuthListener class that provides the interface between authentication
- * mechansisms and applications.
+ * This file defines the alljoyn_authlistener and related functions that provides
+ * the interface between authentication mechansisms and applications.
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,8 +28,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+/**
+ * alljoyn_authlistener allows authentication mechanisms to interact with the user or application.
+ */
 typedef struct _alljoyn_authlistener_handle*                alljoyn_authlistener;
+/**
+ * Generic struct for describing different authentication credentials.
+ */
 typedef struct _alljoyn_credentials_handle*                 alljoyn_credentials;
 
 /**
@@ -55,21 +60,72 @@ static const uint16_t ALLJOYN_CRED_ONE_TIME_PWD = 0x2001; /**< Indicates the cre
 
 /**
  * Type for the RequestCredentials callback.
+ *
+ * Authentication mechanism requests user credentials. If the user name is not an empty string
+ * the request is for credentials for that specific user. A count allows the listener to decide
+ * whether to allow or reject multiple authentication attempts to the same peer.
+ *
+ * An implementation must provide RequestCredentials or RequestCredentialsAsync but not both.
+ *
+ * @param context        The context pointer passed into the alljoyn_authlistener_create function
+ * @param authMechanism  The name of the authentication mechanism issuing the request.
+ * @param peerName       The name of the remote peer being authenticated.  On the initiating
+ *                       side this will be a well-known-name for the remote peer. On the
+ *                       accepting side this will be the unique bus name for the remote peer.
+ * @param authCount      Count (starting at 1) of the number of authentication request attempts made.
+ * @param userName       The user name for the credentials being requested.
+ * @param credMask       A bit mask identifying the credentials being requested. The application
+ *                       may return none, some or all of the requested credentials.
+ * @param[out] credentials    The credentials returned.
+ *
+ * @return  The caller should return true if the request is being accepted or false if the
+ *          requests is being rejected. If the request is rejected the authentication is
+ *          complete.
  */
 typedef QCC_BOOL (*alljoyn_authlistener_requestcredentials_ptr)(const void* context, const char* authMechanism, const char* peerName, uint16_t authCount,
                                                                 const char* userName, uint16_t credMask, alljoyn_credentials credentials);
 /**
  * Type for the VerifyCredentials callback.
+ *
+ * Authentication mechanism requests verification of credentials from a remote peer.
+ *
+ * @param context        The context pointer passed into the alljoyn_authlistener_create function
+ * @param authMechanism  The name of the authentication mechanism issuing the request.
+ * @param peerName       The name of the remote peer being authenticated.  On the initiating
+ *                       side this will be a well-known-name for the remote peer. On the
+ *                       accepting side this will be the unique bus name for the remote peer.
+ * @param credentials    The credentials to be verified.
+ *
+ * @return  The listener should return true if the credentials are acceptable or false if the
+ *          credentials are being rejected.
  */
 typedef QCC_BOOL (*alljoyn_authlistener_verifycredentials_ptr)(const void* context, const char* authMechanism, const char* peerName,
                                                                const alljoyn_credentials credentials);
 /**
  * Type for the SecurityViolation callback.
+ *
+ * Optional function that if implemented allows an application to monitor security violations. This
+ * function is called when an attempt to decrypt an encrypted messages failed or when an unencrypted
+ * message was received on an interface that requires encryption. The message contains only
+ * header information.
+ *
+ * @param context  The context pointer passed into the alljoyn_authlistener_create function
+ * @param status   A status code indicating the type of security violation.
+ * @param msg      The message that cause the security violation.
  */
 typedef void (*alljoyn_authlistener_securityviolation_ptr)(const void* context, QStatus status, const alljoyn_message msg);
 
 /**
  * Type for the AuthenticationComplete callback.
+ *
+ * Reports successful or unsuccessful completion of authentication.
+ *
+ * @param authMechanism  The name of the authentication mechanism that was used or an empty
+ *                       string if the authentication failed.
+ * @param peerName       The name of the remote peer being authenticated.  On the initiating
+ *                       side this will be a well-known-name for the remote peer. On the
+ *                       accepting side this will be the unique bus name for the remote peer.
+ * @param success        true if the authentication was successful, otherwise false.
  */
 typedef void (*alljoyn_authlistener_authenticationcomplete_ptr)(const void* context, const char* authMechanism, const char* peerName, QCC_BOOL success);
 
@@ -77,26 +133,38 @@ typedef void (*alljoyn_authlistener_authenticationcomplete_ptr)(const void* cont
  * Structure used during alljoyn_authlistener_create to provide callbacks into C.
  */
 typedef struct {
+    /**
+     * Authentication mechanism requests user credentials.
+     */
     alljoyn_authlistener_requestcredentials_ptr request_credentials;
+    /**
+     * Authentication mechanism requests verification of credentials from a remote peer.
+     */
     alljoyn_authlistener_verifycredentials_ptr verify_credentials;
+    /**
+     * Optional function that if implemented allows an application to monitor security violations.
+     */
     alljoyn_authlistener_securityviolation_ptr security_violation;
+    /**
+     * Reports successful or unsuccessful completion of authentication.
+     */
     alljoyn_authlistener_authenticationcomplete_ptr authentication_complete;
 } alljoyn_authlistener_callbacks;
 
 /**
- * Create a AuthListener which will trigger the provided callbacks, passing along the provided context.
+ * Create an alljoyn_authlistener which will trigger the provided callbacks, passing along the provided context.
  *
  * @param callbacks Callbacks to trigger for associated events.
  * @param context   Context to pass to callback functions
  *
- * @return Handle to newly allocated AuthListener.
+ * @return Handle to newly allocated alljoyn_authlistener.
  */
 extern AJ_API alljoyn_authlistener alljoyn_authlistener_create(const alljoyn_authlistener_callbacks* callbacks, const void* context);
 
 /**
- * Destroy a AuthListener.
+ * Destroy an alljoyn_authlistener.
  *
- * @param listener AuthListener to destroy.
+ * @param listener alljoyn_authlistener to destroy.
  */
 extern AJ_API void alljoyn_authlistener_destroy(alljoyn_authlistener listener);
 

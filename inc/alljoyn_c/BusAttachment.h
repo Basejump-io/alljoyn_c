@@ -41,6 +41,10 @@ extern "C" {
 
 #ifndef _ALLJOYN_OPAQUE_BUSATTACHMENT_
 #define _ALLJOYN_OPAQUE_BUSATTACHMENT_
+/**
+ * alljoyn_busattachment is the top level object responsible for connecting to and
+ * managing an AllJoyn message bus
+ */
 typedef struct _alljoyn_busattachment_handle*               alljoyn_busattachment;
 #endif
 
@@ -50,29 +54,31 @@ typedef struct _alljoyn_busattachment_handle*               alljoyn_busattachmen
 typedef void (*alljoyn_busattachment_joinsessioncb_ptr)(QStatus status, alljoyn_sessionid sessionId, const alljoyn_sessionopts opts, void* context);
 
 /**
- * Allocate a BusAttachment.
+ * Allocate an alljoyn_busattachment.
  *
- * By default this will create a BusAttachment capable of handling 4 concurrent method and signal handlers.
+ * By default this will create an alljoyn_busattachment capable of handling 4 concurrent method and signal handlers.
  * This is the recommended default value.  If for some reason your application must be able to handle a different
  * number of concurrent methods use alljoyn_busattachment_create_concurrency.
  *
- * @note Any BusAttachment allocated using this function must be freed using alljoyn_busattachment_destroy
+ * @note Any alljoyn_busattachment allocated using this function must be freed using alljoyn_busattachment_destroy
  *
  * @see alljoyn_busattachment_create_concurrency
  * @see alljoyn_busattachment_destroy
  *
  * @param applicationName       Name of the application.
  * @param allowRemoteMessages   QCC_TRUE if this attachment is allowed to receive messages from remote devices.
+ *
+ * @return the allocated alljoyn_busattachment
  */
 extern AJ_API alljoyn_busattachment alljoyn_busattachment_create(const char* applicationName, QCC_BOOL allowRemoteMessages);
 
 /**
- * Allocate a BusAttachment.
+ * Allocate an alljoyn_busattachment.
  *
- * This will Allocate a BusAttachment that is capable of using a different value for concurrency then
+ * This will Allocate an alljoyn_busattachment that is capable of using a different value for concurrency then
  * the default value of 4.
  *
- * @note Any BusAttachment allocated using this function must be freed using alljoyn_busattachment_destroy
+ * @note Any alljoyn_busattachment allocated using this function must be freed using alljoyn_busattachment_destroy
  *
  * @see alljoyn_busattachment_create
  * @see alljoyn_busattachment_destroy
@@ -80,14 +86,16 @@ extern AJ_API alljoyn_busattachment alljoyn_busattachment_create(const char* app
  * @param applicationName       Name of the application.
  * @param allowRemoteMessages   True if this attachment is allowed to receive messages from remote devices.
  * @param concurrency           The maximum number of concurrent method and signal handlers locally executing.
+ *
+ * @return the allocated alljoyn_busattachment
  */
 extern AJ_API alljoyn_busattachment alljoyn_busattachment_create_concurrency(const char* applicationName, QCC_BOOL allowRemoteMessages, uint32_t concurrency);
 
 
 /**
- * Free an allocated BusAttachment.
+ * Free an allocated alljoyn_busattachment.
  *
- * @param bus BusAttachment to free.
+ * @param bus alljoyn_busattachment to free.
  */
 extern AJ_API void alljoyn_busattachment_destroy(alljoyn_busattachment bus);
 
@@ -95,7 +103,7 @@ extern AJ_API void alljoyn_busattachment_destroy(alljoyn_busattachment bus);
  * @brief Start the process of spinning up the independent threads used in
  * the bus attachment, preparing it for action.
  *
- * This method only begins the process of starting the bus. Sending and
+ * This function only begins the process of starting the bus. Sending and
  * receiving messages cannot begin until the bus is Connect()ed.
  *
  * There are two ways to determine whether the bus is currently connected:
@@ -108,8 +116,8 @@ extern AJ_API void alljoyn_busattachment_destroy(alljoyn_busattachment bus);
  * This means that any time a listener of any kind is used in a program, the
  * implication is that a the overall program is multithreaded, irrespective
  * of whether or not threads are explicitly used.  This, in turn, means that
- * any time shared state is accessed in listener methods, that state must be
- * protected.
+ * any time shared state is accessed in listener callback functions, that state
+ * must be protected.
  *
  * As soon as Start() is called, clients of a bus attachment with listeners
  * must be prepared to receive callbacks on those listeners in the context
@@ -118,67 +126,71 @@ extern AJ_API void alljoyn_busattachment_destroy(alljoyn_busattachment bus);
  *
  * Although intimate knowledge of the details of the threading model are not
  * required to use a bus attachment (beyond the caveat above) we do provide
- * methods on the bus attachment that help users reason about more complex
+ * functions on the bus attachment that help users reason about more complex
  * threading situations.  This will apply to situations where clients of the
  * bus attachment are multithreaded and need to interact with the
- * multithreaded bus attachment.  These methods can be especially useful
+ * multithreaded bus attachment.  These functions can be especially useful
  * during shutdown, when the two separate threading systems need to be
  * gracefully brought down together.
  *
- * The BusAttachment methods Start(), Stop() and Join() all work together to
- * manage the autonomous activities that can happen in a BusAttachment.
+ * The alljoyn_busattachment function alljoyn_busattachment_start(),
+ * alljoyn_busattachment_stop() and alljoyn_busattacment_join() all work together to
+ * manage the autonomous activities that can happen in an alljoyn_busattachment.
  * These activities are carried out by so-called hardware threads.  POSIX
  * defines functions used to control hardware threads, which it calls
  * pthreads.  Many threading packages use similar constructs.
  *
- * In a threading package, a start method asks the underlying system to
+ * In a threading package, a start function asks the underlying system to
  * arrange for the start of thread execution.  Threads are not necessarily
- * running when the start method returns, but they are being *started*.  Some time later,
+ * running when the start function returns, but they are being *started*.  Some time later,
  * a thread of execution appears in a thread run function, at which point the
- * thread is considered *running*.  At some later time, executing a stop method asks the
+ * thread is considered *running*.  At some later time, executing a stop function asks the
  * underlying system to arrange for a thread to end its execution.  The system
  * typically sends a message to the thread to ask it to stop doing what it is doing.
  * The thread is running until it responds to the stop message, at which time the
- * run method exits and the thread is considered *stopping*.
+ * run function exits and the thread is considered *stopping*.
  *
- * Note that neither of Start() nor Stop() are synchronous in the sense that
- * one has actually accomplished the desired effect upon the return from a
- * call.  Of particular interest is the fact that after a call to Stop(),
- * threads will still be *running* for some non-deterministic time.
+ * Note that neither alljoyn_busattachment_start() nor alljoyn_busattachment_stop()
+ * are synchronous in the sense that one has actually accomplished the desired
+ * effect upon the return from a call.  Of particular interest is the fact that
+ * after a call to alljoyn_busattachment_stop(), threads will still be *running* for
+ * some non-deterministic time.
  *
  * In order to wait until all of the threads have actually stopped, a
  * blocking call is required.  In threading packages this is typically
- * called join, and our corresponding method is called Join().
+ * called join, and our corresponding function is called alljoyn_busattachment_join().
  *
- * A Start() method call should be thought of as mapping to a threading
- * package start function.  it causes the activity threads in the
- * BusAttachment to be spun up and gets the attachment ready to do its main
- * job.  As soon as Start() is called, the user should be prepared for one
- * or more of these threads of execution to pop out of the bus attachment
+ * An alljoyn_busattachment_start() function call should be thought of as mapping
+ * to a threading package start function.  it causes the activity threads in the
+ * alljoyn_busattachment to be spun up and gets the attachment ready to do its main
+ * job.  As soon as alljoyn_busattachment_start() is called, the user should be prepared
+ * for one or more of these threads of execution to pop out of the bus attachment
  * and into a listener callback.
  *
- * The Stop() method call should be thought of as mapping to a threading
- * package stop function.  It asks the BusAttachment to begin shutting down
- * its various threads of execution, but does not wait for any threads to exit.
+ * The alljoyn_busattachment_stop() function should be thought of as mapping to a
+ * threading package stop function.  It asks the alljoyn_busattachment to begin
+ * shutting down its various threads of execution, but does not wait for any
+ * threads to exit.
  *
- * A call to the Join() method should be thought of as mapping to a
- * threading package join function call.  It blocks and waits until all of
- * the threads in the BusAttachment have in fact exited their Run functions,
+ * A call to the alljoyn_busattachment_join() function should be thought of as mapping
+ * to a threading package join function call.  It blocks and waits until all of
+ * the threads in the alljoyn_busattachment have in fact exited their Run functions,
  * gone through the stopping state and have returned their status.  When
- * the Join() method returns, one may be assured that no threads are running
- * in the bus attachment, and therefore there will be no callbacks in
- * progress and no further callbacks will ever come out of a particular
+ * the alljoyn_busattachment_join() function returns, one may be assured that no
+ * threads are running in the bus attachment, and therefore there will be no callbacks
+ * in progress and no further callbacks will ever come out of a particular
  * instance of a bus attachment.
  *
- * It is important to understand that since Start(), Stop() and Join() map
- * to threads concepts and functions, one should not expect them to clean up
- * any bus attachment state when they are called.  These functions are only
- * present to help in orderly termination of complex threading systems.
+ * It is important to understand that since alljoyn_busattachment_start(),
+ * alljoyn_busattachment_stop() and alljoyn_busattachment_join() map to threads
+ * concepts and functions, one should not expect them to clean up any bus
+ * attachment state when they are called.  These functions are only present to
+ * help in orderly termination of complex threading systems.
  *
  * @see alljoyn_busattachment_stop()
  * @see alljoyn_busattachment_join()
  *
- * @param bus The BusAttachment to start.
+ * @param bus The alljoyn_busattachment to start.
  *
  * @return
  *      - #ER_OK if successful.
@@ -191,22 +203,22 @@ extern AJ_API QStatus alljoyn_busattachment_start(alljoyn_busattachment bus);
  * @brief Ask the threading subsystem in the bus attachment to begin the
  * process of ending the execution of its threads.
  *
- * The Stop() method call on a bus attachment should be thought of as
- * mapping to a threading package stop function.  It asks the BusAttachment
- * to begin shutting down its various threads of execution, but does not
- * wait for any threads to exit.
+ * The alljoyn_busattachment_stop() function call on a bus attachment should be
+ * thought of as mapping to a threading package stop function.  It asks the
+ * alljoyn_busattachment to begin shutting down its various threads of execution, but
+ * does not wait for any threads to exit.
  *
- * A call to Stop() is implied as one of the first steps in the destruction
- * of a bus attachment.
+ * A call to alljoyn_busattachment_stop() is implied as one of the first steps in
+ * the destruction of a bus attachment.
  *
  * @warning There is no guarantee that a listener callback may begin executing
- * after a call to Stop().  To achieve that effect, the Stop() must be followed
- * by a Join().
+ * after a call to alljoyn_busattachment_stop().  To achieve that effect, the
+ * alljoyn_busattachment_stop() must be followed by an alljoyn_busattachment_join().
  *
  * @see alljoyn_busattachment_start()
  * @see alljoyn_busattachment_join()
  *
- * @param bus                 BusAttachment to stop.
+ * @param bus  alljoyn_busattachment to stop.
  *
  * @return
  *      - #ER_OK if successful.
@@ -218,27 +230,28 @@ extern AJ_API QStatus alljoyn_busattachment_stop(alljoyn_busattachment bus);
  * @brief Wait for all of the threads spawned by the bus attachment to be
  * completely exited.
  *
- * A call to the Join() method should be thought of as mapping to a
- * threading package join function call.  It blocks and waits until all of
- * the threads in the BusAttachment have, in fact, exited their Run functions,
- * gone through the stopping state and have returned their status.  When
- * the Join() method returns, one may be assured that no threads are running
- * in the bus attachment, and therefore there will be no callbacks in
- * progress and no further callbacks will ever come out of the instance of a
- * bus attachment on which Join() was called.
+ * A call to the alljoyn_busattachment_join() function should be thought of as
+ * mapping to a threading package join function call.  It blocks and waits
+ * until all of the threads in the alljoyn_busattachment have, in fact, exited
+ * their Run functions, gone through the stopping state and have returned their
+ * status.  When the alljoyn_busattachment_join() function returns, one may be
+ * assured that no threads are running in the bus attachment, and therefore
+ * there will be no callbacks in progress and no further callbacks will ever
+ * come out of the instance of a bus attachment on which
+ * alljoyn_busattachment_join() was called.
  *
- * A call to Join() is implied as one of the first steps in the destruction
- * of a bus attachment.  Thus, when a bus attachment is destroyed, it is
- * guaranteed that before it completes its destruction process, there will be
- * no callbacks in process.
+ * A call to alljoyn_busattachment_join() is implied as one of the first steps
+ * in the destruction of a bus attachment.  Thus, when a bus attachment is
+ * destroyed, it is guaranteed that before it completes its destruction process,
+ * there will be no callbacks in process.
  *
- * @warning If Join() is called without a previous Stop() it will result in
- * blocking "forever."
+ * @warning If alljoyn_busattachment_join() is called without a previous
+ * alljoyn_busattachment_stop() it will result in blocking "forever."
  *
  * @see alljoyn_busattachment_start()
  * @see alljoyn_busattachment_stop()
  *
- * @param bus BusAttachment to join.
+ * @param bus alljoyn_busattachment to join.
  *
  * @return
  *      - #ER_OK if successful.
@@ -250,7 +263,7 @@ extern AJ_API QStatus alljoyn_busattachment_join(alljoyn_busattachment bus);
 /**
  * Get the concurrent method and signal handler limit.
  *
- * @param bus    The BusAttachment on which to get the concurrent method and
+ * @param bus    The alljoyn_busattachment on which to get the concurrent method and
  *               signal handler limit.
  *
  * @return The maximum number of concurrent method and signal handlers.
@@ -258,11 +271,11 @@ extern AJ_API QStatus alljoyn_busattachment_join(alljoyn_busattachment bus);
 extern AJ_API uint32_t alljoyn_busattachment_getconcurrency(alljoyn_busattachment bus);
 
 /**
- * Get the connect spec used by the BusAttachment
+ * Get the connect spec used by the alljoyn_busattachment
  *
- * @param bus    The BusAttachment to obtain the connect spec from.
+ * @param bus    The alljoyn_busattachment to obtain the connect spec from.
  *
- * @return The string representing the connect spec used by the BusAttachment
+ * @return The string representing the connect spec used by the alljoyn_busattachment
  */
 extern AJ_API const char* alljoyn_busattachment_getconnectspec(alljoyn_busattachment bus);
 
@@ -270,14 +283,14 @@ extern AJ_API const char* alljoyn_busattachment_getconnectspec(alljoyn_busattach
  * Allow the currently executing method/signal handler to enable concurrent callbacks
  * during the scope of the handler's execution.
  *
- * @param bus    The BusAttachment to enable concurrent callbacks on
+ * @param bus    The alljoyn_busattachment to enable concurrent callbacks on
  *
  */
 extern AJ_API void alljoyn_busattachment_enableconcurrentcallbacks(alljoyn_busattachment bus);
 /**
  * Create an interface description with a given name.
  *
- * @param bus    The BusAttachment on which to create an interface.
+ * @param bus    The alljoyn_busattachment on which to create an interface.
  * @param name   The requested interface name.
  * @param[out] iface
  *      - Interface description
@@ -294,7 +307,7 @@ extern AJ_API QStatus alljoyn_busattachment_createinterface(alljoyn_busattachmen
 /**
  * Connect to a remote bus address.
  *
- * @param bus          The BusAttachment to be connected.
+ * @param bus          The alljoyn_busattachment to be connected.
  * @param connectSpec  A transport connection spec string of the form:
  *                     @c "<transport>:<param1>=<value1>,<param2>=<value2>...[;]"
  *
@@ -307,15 +320,16 @@ extern AJ_API QStatus alljoyn_busattachment_connect(alljoyn_busattachment bus, c
 /**
  * Register an object that will receive bus event notifications.
  *
- * @param bus       The BusAttachment on which to attach a BusListener.
+ * @param bus       The alljoyn_busattachment on which to attach an alljoyn_buslistener.
  * @param listener  Object instance that will receive bus event notifications.
  */
 extern AJ_API void alljoyn_busattachment_registerbuslistener(alljoyn_busattachment bus, alljoyn_buslistener listener);
 
 /**
- * Unregister an object that was previously registered with RegisterBusListener.
+ * Unregister an object that was previously registered with
+ * alljoyn_busattachment_registerbuslistener.
  *
- * @param bus       The BusAttachment from which to detach a BusListener.
+ * @param bus       The alljoyn_busattachment from which to detach an alljoyn_buslistener.
  * @param listener  Object instance to un-register as a listener.
  */
 extern AJ_API void alljoyn_busattachment_unregisterbuslistener(alljoyn_busattachment bus, alljoyn_buslistener listener);
@@ -325,9 +339,9 @@ extern AJ_API void alljoyn_busattachment_unregisterbuslistener(alljoyn_busattach
  * This method is a shortcut/helper that issues an org.alljoyn.Bus.FindAdvertisedName method call to the local daemon
  * and interprets the response.
  *
- * @param      bus           The BusAttachment on which to register interest in the namePrefix.
+ * @param      bus           The alljoyn_busattachment on which to register interest in the namePrefix.
  * @param[in]  namePrefix    Well-known name prefix that application is interested in receiving
- *                           BusListener::FoundAdvertisedName notifications about.
+ *                           alljoyn_buslistener_foundadvertisedname notifications about.
  *
  * @return
  *      - #ER_OK iff daemon response was received and discovery was successfully started.
@@ -337,12 +351,12 @@ extern AJ_API void alljoyn_busattachment_unregisterbuslistener(alljoyn_busattach
 extern AJ_API QStatus alljoyn_busattachment_findadvertisedname(alljoyn_busattachment bus, const char* namePrefix);
 
 /**
- * Cancel interest in a well-known name prefix that was previously
- * registered with FindAdvertisedName.  This method is a shortcut/helper
- * that issues an org.alljoyn.Bus.CancelFindAdvertisedName method
- * call to the local daemon and interprets the response.
+ * Cancel interest in a well-known name prefix that was previously registered
+ * with alljoyn_busattachment_findadvertisedname.  This method is a shortcut/helper
+ * that issues an org.alljoyn.Bus.CancelFindAdvertisedName method call to the
+ * local daemon and interprets the response.
  *
- * @param      bus           The BusAttachment from which to remove interest in the namePrefix.
+ * @param      bus           The alljoyn_busattachment from which to remove interest in the namePrefix.
  * @param[in]  namePrefix    Well-known name prefix that application is no longer interested in receiving
  *                           BusListener::FoundAdvertisedName notifications about.
  *
@@ -375,7 +389,7 @@ extern AJ_API QStatus alljoyn_busattachment_advertisename(alljoyn_busattachment 
  *
  * This method is a shortcut/helper that issues an org.alljoyn.Bus.CancelAdvertiseName method call to the local daemon
  * and interprets the response.
- *
+ * @param[in]  bus           The bus on which we wish to cancel the name advertisement
  * @param[in]  name          A well-known name that was previously advertised via AdvertiseName.
  * @param[in]  transports    Set of transports whose name advertisment will be cancelled.
  *
@@ -387,9 +401,9 @@ extern AJ_API QStatus alljoyn_busattachment_advertisename(alljoyn_busattachment 
 extern AJ_API QStatus alljoyn_busattachment_canceladvertisename(alljoyn_busattachment bus, const char* name, alljoyn_transportmask transports);
 
 /**
- * Retrieve an existing activated InterfaceDescription.
+ * Retrieve an existing activated alljoyn_interfacedescription.
  *
- * @param bus        The BusAttachment from which to retrieve the interface.
+ * @param bus        The alljoyn_busattachment from which to retrieve the interface.
  * @param name       Interface name.
  *
  * @return
@@ -403,9 +417,9 @@ extern AJ_API const alljoyn_interfacedescription alljoyn_busattachment_getinterf
  * This method is a shortcut/helper that issues an org.alljoyn.Bus.JoinSession method call to the local daemon
  * and interprets the response.
  *
- * @param[in]  bus              BusAttachment with which to join a session.
+ * @param[in]  bus              alljoyn_busattachment with which to join a session.
  * @param[in]  sessionHost      Bus name of attachment that is hosting the session to be joined.
- * @param[in]  sessionPort      SessionPort of sessionHost to be joined.
+ * @param[in]  sessionPort      alljoyn_sessionport of sessionHost to be joined.
  * @param[in]  listener         Optional listener called when session related events occur. May be NULL.
  * @param[out] sessionId        Unique identifier for session.
  * @param[in,out] opts          Session options.
@@ -427,9 +441,9 @@ extern AJ_API QStatus alljoyn_busattachment_joinsession(alljoyn_busattachment bu
  *
  * This call executes asynchronously. When the JoinSession response is received, the callback will be called.
  *
- * @param[in]  bus              BusAttachment with which to join a session.
+ * @param[in]  bus              alljoyn_busattachment with which to join a session.
  * @param[in]  sessionHost      Bus name of attachment that is hosting the session to be joined.
- * @param[in]  sessionPort      SessionPort of sessionHost to be joined.
+ * @param[in]  sessionPort      alljoyn_sessionport of sessionHost to be joined.
  * @param[in]  listener         Optional listener called when session related events occur. May be NULL.
  * @param[in]  opts             Session options.
  * @param[in]  callback         Called when JoinSession response is received.
@@ -489,8 +503,8 @@ extern AJ_API QStatus alljoyn_busattachment_requestname(alljoyn_busattachment bu
  * This method is a shortcut/helper that issues an org.freedesktop.DBus.ReleaseName method call to the local daemon
  * and interprets the response.
  *
- * @parma[in]  bus           The bus from which to release the name.
- * @param[in]  name          Well-known name being released.
+ * @param[in]  bus   The alljoyn_busattachment from which to release the name.
+ * @param[in]  name  Well-known name being released.
  *
  * @return
  *      - #ER_OK iff daemon response was received amd the name was successfully released.
@@ -500,27 +514,28 @@ extern AJ_API QStatus alljoyn_busattachment_requestname(alljoyn_busattachment bu
 extern AJ_API QStatus alljoyn_busattachment_releasename(alljoyn_busattachment bus, const char* name);
 
 /**
- * Make a SessionPort available for external BusAttachments to join.
+ * Make an alljoyn_sessionport available for external alljoyn_busattachments to join.
  *
- * Each BusAttachment binds its own set of SessionPorts. Session joiners use the bound session
- * port along with the name of the attachement to create a persistent logical connection (called
- * a Session) with the original BusAttachment.
+ * Each alljoyn_busattachment binds its own set of alljoyn_sessionports. Session joiners use the
+ * bound session port along with the name of the attachement to create a persistent logical
+ * connection (called a Session) with the original alljoyn_busattachment.
  *
- * A SessionPort and bus name form a unique identifier that BusAttachments use when joining a
- * session.
+ * An alljoyn_sessionport and bus name form a unique identifier that
+ * alljoyn_busattachments use when joining a session.
  *
- * SessionPort values can be pre-arranged between AllJoyn services and their clients (well-known
- * SessionPorts).
+ * alljoyn_sessionport values can be pre-arranged between AllJoyn services and their clients (well-known
+ * alljoyn_sessionports).
  *
- * Once a session is joined using one of the service's well-known SessionPorts, the service may
- * bind additional SessionPorts (dyanamically) and share these SessionPorts with the joiner over
- * the original session. The joiner can then create additional sessions with the service by
- * calling JoinSession with these dynamic SessionPort ids.
+ * Once a session is joined using one of the service's well-known alljoyn_sessionports,
+ * the service may bind additional alljoyn_sessionports (dyanamically) and share
+ * these alljoyn_sessionports with the joiner over the original session.
+ * The joiner can then create additional sessions with the service by calling
+ * JoinSession with these dynamic alljoyn_sessionport ids.
  *
  * @param[in]     bus              The bus on which to make the session port available.
- * @param[in,out] sessionPort      SessionPort value to bind or SESSION_PORT_ANY to allow this method
+ * @param[in,out] sessionPort      alljoyn_sessionport value to bind or SESSION_PORT_ANY to allow this method
  *                                 to choose an available port. On successful return, this value
- *                                 contains the chosen SessionPort.
+ *                                 contains the chosen alljoyn_sessionport.
  *
  * @param[in]     opts             Session options that joiners must agree to in order to
  *                                 successfully join the session.
@@ -549,11 +564,11 @@ extern AJ_API QStatus alljoyn_busattachment_bindsessionport(alljoyn_busattachmen
 extern AJ_API QStatus alljoyn_busattachment_unbindsessionport(alljoyn_busattachment bus, alljoyn_sessionport sessionPort);
 
 /**
- * Enable peer-to-peer security. This function must be called by applications that want to use
- * authentication and encryption . The bus must have been started by calling
- * BusAttachment::Start() before this function is called. If the application is providing its
- * own key store implementation it must have already called RegisterKeyStoreListener() before
- * calling this function.
+ * Enable peer-to-peer security. This function must be called by applications that
+ * want to use authentication and encryption . The bus must have been started by calling
+ * alljoyn_busattachment_start() before this function is called. If the application
+ * is providing its own key store implementation it must have already called
+ * alljoyn_busattachment_registerkeystorelistener() before calling this function.
  *
  * @param bus              The bus on which to enable security.
  * @param authMechanisms   The authentication mechanism(s) to use for peer-to-peer authentication.
@@ -562,7 +577,7 @@ extern AJ_API QStatus alljoyn_busattachment_unbindsessionport(alljoyn_busattachm
  * @param listener         Passes password and other authentication related requests to the application.
  *
  * @param keyStoreFileName Optional parameter to specify the filename of the default key store. The
- *                         default value is the applicationName parameter of BusAttachment().
+ *                         default value is the applicationName parameter of alljoyn_busattachment_create().
  *                         Note that this parameter is only meaningful when using the default
  *                         key store implementation.
  *
@@ -573,7 +588,7 @@ extern AJ_API QStatus alljoyn_busattachment_unbindsessionport(alljoyn_busattachm
  *
  * @return
  *      - #ER_OK if peer security was enabled.
- *      - #ER_BUS_BUS_NOT_STARTED BusAttachment::Start has not be called
+ *      - #ER_BUS_BUS_NOT_STARTED alljoyn_busattachment_start has not be called
  */
 extern AJ_API QStatus alljoyn_busattachment_enablepeersecurity(alljoyn_busattachment bus, const char* authMechanisms,
                                                                alljoyn_authlistener listener, const char* keyStoreFileName,
@@ -609,6 +624,7 @@ extern AJ_API QStatus alljoyn_busattachment_createinterfacesfromxml(alljoyn_busa
 /**
  * Returns the existing activated InterfaceDescriptions.
  *
+ * @param bus        The bus to obtaining the interfaces from
  * @param ifaces     A pointer to an InterfaceDescription array to receive the interfaces. Can be NULL in
  *                   which case no interfaces are returned and the return value gives the number
  *                   of interface available.
@@ -637,13 +653,17 @@ extern AJ_API QStatus alljoyn_busattachment_deleteinterface(alljoyn_busattachmen
  * Returns QCC_TRUE if the mesage bus has been started.
  *
  * @param bus The bus to query.
+ *
+ * @return true if the message bus has been started i.e. alljoyn_busattachment_start() has been called.
  */
 extern AJ_API QCC_BOOL alljoyn_busattachment_isstarted(alljoyn_busattachment bus);
 
 /**
- * Returns QCC_TRUE if the mesage bus has been requested to stop.
+ * Indicates #alljoyn_busattachment_stop() has been called
  *
  * @param bus The bus to query.
+ *
+ * @return QCC_TRUE if the mesage bus has been requested to stop.
  */
 extern AJ_API QCC_BOOL alljoyn_busattachment_isstopping(alljoyn_busattachment bus);
 
@@ -666,7 +686,7 @@ extern AJ_API QCC_BOOL alljoyn_busattachment_isconnected(const alljoyn_busattach
  * @return
  *          - #ER_OK if successful
  *          - #ER_BUS_BUS_NOT_STARTED if the bus is not started
- *          - #ER_BUS_NOT_CONNECTED if the %BusAttachment is not connected to the bus
+ *          - #ER_BUS_NOT_CONNECTED if the %alljoyn_busattachment is not connected to the bus
  *          - Other error status codes indicating a failure
  */
 extern AJ_API QStatus alljoyn_busattachment_disconnect(alljoyn_busattachment bus, const char* connectSpec);
@@ -699,11 +719,11 @@ extern AJ_API const alljoyn_proxybusobject alljoyn_busattachment_getalljoynproxy
 extern AJ_API const alljoyn_proxybusobject alljoyn_busattachment_getalljoyndebugobj(alljoyn_busattachment bus);
 
 /**
- * Get the unique name of this BusAttachment.
+ * Get the unique name of this alljoyn_busattachment.
  *
  * @param bus The bus to query.
  *
- * @return The unique name of this BusAttachment.
+ * @return The unique name of this alljoyn_busattachment.
  */
 extern AJ_API const char* alljoyn_busattachment_getuniquename(const alljoyn_busattachment bus);
 
@@ -723,11 +743,10 @@ extern AJ_API const char* alljoyn_busattachment_getglobalguidstring(const alljoy
  * Signals are forwarded to the signalHandler if sender, interface, member and path
  * qualifiers are ALL met.
  *
- * @param bus            The BusAttachment to register the signal handler with
- * @param receiver       The object receiving the signal.
- * @param signalHandler  The signal handler method.
- * @param member         The interface/member of the signal.
- * @param srcPath        The object path of the emitter of the signal or NULL for all paths.
+ * @param bus             The alljoyn_busattachment to register the signal handler with
+ * @param signal_handler  The signal handler method.
+ * @param member          The interface/member of the signal.
+ * @param srcPath         The object path of the emitter of the signal or NULL for all paths.
  * @return #ER_OK
  */
 /*
@@ -744,11 +763,10 @@ extern AJ_API QStatus alljoyn_busattachment_registersignalhandler(alljoyn_busatt
  *
  * Remove the signal handler that was registered with the given parameters.
  *
- * @param bus            The BusAttachment to unregister the signal handler with
- * @param receiver       The object receiving the signal.
- * @param signalHandler  The signal handler method.
- * @param member         The interface/member of the signal.
- * @param srcPath        The object path of the emitter of the signal or NULL for all paths.
+ * @param bus             The alljoyn_busattachment to unregister the signal handler with
+ * @param signal_handler  The signal handler method.
+ * @param member          The interface/member of the signal.
+ * @param srcPath         The object path of the emitter of the signal or NULL for all paths.
  * @return #ER_OK
  */
 extern AJ_API QStatus alljoyn_busattachment_unregistersignalhandler(alljoyn_busattachment bus,
@@ -757,10 +775,9 @@ extern AJ_API QStatus alljoyn_busattachment_unregistersignalhandler(alljoyn_busa
                                                                     const char* srcPath);
 
 /**
- * Unregister all signal and reply handlers for the specified alljoyn_busobject.
+ * Unregister all signal and reply handlers for the specified alljoyn_busattachment.
  *
- * @param bus            The BusAttachment to unregister the signal handler with
- * @param receiver       The message receiver that is being unregistered.
+ * @param bus  The alljoyn_busattachment to unregister the signal handler with
  * @return ER_OK if successful.
  */
 extern AJ_API QStatus alljoyn_busattachment_unregisterallhandlers(alljoyn_busattachment bus);
@@ -870,7 +887,7 @@ extern AJ_API QStatus alljoyn_busattachment_addlogonentry(alljoyn_busattachment 
  * Add a DBus match rule.
  * This method is a shortcut/helper that issues an org.freedesktop.DBus.AddMatch method call to the local daemon.
  *
- * @parma[in]  bus   The bus on which to add the match rule.
+ * @param[in]  bus   The bus on which to add the match rule.
  * @param[in]  rule  Match rule to be added (see DBus specification for format of this string).
  *
  * @return
@@ -884,7 +901,7 @@ extern AJ_API QStatus alljoyn_busattachment_addmatch(alljoyn_busattachment bus, 
  * Remove a DBus match rule.
  * This method is a shortcut/helper that issues an org.freedesktop.DBus.RemoveMatch method call to the local daemon.
  *
- * @parma[in]  bus   The bus from which to remove the match rule.
+ * @param[in]  bus   The bus from which to remove the match rule.
  * @param[in]  rule  Match rule to be removed (see DBus specification for format of this string).
  *
  * @return
@@ -945,7 +962,7 @@ extern AJ_API QStatus alljoyn_busattachment_leavesession(alljoyn_busattachment b
  *      - #ER_ALLJOYN_SETLINKTIMEOUT_REPLY_NO_DEST_SUPPORT if SetLinkTimeout not supported by destination
  *      - #ER_BUS_NO_SESSION if the Session id is not valid
  *      - #ER_ALLJOYN_SETLINKTIMEOUT_REPLY_FAILED if SetLinkTimeout failed
- *      - #ER_BUS_NOT_CONNECTED if the BusAttachment is not connected to the daemon
+ *      - #ER_BUS_NOT_CONNECTED if the alljoyn_busattachment is not connected to the daemon
  */
 extern AJ_API QStatus alljoyn_busattachment_setlinktimeout(alljoyn_busattachment bus, alljoyn_sessionid sessionid, uint32_t* linkTimeout);
 

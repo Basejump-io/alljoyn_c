@@ -5,7 +5,7 @@
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,10 +38,6 @@
 struct _alljoyn_msgarg_handle {
     /* Empty by design, this is just to allow the type restrictions to save coders from themselves */
 };
-
-//struct _alljoyn_msgarg_array_handle {
-//    /* Empty by design, this is just to allow the type restrictions to save coders from themselves */
-//};
 
 alljoyn_msgarg alljoyn_msgarg_create() {
     ajn::MsgArgC* arg = new ajn::MsgArgC[1];
@@ -85,13 +81,6 @@ alljoyn_msgarg alljoyn_msgarg_array_create(size_t size)
     }
     return (alljoyn_msgarg)args;
 }
-
-//void  alljoyn_msgarg_array_destroy(alljoyn_msgarg_array arg)
-//{
-//    if (arg != NULL) {
-//        delete [] (ajn::MsgArgC*)arg;
-//    }
-//}
 
 alljoyn_msgarg alljoyn_msgarg_array_element(alljoyn_msgarg arg, size_t index)
 {
@@ -323,12 +312,12 @@ void alljoyn_msgarg_clear(alljoyn_msgarg arg)
     ((ajn::MsgArgC*)arg)->Clear();
 }
 
-AllJoynTypeId alljoyn_msgarg_gettype(alljoyn_msgarg arg)
+allJoyn_typeid alljoyn_msgarg_gettype(alljoyn_msgarg arg)
 {
     if (!arg) {
         return ALLJOYN_INVALID;
     }
-    return (AllJoynTypeId)((ajn::MsgArgC*)arg)->typeId;
+    return (allJoyn_typeid)((ajn::MsgArgC*)arg)->typeId;
 }
 
 void alljoyn_msgarg_stabilize(alljoyn_msgarg arg)

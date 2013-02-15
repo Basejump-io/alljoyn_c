@@ -1,5 +1,12 @@
+/**
+ * @file
+ * This file redefines __dllexport or __dllimport on relevant platforms
+ *
+ * This file also defines the deferred callback mechanism used to make sure the
+ * callbacks occur on the same thread that registered for the callback.
+ */
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +23,7 @@
 #ifndef _ALLJOYN_C_AJAPI_H
 #define _ALLJOYN_C_AJAPI_H
 
-/** This #define allows for redefinition to __dllexport or __dllimport on relevant platforms */
+/** This @#define allows for redefinition to __dllexport or __dllimport on relevant platforms */
 #ifndef AJ_API
 #  if defined(QCC_OS_GROUP_WINDOWS)
 #    define AJ_API __declspec(dllexport)

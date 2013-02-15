@@ -5,7 +5,7 @@
  */
 
 /******************************************************************************
- * Copyright 2010-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2010-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,11 +32,14 @@ extern "C" {
 
 #ifndef _ALLJOYN_OPAQUE_BUSOBJECT_
 #define _ALLJOYN_OPAQUE_BUSOBJECT_
+/**
+ * Message bus object
+ */
 typedef struct _alljoyn_busobject_handle*                   alljoyn_busobject;
 #endif
 
 /**
- * MethodHandlers are %MessageReceiver methods which are called by AllJoyn library
+ * MethodHandlers are %MessageReceiver functions which are called by AllJoyn library
  * to forward AllJoyn method_calls to AllJoyn library users.
  *
  * @param bus       The bus object triggering this callback.
@@ -48,7 +51,7 @@ typedef void (*alljoyn_messagereceiver_methodhandler_ptr)(alljoyn_busobject bus,
                                                           alljoyn_message message);
 
 /**
- * ReplyHandlers are %MessageReceiver methods which are called by AllJoyn library
+ * ReplyHandlers are %MessageReceiver functions which are called by AllJoyn library
  * to forward AllJoyn method_reply and error responses to AllJoyn library users.
  *
  * @param message   The received message.
@@ -57,7 +60,7 @@ typedef void (*alljoyn_messagereceiver_methodhandler_ptr)(alljoyn_busobject bus,
 typedef void (*alljoyn_messagereceiver_replyhandler_ptr)(alljoyn_message message, void* context);
 
 /**
- * SignalHandlers are %MessageReceiver methods which are called by AllJoyn library
+ * SignalHandlers are %MessageReceiver functions which are called by AllJoyn library
  * to forward AllJoyn received signals to AllJoyn library users.
  *
  * @param member    Method or signal interface member entry.

@@ -7,7 +7,7 @@
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -38,28 +38,81 @@ extern "C" {
 
 #ifndef _ALLJOYN_OPAQUE_BUSOBJECT_
 #define _ALLJOYN_OPAQUE_BUSOBJECT_
+/**
+ * alljoyn_busobjects are objects that are implemented and registered locally.
+ * An alljoyn_busobject can contain multiple interfaces that can be called remotely.
+ */
 typedef struct _alljoyn_busobject_handle*                   alljoyn_busobject;
 #endif
 
-/*
+/**
  * Callback for property get method.
+ *
+ * Handle a bus request to read a property from this object.
+ * alljoyn_busobjects that implement properties should provide an implementation
+ * of this function.
+ * The default version simply returns ER_BUS_NO_SUCH_PROPERTY.
+ *
+ * @param context   context pointer passed in when creating a new alljoyn_busobject
+ * @param ifcName   Identifies the interface that the property is defined on
+ * @param propName  Identifies the the property to get
+ * @param[out] val  Returns the property value. The type of this value is the actual value
+ *                  type.
+ * @return #ER_BUS_NO_SUCH_PROPERTY (Should be changed to #ER_OK by user implementation of alljoyn_busobject_prop_get_ptr
+ *                                   if the request results in successfully reading a property from the object.)
  */
 typedef QStatus (*alljoyn_busobject_prop_get_ptr)(const void* context, const char* ifcName, const char* propName, alljoyn_msgarg val);
 
-/*
+/**
  * Callback for property set method.
+ *
+ * Handle a bus attempt to write a property value to this object.
+ * alljoyn_busobjects that implement properties should provide an implementation
+ * of this function.
+ * This default version just replies with ER_BUS_NO_SUCH_PROPERTY
+ *
+ * @param context    context pointer passed in when creating a new alljoyn_busobject
+ * @param ifcName    Identifies the interface that the property is defined on
+ * @param propName   Identifies the the property to set
+ * @param val        The property value to set. The type of this value is the actual value
+ *                   type.
+ * @return #ER_BUS_NO_SUCH_PROPERTY (Should be changed to #ER_OK by user implementation of alljoyn_busobject_prop_set_ptr
+ *                                   is the set request results in successfully changing the property.)
  */
 typedef QStatus (*alljoyn_busobject_prop_set_ptr)(const void* context, const char* ifcName, const char* propName, alljoyn_msgarg val);
 
-/*
+/**
  * Callback for ObjectRegistered and ObjectUnregistered
+ *
+ * ObjectRegistered is called by the bus when the alljoyn_busobject has been successfully registered
+ * ObjectUnregistered is called by the bus when the alljoyn_busobject has been successfully unregistered
+ *
+ * @param context   context pointer passed in when creating a new alljoyn_busobject
  */
 typedef void (*alljoyn_busobject_object_registration_ptr)(const void* context);
 
+/**
+ * a structure containing a collection of function pointers.
+ * These functions are call by AllJoyn in response to certain events and requests
+ */
 typedef struct {
+    /**
+     * Handle a bus request to read a property from the alljoyn_busobject
+     */
     alljoyn_busobject_prop_get_ptr property_get;
+    /**
+     * Handle a bus request to write a property value to the alljoyn_busobject
+     */
     alljoyn_busobject_prop_set_ptr property_set;
+    /**
+     * Called by the message bus when the object has been successfully registered.
+     *
+     * The object can perform any initialization such as adding match rules at this time
+     */
     alljoyn_busobject_object_registration_ptr object_registered;
+    /**
+     * Called by the message bus when the object has been successfully unregistered.
+     */
     alljoyn_busobject_object_registration_ptr object_unregistered;
 } alljoyn_busobject_callbacks;
 
@@ -73,18 +126,21 @@ typedef struct {
 } alljoyn_busobject_methodentry;
 
 /**
- * Create a %BusObject.
+ * Create an %alljoyn_busobject.
  *
- * @param bus            Bus that this object exists on.
  * @param path           Object path for object.
  * @param isPlaceholder  Place-holder objects are created by the bus itself and serve only
  *                       as parent objects (in the object path sense) to other objects.
+ * @param callbacks_in   an alljoyn_busobject_callbacks struct containing pointer to callback functions
+ * @param context_in     a context pointer that can be used in the callback functions
+ *
+ * @return allocated alljoyn_busobject
  */
 extern AJ_API alljoyn_busobject alljoyn_busobject_create(const char* path, QCC_BOOL isPlaceholder,
                                                          const alljoyn_busobject_callbacks* callbacks_in, const void* context_in);
 
 /**
- * Destroy a BusObject
+ * Destroy an alljoyn_busobject
  *
  * @param bus Bus to destroy.
  */
@@ -93,7 +149,7 @@ extern AJ_API void alljoyn_busobject_destroy(alljoyn_busobject bus);
 /**
  * Return the path for the object
  *
- * @param bus BusObject on which to get the path.
+ * @param bus alljoyn_busobject on which to get the path.
  * @return Object path
  */
 extern AJ_API const char* alljoyn_busobject_getpath(alljoyn_busobject bus);
@@ -102,7 +158,7 @@ extern AJ_API const char* alljoyn_busobject_getpath(alljoyn_busobject bus);
 /**
  * Emit PropertiesChanged to signal the bus that this property has been updated
  *
- * @param bus       BusObject with which to emit the signal
+ * @param bus       alljoyn_busobject with which to emit the signal
  * @param ifcName   The name of the interface
  * @param propName  The name of the property being changed
  * @param val       The new value of the property
@@ -121,7 +177,7 @@ extern AJ_API void alljoyn_emit_property_changed(
  *
  * If the buffer is NULL or the bufferSz is 0, the length of the name + nul will be returned.
  *
- * @param bus       BusObject on which to get the name.
+ * @param bus       alljoyn_busobject on which to get the name.
  * @param buffer    A buffer into which to copy the name.
  * @param bufferSz  The size of the buffer provided.
  * @return The size of the name string, if the returned value is > bufferSz, the entire name was not copied into buffer.
@@ -152,6 +208,7 @@ extern AJ_API QStatus alljoyn_busobject_addinterface(alljoyn_busobject bus, cons
  * Add a method handler to this object. The interface for the method handler must have already
  * been added by calling AddInterface().
  *
+ * @param bus      The alljoyn_busobject onto which the method handler will be added.
  * @param member   Interface member implemented by handler.
  * @param handler  Method handler.
  * @param context  An optional context. This is mainly intended for implementing language
@@ -230,9 +287,9 @@ extern AJ_API QStatus alljoyn_busobject_methodreply_status(alljoyn_busobject bus
  *                         network congestion or other factors the signal may be discarded. There is
  *                         no guarantee that expired signals will not still be delivered.
  * @param flags            Logical OR of the message flags for this signals. The following flags apply to signals:
- *                         - If ::ALLJOYN_FLAG_GLOBAL_BROADCAST is set broadcast signal (null destination) will be forwarded across bus-to-bus connections.
- *                         - If ::ALLJOYN_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
- *                         - If ::ALLJOYN_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
+ *                         - If #ALLJOYN_MESSAGE_FLAG_GLOBAL_BROADCAST is set broadcast signal (null destination) will be forwarded across bus-to-bus connections.
+ *                         - If #ALLJOYN_MESSAGE_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
+ *                         - If #ALLJOYN_MESSAGE_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
  * @return
  *      - #ER_OK if successful
  *      - An error status otherwise

@@ -4,7 +4,7 @@
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,9 +31,16 @@
 extern "C" {
 #endif
 
+/**
+ * alljoyn_message for parsing and generating message bus messages
+ */
 typedef struct _alljoyn_message_handle*                     alljoyn_message;
 #ifndef _ALLJOYN_OPAQUE_BUSATTACHMENT_
 #define _ALLJOYN_OPAQUE_BUSATTACHMENT_
+/**
+ * alljoyn_busattachment is the top level object responsible for connecting to and
+ * managing an AllJoyn message bus
+ */
 typedef struct _alljoyn_busattachment_handle*               alljoyn_busattachment;
 #endif
 
@@ -76,16 +83,18 @@ typedef enum {
 } alljoyn_messagetype;
 
 /**
- * Create a message object.
+ * Create an alljoyn_message object.
  *
- * @param bus  The bus that this message is sent or received on.
+ * @param bus  The alljoyn_busattachment that this alljoyn_message is sent or received on.
+ *
+ * @return the allocated alljoyn_message
  */
 extern AJ_API alljoyn_message alljoyn_message_create(alljoyn_busattachment bus);
 
 /**
- * Destroy a message object.
+ * Destroy an alljoyn_message object.
  *
- * @param msg The message to destroy
+ * @param msg The alljoyn_message to destroy
  */
 extern AJ_API void alljoyn_message_destroy(alljoyn_message msg);
 
@@ -180,7 +189,7 @@ extern AJ_API alljoyn_messagetype alljoyn_message_gettype(alljoyn_message msg);
 /**
  * Return the arguments for this message.
  *
- * @param[in]  msg     The message from which to extract the arguments.
+ * @param[in]  msg     The alljoyn_message from which to extract the arguments.
  * @param[out] numArgs The number of arguments
  * @param[out] args    Returns the arguments
  */
@@ -189,7 +198,7 @@ extern AJ_API void alljoyn_message_getargs(alljoyn_message msg, size_t* numArgs,
 /**
  * Return a specific argument.
  *
- * @param msg   The message from which to extract an argument.
+ * @param msg   The alljoyn_message from which to extract an argument.
  * @param argN  The index of the argument to get.
  *
  * @return
@@ -199,10 +208,10 @@ extern AJ_API void alljoyn_message_getargs(alljoyn_message msg, size_t* numArgs,
 extern AJ_API const alljoyn_msgarg alljoyn_message_getarg(alljoyn_message msg, size_t argN);
 
 /**
- * Unpack and return the arguments for this message. This method uses the functionality from
- * MsgArg::Get() see MsgArg.h for documentation.
+ * Unpack and return the arguments for this message. This function uses the
+ * functionality from alljoyn_msgarg_get() see MsgArg.h for documentation.
  *
- * @param[in]  msg     The message from which to extract the arguments.
+ * @param[in]  msg     The alljoyn_message from which to extract the arguments.
  * @param[in]  signature  The signature to match against the message arguments.
  * @param[out] ...        Pointers to return references to the unpacked values.
  * @return  ER_OK if successful.
@@ -211,9 +220,9 @@ extern AJ_API QStatus alljoyn_message_parseargs(alljoyn_message msg, const char*
 
 /**
  * Accessor function to get serial number for the message. Usually only important for
- * #MESSAGE_METHOD_CALL for matching up the reply to the call.
+ * #ALLJOYN_MESSAGE_METHOD_CALL for matching up the reply to the call.
  *
- * @param[in]  msg     The message from which to extract the serial.
+ * @param[in]  msg     The alljoyn_message from which to extract the serial.
  *
  * @return the serial number of the %Message
  */
@@ -222,7 +231,7 @@ extern AJ_API uint32_t alljoyn_message_getcallserial(alljoyn_message msg);
 /**
  * Accessor function to get the signature for this message
  *
- * @param[in] msg  The message from which to extract the signature.
+ * @param[in] msg  The alljoyn_message from which to extract the signature.
  *
  * @return
  *      - The AllJoyn SIGNATURE string stored in the AllJoyn header field
@@ -233,7 +242,7 @@ extern AJ_API const char* alljoyn_message_getsignature(alljoyn_message msg);
 /**
  * Accessor function to get the object path for this message
  *
- * @param[in] msg  The message from which to extract the object path.
+ * @param[in] msg  The alljoyn_message from which to extract the object path.
  *
  * @return
  *      - The AllJoyn object path string stored in the AllJoyn header field
@@ -244,7 +253,7 @@ extern AJ_API const char* alljoyn_message_getobjectpath(alljoyn_message msg);
 /**
  * Accessor function to get the interface for this message
  *
- * @param[in] msg  The message from which to extract the interface name.
+ * @param[in] msg  The alljoyn_message from which to extract the interface name.
  *
  * @return
  *      - The AllJoyn interface string stored in the AllJoyn header field
@@ -255,7 +264,7 @@ extern AJ_API const char* alljoyn_message_getinterface(alljoyn_message msg);
 /**
  * Accessor function to get the member (method/signal) name for this message
  *
- * @param[in] msg  The message from which to extract the member name.
+ * @param[in] msg  The alljoyn_message from which to extract the member name.
  *
  * @return
  *      - The AllJoyn member (method/signal) name string stored in the AllJoyn header field
@@ -264,9 +273,9 @@ extern AJ_API const char* alljoyn_message_getinterface(alljoyn_message msg);
 extern AJ_API const char* alljoyn_message_getmembername(alljoyn_message msg);
 
 /**
- * Accessor function to get the reply serial number for the message. Only meaningful for #MESSAGE_METHOD_RET
+ * Accessor function to get the reply serial number for the message. Only meaningful for #ALLJOYN_MESSAGE_METHOD_RET
  *
- * @param[in] msg  The message from which to extract the reply serial.
+ * @param[in] msg  The alljoyn_message from which to extract the reply serial.
  *
  * @return
  *      - The serial number for the message stored in the AllJoyn header field
@@ -277,7 +286,7 @@ extern AJ_API uint32_t alljoyn_message_getreplyserial(alljoyn_message msg);
 /**
  * Accessor function to get the sender for this message.
  *
- * @param[in] msg  The message from which to extract the sender information.
+ * @param[in] msg  The alljoyn_message from which to extract the sender information.
  *
  * @return
  *      - The senders well-known name string stored in the AllJoyn header field.
@@ -288,7 +297,7 @@ extern AJ_API const char* alljoyn_message_getsender(alljoyn_message msg);
 /**
  * Get the unique name of the endpoint that the message was received on.
  *
- * @param[in] msg  The message from which to extract the endpoint information.
+ * @param[in] msg  The alljoyn_message from which to extract the endpoint information.
  *
  * @return
  *     - The unique name of the endpoint that the message was received on.
@@ -298,7 +307,7 @@ extern AJ_API const char* alljoyn_message_getreceiveendpointname(alljoyn_message
 /**
  * Accessor function to get the destination for this message
  *
- * @param[in] msg  The message from which to extract the destination information.
+ * @param[in] msg  The alljoyn_message from which to extract the destination information.
  *
  * @return
  *      - The message destination string stored in the AllJoyn header field.
@@ -309,7 +318,7 @@ extern AJ_API const char* alljoyn_message_getdestination(alljoyn_message msg);
 /**
  * Accessor function to get the compression token for the message.
  *
- * @param[in] msg  The message from which to extract the compression token information.
+ * @param[in] msg  The alljoyn_message from which to extract the compression token information.
  *
  * @return
  *      - Compression token for the message stored in the AllJoyn header field
@@ -320,7 +329,7 @@ extern AJ_API uint32_t alljoyn_message_getcompressiontoken(alljoyn_message msg);
 /**
  * Accessor function to get the session id for the message.
  *
- * @param[in] msg  The message from which to extract the session id information.
+ * @param[in] msg  The alljoyn_message from which to extract the session id information.
  * @return
  *      - Session id for the message
  *      - 0 'zero' if sender did not specify a session
@@ -330,7 +339,7 @@ extern AJ_API alljoyn_sessionid alljoyn_message_getsessionid(alljoyn_message msg
 /**
  * If the message is an error message returns the error name and optionally the error message string
  *
- * @param[in] msg  The message from which to extract the error name information.
+ * @param[in] msg  The alljoyn_message from which to extract the error name information.
  * @param[out] errorMessage
  *                      - Return the error message string stored
  *                      - leave errorMessage unchanged if error message string not found
@@ -348,7 +357,7 @@ extern AJ_API const char* alljoyn_message_geterrorname(alljoyn_message msg, char
 /**
  * Returns an XML string representation of the message
  *
- * @param[in]  msg  The message which to return an XML representation of.
+ * @param[in]  msg  The alljoyn_message which to return an XML representation of.
  * @param[out] str  The character string that will hold the XML string
  *                  representation of the alljoyn_message
  * @param[in]  buf  The size of the char* array that will hold the string
@@ -364,7 +373,7 @@ extern AJ_API size_t alljoyn_message_tostring(alljoyn_message msg, char* str, si
 /**
  * Returns a string that provides a brief description of the message
  *
- * @param[in] msg  The message which to return an XML representation of.
+ * @param[in] msg  The alljoyn_message which to return an XML representation of.
  * @param[out] str The character string that will hold the description of the
  *                 message
  * @param[in]  buf  The size of the char* array that will hold the string
@@ -382,7 +391,7 @@ extern AJ_API size_t alljoyn_message_description(alljoyn_message msg, char* str,
  * otherwise it is the timestamp for when the message was unmarshaled. Note that the timestamp
  * is always relative to local time.
  *
- * @param[in] msg  The message from which to extract the timestamp information.
+ * @param[in] msg  The alljoyn_message from which to extract the timestamp information.
  *
  * @return The timestamp for this message.
  */
@@ -399,10 +408,10 @@ extern AJ_API uint32_t alljoyn_message_gettimestamp(alljoyn_message msg);
 extern AJ_API QCC_BOOL alljoyn_message_eql(const alljoyn_message one, const alljoyn_message other);
 
 /**
- * Set the endianess for outgoing messages. This is mainly for testing purposes.
+ * Set the endianness for outgoing messages. This is mainly for testing purposes.
  *
  * @param endian  Either ALLJOYN_LITTLE_ENDIAN or ALLJOYN_BIG_ENDIAN. Any other value
- *                sets the endianess to the native endianess for this platform.
+ *                sets the endianness to the native endianness for this platform.
  *
  *
  */

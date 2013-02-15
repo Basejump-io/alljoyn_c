@@ -5,7 +5,7 @@
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@
 #include "DeferredCallback.h"
 
 
-static void __PropertyChanged(alljoyn_buslistener_bus_prop_changed_ptr fcn, const char* interface_name, const char* prop_name, alljoyn_msgarg prop_value)
+static void __PropertyChanged(alljoyn_buslistener_bus_prop_changed_ptr fcn, const void* context, const char* prop_name, alljoyn_msgarg prop_value)
 {
-    (*fcn)(interface_name, prop_name, prop_value);
+    (*fcn)(context, prop_name, prop_value);
 
     if (prop_value) {
         alljoyn_msgarg_destroy(prop_value);
@@ -115,15 +115,15 @@ class BusListenerCallbackC : BusListener {
         }
     }
 
-    void PropertyChanged(const char* interface_name, const char* prop_name, MsgArg* prop_value)
+    void PropertyChanged(const char* prop_name, MsgArg* prop_value)
     {
         if (callbacks.property_changed != NULL) {
             alljoyn_msgarg msg_arg = prop_value ? alljoyn_msgarg_create_and_set(prop_value->Signature().c_str(), prop_value->v_variant.val) : NULL;
 
             // must wrap the user function in order to properly clean up msg_arg
-            DeferredCallback_4<void, alljoyn_buslistener_bus_prop_changed_ptr, const char*, const char*, alljoyn_msgarg>* dcb =
-                new DeferredCallback_4<void, alljoyn_buslistener_bus_prop_changed_ptr, const char*, const char*, alljoyn_msgarg>(
-                    __PropertyChanged, callbacks.property_changed, interface_name, prop_name, msg_arg);
+            DeferredCallback_4<void, alljoyn_buslistener_bus_prop_changed_ptr, const void*, const char*, alljoyn_msgarg>* dcb =
+                new DeferredCallback_4<void, alljoyn_buslistener_bus_prop_changed_ptr, const void*, const char*, alljoyn_msgarg>(
+                    __PropertyChanged, callbacks.property_changed, context, prop_name, msg_arg);
             DEFERRED_CALLBACK_EXECUTE(dcb);
         }
     }

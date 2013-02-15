@@ -1,12 +1,12 @@
 /**
  * @file
- * This file defines the class ProxyBusObject.
- * The ProxyBusObject represents a single object registered  registered on the bus.
- * ProxyBusObjects are used to make method calls on these remotely located DBus objects.
+ * This file defines the alljoyn_proxybusobject and related functions.
+ * The alljoyn_proxybusobject represents a single object registered on the bus.
+ * alljoyn_proxybusobjects are used to make method calls on these remotely located DBus objects.
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,9 +36,18 @@
 extern "C" {
 #endif
 
+/**
+ * The alljoyn_proxybusobject represents a single object registered on the bus.
+ * alljoyn_proxybusobjects are used to make method calls on these remotely
+ * located AllJoyn objects.
+ */
 typedef struct _alljoyn_proxybusobject_handle*              alljoyn_proxybusobject;
 #ifndef _ALLJOYN_OPAQUE_BUSATTACHMENT_
 #define _ALLJOYN_OPAQUE_BUSATTACHMENT_
+/**
+ * alljoyn_busattachment is the top level object responsible for connecting to and
+ * managing an AllJoyn message bus
+ */
 typedef struct _alljoyn_busattachment_handle*               alljoyn_busattachment;
 #endif
 
@@ -67,6 +76,8 @@ typedef void (*alljoyn_proxybusobject_listener_introspectcb_ptr)(QStatus status,
  * @param service    The remote service name (well-known or unique).
  * @param path       The absolute (non-relative) object path for the remote object.
  * @param sessionId  The session id the be used for communicating with remote object.
+ *
+ * @return the allocated alljoyn_proxybusobject
  */
 extern AJ_API alljoyn_proxybusobject alljoyn_proxybusobject_create(alljoyn_busattachment bus, const char* service,
                                                                    const char* path, alljoyn_sessionid sessionId);
@@ -79,12 +90,12 @@ extern AJ_API alljoyn_proxybusobject alljoyn_proxybusobject_create(alljoyn_busat
 extern AJ_API void alljoyn_proxybusobject_destroy(alljoyn_proxybusobject proxyObj);
 
 /**
- * Add an interface to this ProxyBusObject.
+ * Add an interface to this alljoyn_proxybusobject.
  *
  * Occasionally, AllJoyn library user may wish to call a method on
- * a %ProxyBusObject that was not reported during introspection of the remote object.
+ * an %alljoyn_proxybusobject that was not reported during introspection of the remote object.
  * When this happens, the InterfaceDescription will have to be registered with the
- * Bus manually and the interface will have to be added to the %ProxyBusObject using this method.
+ * Bus manually and the interface will have to be added to the %alljoyn_proxybusobject using this function.
  * @remark
  * The interface added via this call must have been previously registered with the
  * Bus. (i.e. it must have come from a call to alljoyn_busattachment_getinterface).
@@ -109,37 +120,37 @@ extern AJ_API QStatus alljoyn_proxybusobject_addinterface(alljoyn_proxybusobject
 extern AJ_API QStatus alljoyn_proxybusobject_addinterface_by_name(alljoyn_proxybusobject proxyObj, const char* name);
 
 /**
- * Get a path descendant ProxyBusObject (child) by its relative path name.
+ * Get a path descendant alljoyn_proxybusobject (child) by its relative path name.
  *
- * For example, if this ProxyBusObject's path is @c "/foo/bar", then you can
- * retrieve the ProxyBusObject for @c "/foo/bar/bat/baz" by calling
+ * For example, if this alljoyn_proxybusobject's path is @c "/foo/bar", then you can
+ * retrieve the alljoyn_proxybusobject for @c "/foo/bar/bat/baz" by calling
  * @c GetChild("bat/baz")
  *
  * @param proxyObj The proxybus object we are getting the descendant from
  * @param path     The relative path for the child.
  *
  * @return
- *      - The (potentially deep) descendant ProxyBusObject
+ *      - The (potentially deep) descendant alljoyn_proxybusobject
  *      - NULL if not found.
  */
 extern AJ_API alljoyn_proxybusobject alljoyn_proxybusobject_getchild(alljoyn_proxybusobject proxyObj, const char* path);
 
 /**
  * Add a child object (direct or deep object path descendant) to this object.
- * If you add a deep path descendant, this method will create intermediate
- * ProxyBusObject children as needed.
+ * If you add a deep path descendant, this function will create intermediate
+ * alljoyn_proxybusobject children as needed.
  *
  * @remark
  *  - It is an error to try to add a child that already exists.
  *  - It is an error to try to add a child that has an object path that is not a descendant of this object's path.
  *
  * @param proxyObj The proxy bus object onto which the child object is to be added
- * @param child    Child ProxyBusObject
+ * @param child    Child alljoyn_proxybusobject
  *
  * @return
  *      - #ER_OK if successful.
  *      - #ER_BUS_BAD_CHILD_PATH if the path is a bad path
- *      - #ER_BUS_OBJ_ALREADY_EXISTS the the object already exists on the ProxyBusObject
+ *      - #ER_BUS_OBJ_ALREADY_EXISTS the the object already exists on the alljoyn_proxybusobject
  */
 extern AJ_API QStatus alljoyn_proxybusobject_addchild(alljoyn_proxybusobject proxyObj, const alljoyn_proxybusobject child);
 
@@ -147,7 +158,7 @@ extern AJ_API QStatus alljoyn_proxybusobject_addchild(alljoyn_proxybusobject pro
  * Remove a child object and any descendants it may have.
  *
  * @param proxyObj The proxy bus object off of which the child object is to be removed
- * @param path     Absolute or relative (to this ProxyBusObject) object path.
+ * @param path     Absolute or relative (to this alljoyn_proxybusobject) object path.
  *
  * @return
  *      - #ER_OK if successful.
@@ -180,7 +191,7 @@ extern AJ_API QStatus alljoyn_proxybusobject_introspectremoteobject(alljoyn_prox
  * interfaces and children.
  *
  * This call executes asynchronously. When the introspection response
- * is received from the actual remote object, this ProxyBusObject will
+ * is received from the actual remote object, this alljoyn_proxybusobject will
  * be updated and the callback will be called.
  *
  * This call exists primarily to allow introspection of remote objects
@@ -242,7 +253,7 @@ extern AJ_API QStatus alljoyn_proxybusobject_setproperty(alljoyn_proxybusobject 
 /**
  * Make a synchronous method call
  *
- * @param proxyObj     ProxyBusObject on which to call the method.
+ * @param proxyObj     alljoyn_proxybusobject on which to call the method.
  * @param ifaceName    Name of interface.
  * @param methodName   Name of method.
  * @param args         The arguments for the method call (can be NULL)
@@ -250,13 +261,13 @@ extern AJ_API QStatus alljoyn_proxybusobject_setproperty(alljoyn_proxybusobject 
  * @param replyMsg     The reply message received for the method call
  * @param timeout      Timeout specified in milliseconds to wait for a reply
  * @param flags        Logical OR of the message flags for this method call. The following flags apply to method calls:
- *                     - If #ALLJOYN_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
- *                     - If #ALLJOYN_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
- *                     - If #ALLJOYN_FLAG_AUTO_START is set the bus will attempt to start a service if it is not running.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_AUTO_START is set the bus will attempt to start a service if it is not running.
  *
  * @return
- *      - #ER_OK if the method call succeeded and the reply message type is #MESSAGE_METHOD_RET
- *      - #ER_BUS_REPLY_IS_ERROR_MESSAGE if the reply message type is #MESSAGE_ERROR
+ *      - #ER_OK if the method call succeeded and the reply message type is #ALLJOYN_MESSAGE_METHOD_RET
+ *      - #ER_BUS_REPLY_IS_ERROR_MESSAGE if the reply message type is #ALLJOYN_MESSAGE_ERROR
  */
 extern AJ_API QStatus alljoyn_proxybusobject_methodcall(alljoyn_proxybusobject proxyObj,
                                                         const char* ifaceName,
@@ -270,7 +281,7 @@ extern AJ_API QStatus alljoyn_proxybusobject_methodcall(alljoyn_proxybusobject p
 /**
  * Make a synchronous method call from this object
  *
- * @param proxyObj     ProxyBusObject on which to call the method.
+ * @param proxyObj     alljoyn_proxybusobject on which to call the method.
  * @param method       The alljoyn_interfacedescription_member specifying the method being invoked.
  * @param args         The arguments for the method call (can be NULL)
  * @param numArgs      The number of arguments
@@ -285,8 +296,8 @@ extern AJ_API QStatus alljoyn_proxybusobject_methodcall(alljoyn_proxybusobject p
  *
  *
  * @return
- *      - #ER_OK if the method call succeeded and the reply message type is #MESSAGE_METHOD_RET
- *      - #ER_BUS_REPLY_IS_ERROR_MESSAGE if the reply message type is #MESSAGE_ERROR
+ *      - #ER_OK if the method call succeeded and the reply message type is #ALLJOYN_MESSAGE_METHOD_RET
+ *      - #ER_BUS_REPLY_IS_ERROR_MESSAGE if the reply message type is #ALLJOYN_MESSAGE_ERROR
  */
 extern AJ_API QStatus alljoyn_proxybusobject_methodcall_member(alljoyn_proxybusobject proxyObj,
                                                                const alljoyn_interfacedescription_member method,
@@ -302,15 +313,15 @@ extern AJ_API QStatus alljoyn_proxybusobject_methodcall_member(alljoyn_proxybuso
  * flags == ALLJOYN_FLAG_NO_REPLY_EXPECTED. Because this call doesn't block it can be made from
  * within a signal handler.
  *
- * @param proxyObj     ProxyBusObject on which to call the method.
+ * @param proxyObj     alljoyn_proxybusobject on which to call the method.
  * @param ifaceName    Name of interface.
  * @param methodName   Name of method.
  * @param args         The arguments for the method call (can be NULL)
  * @param numArgs      The number of arguments
  * @param flags        Logical OR of the message flags for this method call. The following flags apply to method calls:
- *                     - If #ALLJOYN_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
- *                     - If #ALLJOYN_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
- *                     - If #ALLJOYN_FLAG_AUTO_START is set the bus will attempt to start a service if it is not running.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_AUTO_START is set the bus will attempt to start a service if it is not running.
  *                     Set value to '0' for no flags.
  *
  * @return
@@ -329,14 +340,14 @@ extern AJ_API QStatus alljoyn_proxybusobject_methodcall_noreply(alljoyn_proxybus
  * flags == ALLJOYN_FLAG_NO_REPLY_EXPECTED. Because this call doesn't block it can be made from
  * within a signal handler.
  *
- * @param proxyObj     ProxyBusObject on which to call the method.
+ * @param proxyObj     alljoyn_proxybusobject on which to call the method.
  * @param method       Method being invoked.
  * @param args         The arguments for the method call (can be NULL)
  * @param numArgs      The number of arguments
  * @param flags        Logical OR of the message flags for this method call. The following flags apply to method calls:
- *                     - If #ALLJOYN_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
- *                     - If #ALLJOYN_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
- *                     - If #ALLJOYN_FLAG_AUTO_START is set the bus will attempt to start a service if it is not running.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_AUTO_START is set the bus will attempt to start a service if it is not running.
  *                     Set value to '0' for no flags.
  *
  * @return
@@ -351,7 +362,7 @@ extern AJ_API QStatus alljoyn_proxybusobject_methodcall_member_noreply(alljoyn_p
 /**
  * Make an asynchronous method call from this object
  *
- * @param proxyObj     ProxyBusObject on which to call the method
+ * @param proxyObj     alljoyn_proxybusobject on which to call the method
  * @param ifaceName    Name of interface for method.
  * @param methodName   Name of method.
  * @param replyFunc    The function that is called to deliver the reply
@@ -362,9 +373,9 @@ extern AJ_API QStatus alljoyn_proxybusobject_methodcall_member_noreply(alljoyn_p
  * @param timeout      Timeout specified in milliseconds to wait for a reply
  *                     Recommended default #ALLJOYN_MESSAGE_DEFAULT_TIMEOUT which is 25000 ms
  * @param flags        Logical OR of the message flags for this method call. The following flags apply to method calls:
- *                     - If #ALLJOYN_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
- *                     - If #ALLJOYN_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
- *                     - If #ALLJOYN_FLAG_AUTO_START is set the bus will attempt to start a service if it is not running.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_AUTO_START is set the bus will attempt to start a service if it is not running.
  *                     Set value to '0' for no flags.
  * @return
  *      - ER_OK if successful
@@ -383,7 +394,7 @@ extern AJ_API QStatus alljoyn_proxybusobject_methodcallasync(alljoyn_proxybusobj
 /**
  * Make an asynchronous method call from this object
  *
- * @param proxyObj     ProxyBusObject on which to call the method
+ * @param proxyObj     alljoyn_proxybusobject on which to call the method
  * @param method       Method being invoked.
  * @param replyFunc    The function that is called to deliver the reply
  * @param args         The arguments for the method call (can be NULL)
@@ -393,9 +404,9 @@ extern AJ_API QStatus alljoyn_proxybusobject_methodcallasync(alljoyn_proxybusobj
  * @param timeout      Timeout specified in milliseconds to wait for a reply
  *                     Recommended default #ALLJOYN_MESSAGE_DEFAULT_TIMEOUT which is 25000 ms
  * @param flags        Logical OR of the message flags for this method call. The following flags apply to method calls:
- *                     - If #ALLJOYN_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
- *                     - If #ALLJOYN_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
- *                     - If #ALLJOYN_FLAG_AUTO_START is set the bus will attempt to start a service if it is not running.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
+ *                     - If #ALLJOYN_MESSAGE_FLAG_AUTO_START is set the bus will attempt to start a service if it is not running.
  *                     Set value to '0' for no flags.
  * @return
  *      - ER_OK if successful
@@ -411,23 +422,23 @@ extern AJ_API QStatus alljoyn_proxybusobject_methodcallasync_member(alljoyn_prox
                                                                     uint8_t flags);
 
 /**
- * Initialize this proxy object from an XML string. Calling this method does several things:
+ * Initialize this proxy object from an XML string. Calling this function does several things:
  *
  *  -# Create and register any new InterfaceDescription(s) that are mentioned in the XML.
  *     (Interfaces that are already registered with the bus are left "as-is".)
- *  -# Add all the interfaces mentioned in the introspection data to this ProxyBusObject.
- *  -# Recursively create any child ProxyBusObject(s) and create/add their associated @n
+ *  -# Add all the interfaces mentioned in the introspection data to this alljoyn_proxybusobject.
+ *  -# Recursively create any child alljoyn_proxybusobject(s) and create/add their associated @n
  *     interfaces as mentioned in the XML. Then add the descendant object(s) to the appropriate
- *     descendant of this ProxyBusObject (in the children collection). If the named child object
- *     already exists as a child of the appropriate ProxyBusObject, then it is updated
- *     to include any new interfaces or children mentioned in the XML.
+ *     descendant of this alljoyn_proxybusobject (in the children collection). If the named
+ *     child object already exists as a child of the appropriate alljoyn_proxybusobject, then it is
+ *     updated to include any new interfaces or children mentioned in the XML.
  *
- * Note that when this method fails during parsing, the return code will be set accordingly.
+ * Note that when this function fails during parsing, the return code will be set accordingly.
  * However, any interfaces which were successfully parsed prior to the failure
  * may be registered with the bus. Similarly, any objects that were successfully created
  * before the failure will exist in this object's set of children.
  *
- * @param proxyObj    ProxyBusObject which will be initialized from the XML string
+ * @param proxyObj    alljoyn_proxybusobject which will be initialized from the XML string
  * @param xml         An XML string in DBus introspection format.
  * @param identifier  An optional identifying string to include in error logging messages.
  *
@@ -447,7 +458,7 @@ extern AJ_API QStatus alljoyn_proxybusobject_parsexml(alljoyn_proxybusobject pro
  * This call causes messages to be send on the bus, therefore it cannot be called within AllJoyn
  * callbacks (method/signal/reply handlers or ObjectRegistered callbacks, etc.)
  *
- * @param proxyObj   ProxyBusObject to explicitly set up a secure a connection
+ * @param proxyObj   alljoyn_proxybusobject to explicitly set up a secure a connection
  * @param forceAuth  If true, forces an re-authentication even if the peer connection is already
  *                   authenticated.
  *                   Recommended default QCC_FALSE
@@ -455,29 +466,32 @@ extern AJ_API QStatus alljoyn_proxybusobject_parsexml(alljoyn_proxybusobject pro
  * @return
  *          - #ER_OK if the connection was secured or an error status indicating that the
  *            connection could not be secured.
- *          - #ER_BUS_NO_AUTHENTICATION_MECHANISM if BusAttachment::EnablePeerSecurity() has not been called.
+ *          - #ER_BUS_NO_AUTHENTICATION_MECHANISM if alljoyn_busattachment_enablepeersecurity()
+ *            has not been called.
  *          - #ER_AUTH_FAIL if the attempt(s) to authenticate the peer failed.
  *          - Other error status codes indicating a failure.
  */
 extern AJ_API QStatus alljoyn_proxybusobject_secureconnection(alljoyn_proxybusobject proxyObj, QCC_BOOL forceAuth);
 
 /**
- * Asynchronously secure the connection to the remote peer for this proxy object. Peer-to-peer
- * connections can only be secured if EnablePeerSecurity() was previously called on the bus
- * attachment for this proxy object. If the peer-to-peer connection is already secure this
- * function does nothing. Note that peer-to-peer connections are automatically secured when a
- * method call or signal requiring encryption is sent or received.
+ * Asynchronously secure the connection to the remote peer for this proxy object.
+ * Peer-to-peer connections can only be secured if alljoyn_busattachment_enablepeersecurity()
+ * was previously called on the bus attachment for this proxy object. If the peer-to-peer
+ * connection is already secure this function does nothing. Note that peer-to-peer
+ * connections are automatically secured when a method call or signal requiring
+ * encryption is sent or received.
  *
- * Notification of success or failure is via the AuthListener passed to EnablePeerSecurity().
+ * Notification of success or failure is via the AuthListener passed to
+ * alljoyn_busattachment_enablepeersecurity().
  *
- * @param proxyObj   ProxyBusObject to explicitly set up a secure a connection
+ * @param proxyObj   alljoyn_proxybusobject to explicitly set up a secure a connection
  * @param forceAuth  If true, forces an re-authentication even if the peer connection is already
  *                   authenticated.
  *                   Recommended default QCC_FALSE
  *
  * @return
  *          - #ER_OK if securing could begin.
- *          - #ER_BUS_NO_AUTHENTICATION_MECHANISM if BusAttachment::EnablePeerSecurity() has not been called.
+ *          - #ER_BUS_NO_AUTHENTICATION_MECHANISM if alljoyn_busattachment_enablepeersecurity() has not been called.
  *          - Other error status codes indicating a failure.
  */
 extern AJ_API QStatus alljoyn_proxybusobject_secureconnectionasync(alljoyn_proxybusobject proxyObj, QCC_BOOL forceAuth);
@@ -561,6 +575,8 @@ extern AJ_API alljoyn_proxybusobject alljoyn_proxybusobject_copy(const alljoyn_p
 /**
  * Indicates if this is a valid (usable) proxy bus object.
  *
+ * @param proxyObj  The alljoyn_proxybusobject to be checked for usability
+ *
  * @return true if a valid proxy bus object, false otherwise.
  */
 extern AJ_API QCC_BOOL alljoyn_proxybusobject_isvalid(alljoyn_proxybusobject proxyObj);
@@ -569,13 +585,13 @@ extern AJ_API QCC_BOOL alljoyn_proxybusobject_isvalid(alljoyn_proxybusobject pro
 /*TODO create C bindings for the following C++ methods */
 
 /**
- * Returns an array of ProxyBusObjects for the children of this %ProxyBusObject.
+ * Returns an array of alljoyn_proxybusobjects for the children of this %alljoyn_proxybusobject.
  *
- * @param children     A pointer to an %ProxyBusObject array to receive the children. Can be NULL in
- *                     which case no children are returned and the return value gives the number
+ * @param children     A pointer to an %alljoyn_proxybusobject array to receive the children. Can be
+ *                     NULL in which case no children are returned and the return value gives the number
  *                     of children available.
- * @param numChildren  The size of the %ProxyBusObject array. If this value is smaller than the total
- *                     number of children only numChildren will be returned.
+ * @param numChildren  The size of the %alljoyn_proxybusobject array. If this value is smaller than
+ *                     the total number of children only numChildren will be returned.
  *
  * @return  The number of children returned or the total number of children if children is NULL.
  */

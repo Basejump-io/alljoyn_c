@@ -4,7 +4,7 @@
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,6 +30,30 @@
 extern "C" {
 #endif
 
+/**
+ *
+ * alljoyn_interfacedescription is an object for describing message bus interfaces.
+ * alljoyn_interfacedescription objects describe the methods,
+ * signals and properties of an alljoyn_busobject or an alljoyn_proxybusobject.
+ *
+ * Calling #alljoyn_proxybusobject_addinterface() adds the AllJoyn interface described by an
+ * alljoyn_interfacedescription to a ProxyBusObject instance. After an
+ * %alljoyn_interfacedescription has been added, the methods described in the interface
+ * can be called. Similarly calling #alljoyn_busobject_addinterface adds the interface
+ * and its methods, properties, and signal to an #alljoyn_busobject. After an interface
+ * has been added method handlers for the methods described in the interface can be
+ * added by calling #alljoyn_busobject_addmethodhandler or #alljoyn_busobject_addmethodhandlers.
+ *
+ * An alljoyn_interfacedescription can be constructed piecemeal by calling
+ * #alljoyn_interfacedescription_addmethod, #alljoyn_interfacedescription_addmember(),
+ * #alljoyn_interfacedescription_addsignal and #alljoyn_interfacedescription_addproperty().
+ * Alternatively, calling #alljoyn_proxybusobject_parsexml() will create the
+ * alljoyn_interfacedescription instances for that proxy object directly from an XML
+ * string. Calling #alljoyn_proxybusobject_introspectremoteobject or
+ * #alljoyn_proxybusobject_introspectremoteobjectasync also creates the
+ * alljoyn_interfacedescription instances from XML but in this case the XML is obtained
+ * by making a remote Introspect method call on a bus object.
+ */
 typedef struct _alljoyn_interfacedescription_handle*        alljoyn_interfacedescription;
 
 /** @name Access type */
@@ -44,6 +68,9 @@ static const uint8_t ALLJOYN_MEMBER_ANNOTATE_NO_REPLY   = 1; /**< No reply annot
 static const uint8_t ALLJOYN_MEMBER_ANNOTATE_DEPRECATED = 2; /**< Deprecated annotate flag */
 // @}
 
+/**
+ * Structure representing the member to be added to the Interface
+ */
 typedef struct {
     alljoyn_interfacedescription iface;         /**< Interface that this member belongs to */
     alljoyn_messagetype memberType;             /**< %Member type */
@@ -90,7 +117,7 @@ extern AJ_API void alljoyn_interfacedescription_member_getannotationatindex(allj
  * Get this member's annotation value return the size of the value string if
  * name is NULL.
  *
- * @param[in] member The AllJoyn InterfaceDescription member that we want the annotation from
+ * @param[in] member The AllJoyn alljoyn_interfacedescription member that we want the annotation from
  * @param[in] name   Name of the annotation to look for
  * @param[out] value  Value to compare with
  * @param[in,out] value_size size of the value string if value == NULL it will return the size of the value string plus nul character
@@ -98,10 +125,13 @@ extern AJ_API void alljoyn_interfacedescription_member_getannotationatindex(allj
  */
 extern AJ_API QCC_BOOL alljoyn_interfacedescription_member_getannotation(alljoyn_interfacedescription_member member, const char* name, char* value, size_t* value_size);
 
+/**
+ * Structure representing properties of the Interface
+ */
 typedef struct {
     const char* name;               /**< %Property name */
     const char* signature;          /**< %Property type */
-    uint8_t access;                 /**< Access is #ALLJOYN_PROP_ACCESS_READ, #ALLJOYN_PROP_ACCESS_WRITE, or #ALLJOYN_PROP_ACCESS_RW */
+    uint8_t access;                  /**< Access is #ALLJOYN_PROP_ACCESS_READ, #ALLJOYN_PROP_ACCESS_WRITE, or #ALLJOYN_PROP_ACCESS_RW */
 
     const void* internal_property;  /**< For internal use only */
 } alljoyn_interfacedescription_property;
@@ -141,7 +171,7 @@ extern AJ_API void alljoyn_interfacedescription_property_getannotationatindex(al
  * Get this member's annotation value return the size of the value string if
  * name is NULL.
  *
- * @param[in] property The AllJoyn InterfaceDescription property that we want the annotation from.
+ * @param[in] property The AllJoyn alljoyn_interfacedescription property that we want the annotation from.
  * @param[in] name   Name of the annotation to look for
  * @param[out] value  Value to compare with
  * @param[in,out] value_size size of the value string if value == NULL it will return the size of the value string plus nul character
@@ -153,13 +183,14 @@ extern AJ_API QCC_BOOL alljoyn_interfacedescription_property_getannotation(alljo
  * Activate this interface. An interface must be activated before it can be used. Activating an
  * interface locks the interface so that is can no longer be modified.
  *
- * @param iface InterfaceDescription to activate.
+ * @param iface alljoyn_interfacedescription to activate.
  */
 extern AJ_API void alljoyn_interfacedescription_activate(alljoyn_interfacedescription iface);
 
 /**
  * Add an annotation to the interface.
  *
+ * @param iface      Interface onto which the annotation will be added
  * @param name       Name of annotation.
  * @param value      Value of the annotation
  * @return
@@ -362,10 +393,12 @@ extern AJ_API QStatus alljoyn_interfacedescription_addsignal(alljoyn_interfacede
 /**
  * Lookup a member signal description by name
  *
- * @param name  Name of the signal to lookup
- * @return
- *      - Pointer to member.
- *      - NULL if does not exist.
+ * @param      iface   Interface to query for signal
+ * @param      name    Name of the signal to lookup
+ * @param[out] member  return a pointer to the signal member or NULL if the
+ *                     signal does not exist.
+ *
+ * @return QCC_TRUE is the signal was found QCC_FALSE otherwise
  */
 extern AJ_API QCC_BOOL alljoyn_interfacedescription_getsignal(alljoyn_interfacedescription iface, const char* name, alljoyn_interfacedescription_member* member);
 
@@ -403,7 +436,7 @@ extern AJ_API size_t alljoyn_interfacedescription_getproperties(const alljoyn_in
  * @param iface      Interface on which to add the property.
  * @param name       Name of property.
  * @param signature  Property type.
- * @param access     #PROP_ACCESS_READ, #PROP_ACCESS_WRITE or #PROP_ACCESS_RW
+ * @param access     #ALLJOYN_PROP_ACCESS_READ, #ALLJOYN_PROP_ACCESS_WRITE or #ALLJOYN_PROP_ACCESS_RW
  * @return
  *      - #ER_OK if successful.
  *      - #ER_BUS_PROPERTY_ALREADY_EXISTS if the property can not be added
@@ -427,14 +460,13 @@ extern AJ_API QStatus alljoyn_interfacedescription_addpropertyannotation(alljoyn
                                                                          const char* property,
                                                                          const char* name,
                                                                          const char* value);
-
 /**
  * Get the annotation value for a property
- * @param iface      Interface on which to add the property.
- * @param property   Name of the property
- * @param name       Name of annotation
- * @param[out] value      Value for the annotation use NULL to obtain the size of the string in value
- * @param str_size[in,out] the size of the char* value if value == NULL return the size of the value string plus nul character
+ * @param         iface     Interface on which to add the property.
+ * @param         property  Name of the property
+ * @param         name      Name of annotation
+ * @param[out]    value     Value for the annotation use NULL to obtain the size of the string in value
+ * @param[in,out] str_size  the size of the char* value if value == NULL return the size of the value string plus nul character
  *
  * @code
  * size_t str_size;

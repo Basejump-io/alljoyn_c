@@ -1,11 +1,11 @@
 /**
  * @file
- * SessionPortListener is an abstract base class (interface) implemented by users of the
- * AllJoyn API in order to receive session port related event information.
+ * alljoyn_sessionportlistener is a collection of functions implemented by users
+ * of the AllJoyn API in order to receive session port related event information.
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,16 +30,42 @@
 extern "C" {
 #endif
 
+/**
+ * alljoyn_sessionportlistener is an abstract interface implemented by users of the
+ * AllJoyn API in order to receive session port related event information.
+ */
 typedef struct _alljoyn_sessionportlistener_handle*         alljoyn_sessionportlistener;
 
 /**
  * Type for the AcceptSessionJoiner callback.
+
+ * Accept or reject an incoming JoinSession request. The session does not exist until
+ * after this function returns.
+ *
+ * This callback is only used by session creators. Therefore it is only called on listeners
+ * passed to alljoyn_busattachment_bindsessionport.
+ *
+ * @param context        the context pointer that was passed to alljoyn_sessionportlistener_create
+ * @param sessionPort    Session port that was joined.
+ * @param joiner         Unique name of potential joiner.
+ * @param opts           Session options requested by the joiner.
+ * @return   Return true if JoinSession request is accepted. false if rejected.
  */
 typedef QCC_BOOL (*alljoyn_sessionportlistener_acceptsessionjoiner_ptr)(const void* context, alljoyn_sessionport sessionPort,
                                                                         const char* joiner,  const alljoyn_sessionopts opts);
 
 /**
  * Type for the SessionJoined callback.
+ *
+ * Called by the bus when a session has been successfully joined. The session is now fully up.
+ *
+ * This callback is only used by session creators. Therefore it is only called on the alljoyn_sessionportlistener_callbacks
+ * passed in when calling alljoyn_busattachment_bindsessionport.
+ *
+ * @param context        the context pointer that was passed to alljoyn_sessionportlistener_create
+ * @param sessionPort    Session port that was joined.
+ * @param id             Id of session.
+ * @param joiner         Unique name of the joiner.
  */
 typedef void (*alljoyn_sessionportlistener_sessionjoined_ptr)(const void* context, alljoyn_sessionport sessionPort,
                                                               alljoyn_sessionid id, const char* joiner);
@@ -48,25 +74,33 @@ typedef void (*alljoyn_sessionportlistener_sessionjoined_ptr)(const void* contex
  * Structure used during alljoyn_sessionportlistener_create to provide callbacks into C.
  */
 typedef struct {
+    /**
+     * Accept or reject an incoming JoinSession request. The session does not
+     * exist until this after this function returns.
+     */
     alljoyn_sessionportlistener_acceptsessionjoiner_ptr accept_session_joiner;
+    /**
+     * Called by the bus when a session has been successfully joined. The session
+     * is now fully up.
+     */
     alljoyn_sessionportlistener_sessionjoined_ptr session_joined;
 } alljoyn_sessionportlistener_callbacks;
 
 /**
- * Create a SessionPortListener which will trigger the provided callbacks, passing along the provided context.
+ * Create an alljoyn_sessionportlistener which will trigger the provided callbacks, passing along the provided context.
  *
  * @param callbacks Callbacks to trigger for associated events.
  * @param context   Context to pass to callback functions
  *
- * @return Handle to newly allocated SessionPortListener.
+ * @return Handle to newly allocated alljoyn_sessionportlistener.
  */
 extern AJ_API alljoyn_sessionportlistener alljoyn_sessionportlistener_create(const alljoyn_sessionportlistener_callbacks* callbacks,
                                                                              const void* context);
 
 /**
- * Destroy a SessionPortListener.
+ * Destroy an alljoyn_sessionportlistener.
  *
- * @param listener SessionPortListener to destroy.
+ * @param listener alljoyn_sessionportlistener to destroy.
  */
 extern AJ_API void alljoyn_sessionportlistener_destroy(alljoyn_sessionportlistener listener);
 
