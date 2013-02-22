@@ -88,16 +88,18 @@ char*get_line(char*str, size_t num, FILE*fp)
 /* FoundAdvertisedName callback */
 void found_advertised_name(const void* context, const char* name, alljoyn_transportmask transport, const char* namePrefix)
 {
-    printf("FoundAdvertisedName(name=%s, prefix=%s)\n", name, namePrefix);
+    printf("found_advertised_name(name=%s, prefix=%s)\n", name, namePrefix);
     if (0 == strcmp(name, OBJECT_NAME)) {
+        QStatus status;
         /* We found a remote bus that is advertising basic service's  well-known name so connect to it */
         alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QCC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
-        QStatus status = alljoyn_busattachment_joinsession(g_msgBus, name, SERVICE_PORT, NULL, &s_sessionId, opts);
+        alljoyn_busattachment_enableconcurrentcallbacks(g_msgBus);
+        status = alljoyn_busattachment_joinsession(g_msgBus, name, SERVICE_PORT, NULL, &s_sessionId, opts);
 
         if (ER_OK != status) {
-            printf("JoinSession failed (status=%s)\n", QCC_StatusText(status));
+            printf("alljoyn_busattachment_joinsession failed (status=%s)\n", QCC_StatusText(status));
         } else {
-            printf("JoinSession SUCCESS (Session id=%d)\n", s_sessionId);
+            printf("alljoyn_busattachment_joinsession SUCCESS (Session id=%d)\n", s_sessionId);
         }
         alljoyn_sessionopts_destroy(opts);
     }
@@ -108,7 +110,7 @@ void found_advertised_name(const void* context, const char* name, alljoyn_transp
 void name_owner_changed(const void* context, const char* busName, const char* previousOwner, const char* newOwner)
 {
     if (newOwner && (0 == strcmp(busName, OBJECT_NAME))) {
-        printf("NameOwnerChanged: name=%s, oldOwner=%s, newOwner=%s\n",
+        printf("name_owner_changed: name=%s, oldOwner=%s, newOwner=%s\n",
                busName,
                previousOwner ? previousOwner : "<none>",
                newOwner ? newOwner : "<none>");
@@ -130,7 +132,7 @@ void name_owner_changed(const void* context, const char* busName, const char* pr
 QCC_BOOL request_credentials(const void* context, const char* authMechanism, const char* authPeer, uint16_t authCount,
                              const char* userName, uint16_t credMask, alljoyn_credentials credentials)
 {
-    printf("RequestCredentials for authenticating %s using mechanism %s\n", authPeer, authMechanism);
+    printf("request_credentials for authenticating %s using mechanism %s\n", authPeer, authMechanism);
     if (strcmp(authMechanism, "ALLJOYN_SRP_KEYX") == 0) {
         if (credMask & ALLJOYN_CRED_PASSWORD) {
             if (authCount <= 3) {
@@ -151,7 +153,7 @@ QCC_BOOL request_credentials(const void* context, const char* authMechanism, con
 
 void authentication_complete(const void* context, const char* authMechanism, const char* peerName, QCC_BOOL success)
 {
-    printf("Authentication %s %s\n", authMechanism, success == QCC_TRUE ? "succesful" : "failed");
+    printf("authentication_complete %s %s\n", authMechanism, success == QCC_TRUE ? "successful" : "failed");
 }
 
 /** Main entry point */
@@ -159,7 +161,7 @@ int main(int argc, char** argv, char** envArg)
 {
     QStatus status = ER_OK;
     alljoyn_interfacedescription testIntf = NULL;
-    char connectArgs[][64] = { "tcp:addr=127.0.0.1,port=9955", "unix:abstract=alljoyn" };
+    char* connectArgs = "unix:abstract=alljoyn";
     size_t i;
     alljoyn_buslistener_callbacks callbacks = {
         NULL,
@@ -170,6 +172,8 @@ int main(int argc, char** argv, char** envArg)
         NULL,
         NULL
     };
+    unsigned int count = 0;
+
     printf("AllJoyn Library version: %s\n", alljoyn_getversion());
     printf("AllJoyn Library build info: %s\n", alljoyn_getbuildinfo());
 
@@ -192,9 +196,9 @@ int main(int argc, char** argv, char** envArg)
     if (ER_OK == status) {
         status = alljoyn_busattachment_start(g_msgBus);
         if (ER_OK != status) {
-            printf("BusAttachment::Start failed\n");
+            printf("alljoyn_busattachment_start failed\n");
         } else {
-            printf("BusAttachment started.\n");
+            printf("alljoyn_busattachment started.\n");
         }
     }
 
@@ -212,28 +216,34 @@ int main(int argc, char** argv, char** envArg)
             authentication_complete
         };
         g_authListener = alljoyn_authlistener_create(&callbacks, NULL);
+
+        /*
+         * alljoyn_busattachment_enablepeersecurity function is called by
+         * applications that want to use authentication and encryption. This
+         * function call must be made after alljoyn_busattachment_start and
+         * before calling alljoyn_busattachment_connect.
+         *
+         * In most situations a per-application keystore file is generated.
+         * However, this code specifies the location of the keystore file and
+         * the isShared parameter is being set to QCC_TRUE. The resulting
+         * keystore file can be used by multiple applications.
+         */
         status = alljoyn_busattachment_enablepeersecurity(g_msgBus, "ALLJOYN_SRP_KEYX", g_authListener,
                                                           "/.alljoyn_keystore/central.ks", QCC_TRUE);
         if (ER_OK != status) {
-            printf("BusAttachment::EnablePeerSecurity failed (%s)\n", QCC_StatusText(status));
+            printf("alljoyn_busattachment_enablepeersecurity failed (%s)\n", QCC_StatusText(status));
         } else {
-            printf("BusAttachment::EnablePeerSecurity succesful\n");
+            printf("alljoyn_busattachment_enablepeersecurity Successful\n");
         }
     }
 
     /* Connect to the bus */
     if (ER_OK == status) {
-        for (i = 0; i < sizeof(connectArgs) / sizeof(connectArgs[0]); ++i) {
-            status = alljoyn_busattachment_connect(g_msgBus, connectArgs[i]);
-            if (ER_OK != status) {
-                printf("BusAttachment::Connect(\"%s\") failed\n", connectArgs[i]);
-            } else {
-                printf("BusAttchement connected to %s\n", connectArgs[i]);
-                break;
-            }
-        }
+        status = alljoyn_busattachment_connect(g_msgBus, connectArgs);
         if (ER_OK != status) {
-            printf("Multiple BusAttachment::Connect attempts failed\n");
+            printf("alljoyn_busattachment_connect(\"%s\") failed\n", connectArgs);
+        } else {
+            printf("alljoyn_busattachment connected to \"%s\"\n", alljoyn_busattachment_getconnectspec(g_msgBus));
         }
     }
 
@@ -243,21 +253,24 @@ int main(int argc, char** argv, char** envArg)
     /* Register a bus listener in order to get discovery indications */
     if (ER_OK == status) {
         alljoyn_busattachment_registerbuslistener(g_msgBus, g_busListener);
-        printf("BusListener Registered.\n");
+        printf("alljoyn_buslistener Registered.\n");
     }
 
     /* Begin discovery on the well-known name of the service to be called */
     if (ER_OK == status) {
         status = alljoyn_busattachment_findadvertisedname(g_msgBus, OBJECT_NAME);
         if (status != ER_OK) {
-            printf("org.alljoyn.Bus.FindAdvertisedName failed (%s))\n", QCC_StatusText(status));
+            printf("alljoyn_busattachment_findadvertisednamee failed (%s))\n", QCC_StatusText(status));
         }
     }
 
     /* Wait for join session to complete */
     while (!s_joinComplete && !g_interrupt) {
+        if (0 == (count++ % 10)) {
+            printf("Waited %u seconds for alljoyn_busattachment_joinsession completion.\n", count / 10);
+        }
 #ifdef _WIN32
-        Sleep(10);
+        Sleep(100);
 #else
         usleep(100 * 1000);
 #endif
@@ -273,24 +286,37 @@ int main(int argc, char** argv, char** envArg)
         assert(alljoynTestIntf);
         alljoyn_proxybusobject_addinterface(remoteObj, alljoynTestIntf);
 
-        reply = alljoyn_message_create(g_msgBus);
-        inputs = alljoyn_msgarg_array_create(1);
-        numArgs = 1;
-        status = alljoyn_msgarg_array_set(inputs, &numArgs, "s", "ClientC says Hello AllJoyn!");
-
-        status = alljoyn_proxybusobject_methodcall(remoteObj, INTERFACE_NAME, "Ping", inputs, 1, reply, 5000, 0);
+        /*
+         * Although AllJoyn will automatically try and establish a secure connection
+         * when a method call is made.  It will only allow the user the amount of time
+         * specified in the methodcall timeout parameter to enter user input.  For the
+         * "Ping" method that is 5 seconds.  This is not a reasonable amount of time
+         * for a user to see the security password and enter it.
+         *
+         * By calling alljoyn_proxybusobject_secureconnection the user will have
+         * as much time as they need to to enter the security password to secure
+         * the connection.
+         */
+        status = alljoyn_proxybusobject_secureconnection(remoteObj, QCC_TRUE);
         if (ER_OK == status) {
-            char* ping_str;
-            status = alljoyn_msgarg_get(alljoyn_message_getarg(reply, 0), "s", &ping_str);
-            printf("%s.%s ( path=%s) returned \"%s\"\n", INTERFACE_NAME, "Ping",
-                   OBJECT_PATH, ping_str);
-        } else {
-            printf("MethodCall on %s.%s failed\n", INTERFACE_NAME, "Ping");
-        }
+            reply = alljoyn_message_create(g_msgBus);
+            inputs = alljoyn_msgarg_array_create(1);
+            numArgs = 1;
+            status = alljoyn_msgarg_array_set(inputs, &numArgs, "s", "ClientC says Hello AllJoyn!");
 
+            status = alljoyn_proxybusobject_methodcall(remoteObj, INTERFACE_NAME, "Ping", inputs, 1, reply, 5000, 0);
+            if (ER_OK == status) {
+                char* ping_str;
+                status = alljoyn_msgarg_get(alljoyn_message_getarg(reply, 0), "s", &ping_str);
+                printf("%s.%s ( path=%s) returned \"%s\"\n", INTERFACE_NAME, "Ping",
+                       OBJECT_PATH, ping_str);
+            } else {
+                printf("alljoyn_proxybusobject_methodcall on %s.%s failed\n", INTERFACE_NAME, "Ping");
+            }
+            alljoyn_msgarg_destroy(inputs);
+            alljoyn_message_destroy(reply);
+        }
         alljoyn_proxybusobject_destroy(remoteObj);
-        alljoyn_message_destroy(reply);
-        alljoyn_msgarg_destroy(inputs);
     }
 
     /* Deallocate bus */

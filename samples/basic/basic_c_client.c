@@ -42,9 +42,9 @@
 static alljoyn_busattachment g_msgBus = NULL;
 
 /*constants*/
-static const char* INTERFACE_NAME = "org.alljoyn.Bus.method_sample";
-static const char* OBJECT_NAME = "org.alljoyn.Bus.method_sample";
-static const char* OBJECT_PATH = "/method_sample";
+static const char* INTERFACE_NAME = "org.alljoyn.Bus.sample";
+static const char* OBJECT_NAME = "org.alljoyn.Bus.sample";
+static const char* OBJECT_PATH = "/sample";
 static const alljoyn_sessionport SERVICE_PORT = 25;
 
 static QCC_BOOL s_joinComplete = QCC_FALSE;
@@ -63,16 +63,19 @@ static void SigIntHandler(int sig)
 /* FoundAdvertisedName callback */
 void found_advertised_name(const void* context, const char* name, alljoyn_transportmask transport, const char* namePrefix)
 {
-    printf("FoundAdvertisedName(name=%s, prefix=%s)\n", name, namePrefix);
+    printf("found_advertised_name(name=%s, prefix=%s)\n", name, namePrefix);
     if (0 == strcmp(name, OBJECT_NAME)) {
         /* We found a remote bus that is advertising basic service's  well-known name so connect to it */
         alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QCC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
-        QStatus status = alljoyn_busattachment_joinsession(g_msgBus, name, SERVICE_PORT, NULL, &s_sessionId, opts);
+        QStatus status;
+        /* enable concurrent callbacks so joinsession can be called */
+        alljoyn_busattachment_enableconcurrentcallbacks(g_msgBus);
+        status = alljoyn_busattachment_joinsession(g_msgBus, name, SERVICE_PORT, NULL, &s_sessionId, opts);
 
         if (ER_OK != status) {
-            printf("JoinSession failed (status=%s)\n", QCC_StatusText(status));
+            printf("alljoyn_busattachment_joinsession failed (status=%s)\n", QCC_StatusText(status));
         } else {
-            printf("JoinSession SUCCESS (Session id=%d)\n", s_sessionId);
+            printf("alljoyn_busattachment_joinsession SUCCESS (Session id=%d)\n", s_sessionId);
         }
         alljoyn_sessionopts_destroy(opts);
     }
@@ -83,7 +86,7 @@ void found_advertised_name(const void* context, const char* name, alljoyn_transp
 void name_owner_changed(const void* context, const char* busName, const char* previousOwner, const char* newOwner)
 {
     if (newOwner && (0 == strcmp(busName, OBJECT_NAME))) {
-        printf("NameOwnerChanged: name=%s, oldOwner=%s, newOwner=%s\n",
+        printf("name_owner_changed: name=%s, oldOwner=%s, newOwner=%s\n",
                busName,
                previousOwner ? previousOwner : "<none>",
                newOwner ? newOwner : "<none>");
@@ -95,7 +98,7 @@ void name_owner_changed(const void* context, const char* busName, const char* pr
 int main(int argc, char** argv, char** envArg)
 {
     QStatus status = ER_OK;
-    char connectArgs[][64] = { "tcp:addr=127.0.0.1,port=9955", "unix:abstract=alljoyn" };
+    char* connectArgs = "unix:abstract=alljoyn";
     alljoyn_interfacedescription testIntf = NULL;
     size_t i;
     /* Create a bus listener */
@@ -133,25 +136,19 @@ int main(int argc, char** argv, char** envArg)
     if (ER_OK == status) {
         status = alljoyn_busattachment_start(g_msgBus);
         if (ER_OK != status) {
-            printf("BusAttachment::Start failed\n");
+            printf("alljoyn_busattachment_start failed\n");
         } else {
-            printf("BusAttachment started.\n");
+            printf("alljoyn_busattachment started.\n");
         }
     }
 
     /* Connect to the bus */
     if (ER_OK == status) {
-        for (i = 0; i < sizeof(connectArgs) / sizeof(connectArgs[0]); ++i) {
-            status = alljoyn_busattachment_connect(g_msgBus, connectArgs[i]);
-            if (ER_OK != status) {
-                printf("BusAttachment::Connect(\"%s\") failed\n", connectArgs[i]);
-            } else {
-                printf("BusAttchement connected to %s\n", connectArgs[i]);
-                break;
-            }
-        }
+        status = alljoyn_busattachment_connect(g_msgBus, connectArgs);
         if (ER_OK != status) {
-            printf("Multiple BusAttachment::Connect attempts failed\n");
+            printf("alljoyn_busattachment_connect(\"%s\") failed\n", connectArgs);
+        } else {
+            printf("alljoyn_busattachment connected to \"%s\"\n", alljoyn_busattachment_getconnectspec(g_msgBus));
         }
     }
 
@@ -160,14 +157,14 @@ int main(int argc, char** argv, char** envArg)
     /* Register a bus listener in order to get discovery indications */
     if (ER_OK == status) {
         alljoyn_busattachment_registerbuslistener(g_msgBus, g_busListener);
-        printf("BusListener Registered.\n");
+        printf("alljoyn_buslistener Registered.\n");
     }
 
     /* Begin discovery on the well-known name of the service to be called */
     if (ER_OK == status) {
         status = alljoyn_busattachment_findadvertisedname(g_msgBus, OBJECT_NAME);
         if (status != ER_OK) {
-            printf("org.alljoyn.Bus.FindAdvertisedName failed (%s))\n", QCC_StatusText(status));
+            printf("alljoyn_busattachment_findadvertisedname failed (%s))\n", QCC_StatusText(status));
         }
     }
 

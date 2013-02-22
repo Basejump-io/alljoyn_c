@@ -49,9 +49,9 @@ static alljoyn_sessionportlistener s_sessionPortListener = NULL;
 static alljoyn_buslistener g_busListener = NULL;
 
 /*constants*/
-static const char* INTERFACE_NAME = "org.alljoyn.Bus.method_sample";
-static const char* OBJECT_NAME = "org.alljoyn.Bus.method_sample";
-static const char* OBJECT_PATH = "/method_sample";
+static const char* INTERFACE_NAME = "org.alljoyn.Bus.sample";
+static const char* OBJECT_NAME = "org.alljoyn.Bus.sample";
+static const char* OBJECT_PATH = "/sample";
 static const alljoyn_sessionport SERVICE_PORT = 25;
 
 static volatile sig_atomic_t g_interrupt = QCC_FALSE;
@@ -71,7 +71,7 @@ void busobject_object_registered(const void* context)
 void name_owner_changed(const void* context, const char* busName, const char* previousOwner, const char* newOwner)
 {
     if (newOwner && (0 == strcmp(busName, OBJECT_NAME))) {
-        printf("NameOwnerChanged: name=%s, oldOwner=%s, newOwner=%s\n",
+        printf("name_owner_changed: name=%s, oldOwner=%s, newOwner=%s\n",
                busName,
                previousOwner ? previousOwner : "<none>",
                newOwner ? newOwner : "<none>");
@@ -110,21 +110,26 @@ void cat_method(alljoyn_busobject bus, const alljoyn_interfacedescription_member
     if (ER_OK != status) {
         printf("Ping: Error reading alljoyn_message\n");
     }
-    strncat(result, str1, sizeof(result));
-    strncat(result, str2, sizeof(result));
+    /*
+     * strncat appends the number of characters plus a terminating nul
+     * character thus sizeof(result)-1
+     */
+    strncat(result, str1, sizeof(result) - 1);
+    strncat(result, str2, sizeof(result) - 1);
 
     outArg = alljoyn_msgarg_create_and_set("s", result);
     status = alljoyn_busobject_methodreply_args(bus, msg, outArg, 1);
     if (ER_OK != status) {
         printf("Ping: Error sending reply\n");
     }
+    alljoyn_msgarg_destroy(outArg);
 }
 
 /** Main entry point */
 int main(int argc, char** argv, char** envArg)
 {
     QStatus status = ER_OK;
-    char connectArgs[][64] = { "tcp:addr=127.0.0.1,port=9955", "unix:abstract=alljoyn" };
+    char* connectArgs = "unix:abstract=alljoyn";
     alljoyn_interfacedescription testIntf = NULL;
     alljoyn_busobject_callbacks busObjCbs = {
         NULL,
@@ -198,25 +203,21 @@ int main(int argc, char** argv, char** envArg)
     /* Start the msg bus */
     status = alljoyn_busattachment_start(g_msgBus);
     if (ER_OK == status) {
-        printf("BusAttachement started.\n");
+        printf("alljoyn_busattachment started.\n");
         /* Register  local objects and connect to the daemon */
-        alljoyn_busattachment_registerbusobject(g_msgBus, testObj);
+        status = alljoyn_busattachment_registerbusobject(g_msgBus, testObj);
 
         /* Create the client-side endpoint */
-        for (i = 0; i < sizeof(connectArgs) / sizeof(connectArgs[0]); ++i) {
-            status = alljoyn_busattachment_connect(g_msgBus, connectArgs[i]);
+        if (ER_OK == status) {
+            status = alljoyn_busattachment_connect(g_msgBus, connectArgs);
             if (ER_OK != status) {
-                printf("BusAttachment::Connect(\"%s\") failed\n", connectArgs[i]);
+                printf("alljoyn_busattachment_connect(\"%s\") failed\n", connectArgs);
             } else {
-                printf("BusAttchement connected to %s\n", connectArgs[i]);
-                break;
+                printf("alljoyn_busattachment connected to \"%s\"\n", alljoyn_busattachment_getconnectspec(g_msgBus));
             }
         }
-        if (ER_OK != status) {
-            printf("Multiple BusAttachment::Connect attempts failed\n");
-        }
     } else {
-        printf("BusAttachment::Start failed\n");
+        printf("alljoyn_busattachment_start failed\n");
     }
 
     /*
@@ -232,7 +233,7 @@ int main(int argc, char** argv, char** envArg)
         uint32_t flags = DBUS_NAME_FLAG_REPLACE_EXISTING | DBUS_NAME_FLAG_DO_NOT_QUEUE;
         QStatus status = alljoyn_busattachment_requestname(g_msgBus, OBJECT_NAME, flags);
         if (ER_OK != status) {
-            printf("RequestName(%s) failed (status=%s)\n", OBJECT_NAME, QCC_StatusText(status));
+            printf("alljoyn_busattachment_requestname(%s) failed (status=%s)\n", OBJECT_NAME, QCC_StatusText(status));
         }
     }
 
@@ -245,7 +246,7 @@ int main(int argc, char** argv, char** envArg)
         alljoyn_sessionport sp = SERVICE_PORT;
         status = alljoyn_busattachment_bindsessionport(g_msgBus, &sp, opts, s_sessionPortListener);
         if (ER_OK != status) {
-            printf("BindSessionPort failed (%s)\n", QCC_StatusText(status));
+            printf("alljoyn_busattachment_bindsessionport failed (%s)\n", QCC_StatusText(status));
         }
     }
 
@@ -267,6 +268,10 @@ int main(int argc, char** argv, char** envArg)
         }
     }
 
+    /* Deallocate sessionopts */
+    if (opts) {
+        alljoyn_sessionopts_destroy(opts);
+    }
     /* Deallocate bus */
     if (g_msgBus) {
         alljoyn_busattachment deleteMe = g_msgBus;
@@ -282,6 +287,11 @@ int main(int argc, char** argv, char** envArg)
     /* Deallocate session port listener */
     if (s_sessionPortListener) {
         alljoyn_sessionportlistener_destroy(s_sessionPortListener);
+    }
+
+    /* Deallocate the bus object */
+    if (testObj) {
+        alljoyn_busobject_destroy(testObj);
     }
 
     return (int) status;
