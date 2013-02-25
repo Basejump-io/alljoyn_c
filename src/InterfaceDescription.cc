@@ -289,21 +289,23 @@ size_t alljoyn_interfacedescription_getmembers(const alljoyn_interfacedescriptio
                                                alljoyn_interfacedescription_member* members,
                                                size_t numMembers)
 {
+    size_t ret = 0;
     const ajn::InterfaceDescription::Member** tempMembers = NULL;
     if (members != NULL) {
         tempMembers = new const ajn::InterfaceDescription::Member *[numMembers];
-    }
-    size_t ret = ((const ajn::InterfaceDescription*)iface)->GetMembers(tempMembers, numMembers);
-    for (size_t i = 0; i < ret; i++) {
-        members[i].iface = (alljoyn_interfacedescription)tempMembers[i]->iface;
-        members[i].memberType = (alljoyn_messagetype)tempMembers[i]->memberType;
-        members[i].name = tempMembers[i]->name.c_str();
-        members[i].signature = tempMembers[i]->signature.c_str();
-        members[i].returnSignature = tempMembers[i]->returnSignature.c_str();
-        members[i].argNames = tempMembers[i]->argNames.c_str();
+        ret = ((const ajn::InterfaceDescription*)iface)->GetMembers(tempMembers, numMembers);
+        for (size_t i = 0; i < ret; i++) {
+            members[i].iface = (alljoyn_interfacedescription)tempMembers[i]->iface;
+            members[i].memberType = (alljoyn_messagetype)tempMembers[i]->memberType;
+            members[i].name = tempMembers[i]->name.c_str();
+            members[i].signature = tempMembers[i]->signature.c_str();
+            members[i].returnSignature = tempMembers[i]->returnSignature.c_str();
+            members[i].argNames = tempMembers[i]->argNames.c_str();
 
-        members[i].internal_member = tempMembers[i];
+            members[i].internal_member = tempMembers[i];
+        }
     }
+
 
     if (tempMembers != NULL) {
         delete [] tempMembers;
@@ -389,19 +391,20 @@ size_t alljoyn_interfacedescription_getproperties(const alljoyn_interfacedescrip
                                                   alljoyn_interfacedescription_property* props,
                                                   size_t numProps)
 {
+    size_t ret = 0;
     const ajn::InterfaceDescription::Property** tempProps = NULL;
     if (props != NULL) {
         tempProps = new const ajn::InterfaceDescription::Property *[numProps];
-    }
-    size_t ret = ((const ajn::InterfaceDescription*)iface)->GetProperties(tempProps, numProps);
-    for (size_t i = 0; i < ret; i++) {
-        props[i].name = tempProps[i]->name.c_str();
-        props[i].signature = tempProps[i]->signature.c_str();
-        props[i].access = tempProps[i]->access;
 
-        props[i].internal_property = tempProps[i];
-    }
+        ret = ((const ajn::InterfaceDescription*)iface)->GetProperties(tempProps, numProps);
+        for (size_t i = 0; i < ret; i++) {
+            props[i].name = tempProps[i]->name.c_str();
+            props[i].signature = tempProps[i]->signature.c_str();
+            props[i].access = tempProps[i]->access;
 
+            props[i].internal_property = tempProps[i];
+        }
+    }
     if (tempProps != NULL) {
         delete [] tempProps;
     }
