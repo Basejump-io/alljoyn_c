@@ -20,9 +20,9 @@
 #include <alljoyn_c/BusAttachment.h>
 
 /*constants*/
-//static const char* INTERFACE_NAME = "org.alljoyn.test.BusListenerTest";
-static const char* OBJECT_NAME = "org.alljoyn.test.BusListenerTest";
-//static const char* OBJECT_PATH = "/org/alljoyn/test/BusListenerTest";
+//static const char* INTERFACE_NAME = "org.alljoyn.test.BusListenerMainThreadTest";
+static const char* OBJECT_NAME = "org.alljoyn.test.BusListenerMainThreadTest";
+//static const char* OBJECT_PATH = "/org/alljoyn/test/BusListenerMainThreadTest";
 
 /* flags */
 static QCC_BOOL listener_registered_flag = QCC_FALSE;
@@ -56,9 +56,10 @@ static void bus_disconnected(const void* context) {
     bus_disconnected_flag = QCC_TRUE;
 }
 
-class BusListenerTest : public testing::Test {
+class BusListenerMainThreadTest : public testing::Test {
   public:
     virtual void SetUp() {
+        alljoyn_unity_set_deferred_callback_mainthread_only(QCC_TRUE);
         resetFlags();
         /* register bus listener */
         alljoyn_buslistener_callbacks buslistenerCbs = {
@@ -71,12 +72,16 @@ class BusListenerTest : public testing::Test {
             &bus_disconnected
         };
         buslistener = alljoyn_buslistener_create(&buslistenerCbs, NULL);
-        bus = alljoyn_busattachment_create("BusListenerTest", QCC_FALSE);
+        bus = alljoyn_busattachment_create("BusListenerMainThreadTest", QCC_FALSE);
     }
 
     virtual void TearDown() {
         EXPECT_NO_FATAL_FAILURE(alljoyn_buslistener_destroy(buslistener));
         EXPECT_NO_FATAL_FAILURE(alljoyn_busattachment_destroy(bus));
+        alljoyn_unity_set_deferred_callback_mainthread_only(QCC_FALSE);
+        //make sure the queued processes are cleared.
+        alljoyn_unity_deferred_callbacks_process();
+
     }
 
     void resetFlags() {
@@ -93,9 +98,10 @@ class BusListenerTest : public testing::Test {
     alljoyn_buslistener buslistener;
 };
 
-TEST_F(BusListenerTest, listner_registered_unregistered) {
+TEST_F(BusListenerMainThreadTest, listner_registered_unregistered) {
     alljoyn_busattachment_registerbuslistener(bus, buslistener);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (listener_registered_flag) {
             break;
         }
@@ -104,6 +110,7 @@ TEST_F(BusListenerTest, listner_registered_unregistered) {
     EXPECT_TRUE(listener_registered_flag);
     alljoyn_busattachment_unregisterbuslistener(bus, buslistener);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (listener_unregistered_flag) {
             break;
         }
@@ -112,7 +119,7 @@ TEST_F(BusListenerTest, listner_registered_unregistered) {
     EXPECT_TRUE(listener_unregistered_flag);
 }
 
-TEST_F(BusListenerTest, bus_stopping_disconnected) {
+TEST_F(BusListenerMainThreadTest, bus_stopping_disconnected) {
 
     status = alljoyn_busattachment_start(bus);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -120,6 +127,7 @@ TEST_F(BusListenerTest, bus_stopping_disconnected) {
 
     alljoyn_busattachment_registerbuslistener(bus, buslistener);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (listener_registered_flag) {
             break;
         }
@@ -129,6 +137,7 @@ TEST_F(BusListenerTest, bus_stopping_disconnected) {
 
     alljoyn_busattachment_disconnect(bus, ajn::getConnectArg().c_str());
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (bus_disconnected_flag) {
             break;
         }
@@ -138,6 +147,7 @@ TEST_F(BusListenerTest, bus_stopping_disconnected) {
 
     alljoyn_busattachment_stop(bus);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (bus_stopping_flag) {
             break;
         }
@@ -148,6 +158,7 @@ TEST_F(BusListenerTest, bus_stopping_disconnected) {
 
     alljoyn_busattachment_unregisterbuslistener(bus, buslistener);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (listener_unregistered_flag) {
             break;
         }
@@ -156,13 +167,14 @@ TEST_F(BusListenerTest, bus_stopping_disconnected) {
     EXPECT_TRUE(listener_unregistered_flag);
 }
 
-TEST_F(BusListenerTest, found_lost_advertised_name) {
+TEST_F(BusListenerMainThreadTest, found_lost_advertised_name) {
     status = alljoyn_busattachment_start(bus);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busattachment_connect(bus, ajn::getConnectArg().c_str());
 
     alljoyn_busattachment_registerbuslistener(bus, buslistener);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (listener_registered_flag) {
             break;
         }
@@ -179,6 +191,7 @@ TEST_F(BusListenerTest, found_lost_advertised_name) {
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (found_advertised_name_flag) {
             break;
         }
@@ -189,6 +202,7 @@ TEST_F(BusListenerTest, found_lost_advertised_name) {
     status = alljoyn_busattachment_canceladvertisename(bus, OBJECT_NAME, alljoyn_sessionopts_transports(opts));
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (lost_advertised_name_flag) {
             break;
         }
@@ -198,6 +212,7 @@ TEST_F(BusListenerTest, found_lost_advertised_name) {
 
     alljoyn_busattachment_stop(bus);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (bus_stopping_flag) {
             break;
         }
@@ -207,6 +222,7 @@ TEST_F(BusListenerTest, found_lost_advertised_name) {
     alljoyn_busattachment_join(bus);
     /* the bus will automatically disconnect when it is stopped */
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (bus_disconnected_flag) {
             break;
         }
@@ -216,6 +232,7 @@ TEST_F(BusListenerTest, found_lost_advertised_name) {
 
     alljoyn_busattachment_unregisterbuslistener(bus, buslistener);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (listener_unregistered_flag) {
             break;
         }
@@ -228,13 +245,14 @@ TEST_F(BusListenerTest, found_lost_advertised_name) {
     alljoyn_sessionopts_destroy(opts);
 }
 
-TEST_F(BusListenerTest, name_owner_changed) {
+TEST_F(BusListenerMainThreadTest, name_owner_changed) {
     status = alljoyn_busattachment_start(bus);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busattachment_connect(bus, ajn::getConnectArg().c_str());
 
     alljoyn_busattachment_registerbuslistener(bus, buslistener);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (listener_registered_flag) {
             break;
         }
@@ -244,6 +262,7 @@ TEST_F(BusListenerTest, name_owner_changed) {
 
     alljoyn_busattachment_requestname(bus, OBJECT_NAME, 0);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (name_owner_changed_flag) {
             break;
         }
@@ -253,6 +272,7 @@ TEST_F(BusListenerTest, name_owner_changed) {
 
     alljoyn_busattachment_stop(bus);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (bus_stopping_flag) {
             break;
         }
@@ -262,6 +282,7 @@ TEST_F(BusListenerTest, name_owner_changed) {
     alljoyn_busattachment_join(bus);
     /* the bus will automatically disconnect when it is stopped */
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (bus_disconnected_flag) {
             break;
         }
@@ -271,6 +292,7 @@ TEST_F(BusListenerTest, name_owner_changed) {
 
     alljoyn_busattachment_unregisterbuslistener(bus, buslistener);
     for (size_t i = 0; i < 200; ++i) {
+        alljoyn_unity_deferred_callbacks_process();
         if (listener_unregistered_flag) {
             break;
         }

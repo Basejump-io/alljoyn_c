@@ -23,6 +23,8 @@
 #ifndef _ALLJOYN_C_AJAPI_H
 #define _ALLJOYN_C_AJAPI_H
 
+#include <qcc/platform.h>
+
 /** This @#define allows for redefinition to __dllexport or __dllimport on relevant platforms */
 #ifndef AJ_API
 #  if defined(QCC_OS_GROUP_WINDOWS)
@@ -40,13 +42,15 @@ extern "C" {
 
 /**
  * Unity-specific function to process alternate-thread callbacks on the main thread.
+ *
+ * @return the number of callbacks processed.
  */
 extern AJ_API int alljoyn_unity_deferred_callbacks_process();
 
 /**
  * Enable/disable main thread callback behavior.
  */
-extern AJ_API void alljoyn_unity_set_deferred_callback_mainthread_only(int mainthread_only);
+extern AJ_API void alljoyn_unity_set_deferred_callback_mainthread_only(QCC_BOOL mainthread_only);
 
 #ifdef __cplusplus
 } /* extern "C" */

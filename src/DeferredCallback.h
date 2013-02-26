@@ -22,6 +22,53 @@
 #include <qcc/Mutex.h>
 #include <qcc/Thread.h>
 
+/*
+ * The DeferredCallback class is used by the AllJoyn Unity Extension to force
+ * callbacks to be returned from the main thread.  The reason for this is when
+ * running Unity on Android devices a single-apartment thread model is used.
+ * By default AllJoyn's callbacks come back on there own threads.
+ *
+ * If the static variable sMainThreadCallbacksOnly is set to true when the
+ * callback is received it will be added to a pending callbacks list. The
+ * programmer is responsible for regularly calling
+ * DeferredCallback::TriggerCallbacks to process the callbacks that have been
+ * added to the pending callbacks list.
+ *
+ * In the code deferred callbacks are expected to be used as follows.
+ * @code
+ * if (!DeferredCallback::sMainThreadCallbacksOnly) {
+ *     callbacks.bus_disconnected(context);
+ * } else {
+ *    DeferredCallback_1<void, const void*>* dcb =
+ *        new DeferredCallback_1<void, const void*>(callbacks.bus_disconnected, context);
+ *    DEFERRED_CALLBACK_EXECUTE(dcb);
+ * }
+ * @endcode
+ *
+ * note the dcb pointer is not deleted.  It will be deleted in the
+ * TriggerCallbacks method after the callback has been processed.
+ *
+ * Since the dcb pointer is only freed if the TriggerCallbacks is called the
+ * DeferredCallback class should only be used if the variable
+ * sMainThreadCallbackOnly is true.
+ *
+ * By default sMainThreadCallbackOnly is false.  This can be change from the C
+ * bindings by calling
+ * @code
+ * alljoyn_unity_set_deferred_callback_mainthread_only(QCC_TRUE)
+ * @endcode
+ *
+ * The TriggerCallbacks can be called from the C bindings by calling
+ * @code
+ * alljoyn_unity_deferred_callbacks_process()
+ * @endcode
+ *
+ * The DeferredCallback class is explicitly designed for usage in a specific
+ * situation, the AllJoyn Unity Extension on Android.  The default settings
+ * (which do not used the DeferredCallback) should not be changed to used the
+ * DeferredCallback except in that specific situation or for testing.
+ */
+
 //#define DEBUG_DEFERRED_CALLBACKS 1
 
 #if DEBUG_DEFERRED_CALLBACKS
@@ -117,12 +164,12 @@ class DeferredCallback_1 : public DeferredCallback {
     virtual R Execute()
     {
         ScopeFinishedMarker finisher(&finished);
-        sCallbackListLock.Lock(MUTEX_CONTEXT);
-        sPendingCallbacks.push_back(this);
-        sCallbackListLock.Unlock(MUTEX_CONTEXT);
         if (!sMainThreadCallbacksOnly) {
             runCallbackNow();
         } else {
+            sCallbackListLock.Lock(MUTEX_CONTEXT);
+            sPendingCallbacks.push_back(this);
+            sCallbackListLock.Unlock(MUTEX_CONTEXT);
             if (!IsMainThread()) {
                 Wait();
             }
@@ -154,12 +201,12 @@ class DeferredCallback_1<void, T> : public DeferredCallback {
     virtual void Execute()
     {
         ScopeFinishedMarker finisher(&finished);
-        sCallbackListLock.Lock(MUTEX_CONTEXT);
-        sPendingCallbacks.push_back(this);
-        sCallbackListLock.Unlock(MUTEX_CONTEXT);
         if (!sMainThreadCallbacksOnly) {
             runCallbackNow();
         } else {
+            sCallbackListLock.Lock(MUTEX_CONTEXT);
+            sPendingCallbacks.push_back(this);
+            sCallbackListLock.Unlock(MUTEX_CONTEXT);
             if (!IsMainThread()) {
                 Wait();
             }
@@ -188,12 +235,12 @@ class DeferredCallback_2 : public DeferredCallback {
     virtual R Execute()
     {
         ScopeFinishedMarker finisher(&finished);
-        sCallbackListLock.Lock(MUTEX_CONTEXT);
-        sPendingCallbacks.push_back(this);
-        sCallbackListLock.Unlock(MUTEX_CONTEXT);
         if (!sMainThreadCallbacksOnly) {
             runCallbackNow();
         } else {
+            sCallbackListLock.Lock(MUTEX_CONTEXT);
+            sPendingCallbacks.push_back(this);
+            sCallbackListLock.Unlock(MUTEX_CONTEXT);
             if (!IsMainThread()) {
                 Wait();
             }
@@ -226,12 +273,12 @@ class DeferredCallback_2<void, T, U> : public DeferredCallback {
     virtual void Execute()
     {
         ScopeFinishedMarker finisher(&finished);
-        sCallbackListLock.Lock(MUTEX_CONTEXT);
-        sPendingCallbacks.push_back(this);
-        sCallbackListLock.Unlock(MUTEX_CONTEXT);
         if (!sMainThreadCallbacksOnly) {
             runCallbackNow();
         } else {
+            sCallbackListLock.Lock(MUTEX_CONTEXT);
+            sPendingCallbacks.push_back(this);
+            sCallbackListLock.Unlock(MUTEX_CONTEXT);
             if (!IsMainThread()) {
                 Wait();
             }
@@ -262,12 +309,12 @@ class DeferredCallback_3 : public DeferredCallback {
     virtual R Execute()
     {
         ScopeFinishedMarker finisher(&finished);
-        sCallbackListLock.Lock(MUTEX_CONTEXT);
-        sPendingCallbacks.push_back(this);
-        sCallbackListLock.Unlock(MUTEX_CONTEXT);
         if (!sMainThreadCallbacksOnly) {
             runCallbackNow();
         } else {
+            sCallbackListLock.Lock(MUTEX_CONTEXT);
+            sPendingCallbacks.push_back(this);
+            sCallbackListLock.Unlock(MUTEX_CONTEXT);
             if (!IsMainThread()) {
                 Wait();
             }
@@ -302,12 +349,12 @@ class DeferredCallback_3<void, T, U, V> : public DeferredCallback {
     virtual void Execute()
     {
         ScopeFinishedMarker finisher(&finished);
-        sCallbackListLock.Lock(MUTEX_CONTEXT);
-        sPendingCallbacks.push_back(this);
-        sCallbackListLock.Unlock(MUTEX_CONTEXT);
         if (!sMainThreadCallbacksOnly) {
             runCallbackNow();
         } else {
+            sCallbackListLock.Lock(MUTEX_CONTEXT);
+            sPendingCallbacks.push_back(this);
+            sCallbackListLock.Unlock(MUTEX_CONTEXT);
             if (!IsMainThread()) {
                 Wait();
             }
@@ -339,12 +386,12 @@ class DeferredCallback_4 : public DeferredCallback {
     virtual R Execute()
     {
         ScopeFinishedMarker finisher(&finished);
-        sCallbackListLock.Lock(MUTEX_CONTEXT);
-        sPendingCallbacks.push_back(this);
-        sCallbackListLock.Unlock(MUTEX_CONTEXT);
         if (!sMainThreadCallbacksOnly) {
             runCallbackNow();
         } else {
+            sCallbackListLock.Lock(MUTEX_CONTEXT);
+            sPendingCallbacks.push_back(this);
+            sCallbackListLock.Unlock(MUTEX_CONTEXT);
             if (!IsMainThread()) {
                 Wait();
             }
@@ -381,12 +428,12 @@ class DeferredCallback_4<void, T, U, V, W> : public DeferredCallback {
     virtual void Execute()
     {
         ScopeFinishedMarker finisher(&finished);
-        sCallbackListLock.Lock(MUTEX_CONTEXT);
-        sPendingCallbacks.push_back(this);
-        sCallbackListLock.Unlock(MUTEX_CONTEXT);
         if (!sMainThreadCallbacksOnly) {
             runCallbackNow();
         } else {
+            sCallbackListLock.Lock(MUTEX_CONTEXT);
+            sPendingCallbacks.push_back(this);
+            sCallbackListLock.Unlock(MUTEX_CONTEXT);
             if (!IsMainThread()) {
                 Wait();
             }

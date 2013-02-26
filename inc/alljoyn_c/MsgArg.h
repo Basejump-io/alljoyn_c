@@ -85,7 +85,7 @@ typedef enum {
 
     ALLJOYN_WILDCARD         = '*'     ///< This never appears in a signature but is used for matching arbitrary message args
 
-} allJoyn_typeid;
+} alljoyn_typeid;
 
 /**
  * Create a new message argument.
@@ -519,13 +519,13 @@ extern AJ_API QCC_BOOL alljoyn_msgarg_hassignature(alljoyn_msgarg arg, const cha
 extern AJ_API QStatus alljoyn_msgarg_getdictelement(alljoyn_msgarg arg, const char* elemSig, ...);
 
 /**
- * Get the allJoyn_typeid of the alljoyn_msgarg
+ * Get the alljoyn_typeid of the alljoyn_msgarg
  *
  * @param arg the message argument we want to know the alljoyn_typeid of.
  *
  * @return the alljoyn_typeid of the alljoyn_msgarg
  */
-extern AJ_API allJoyn_typeid alljoyn_msgarg_gettype(alljoyn_msgarg arg);
+extern AJ_API alljoyn_typeid alljoyn_msgarg_gettype(alljoyn_msgarg arg);
 
 /**
  * Clear the alljoyn_msgarg setting the type to ALLJOYN_INVALID and freeing any memory allocated for the

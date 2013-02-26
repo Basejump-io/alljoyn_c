@@ -320,6 +320,7 @@ TEST(InterfaceDescriptionTest, getname) {
     bus = alljoyn_busattachment_create("InterfaceDescriptionTest", QCC_FALSE);
     alljoyn_interfacedescription testIntf = NULL;
     status = alljoyn_busattachment_createinterface(bus, "org.alljoyn.test.InterfaceDescription", &testIntf, QCC_FALSE);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     EXPECT_STREQ("org.alljoyn.test.InterfaceDescription", alljoyn_interfacedescription_getname(testIntf));
 

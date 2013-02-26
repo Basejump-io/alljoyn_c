@@ -113,9 +113,13 @@ class BusObjectC : public BusObject {
     {
         QStatus ret = ER_BUS_NO_SUCH_PROPERTY;
         if (callbacks.property_get != NULL) {
-            DeferredCallback_4<QStatus, const void*, const char*, const char*, alljoyn_msgarg>* dcb =
-                new DeferredCallback_4<QStatus, const void*, const char*, const char*, alljoyn_msgarg>(callbacks.property_get, context, ifcName, propName, (alljoyn_msgarg)(&val));
-            ret = DEFERRED_CALLBACK_EXECUTE(dcb);
+            if (!DeferredCallback::sMainThreadCallbacksOnly) {
+                ret = callbacks.property_get(context, ifcName, propName, (alljoyn_msgarg)(&val));
+            } else {
+                DeferredCallback_4<QStatus, const void*, const char*, const char*, alljoyn_msgarg>* dcb =
+                    new DeferredCallback_4<QStatus, const void*, const char*, const char*, alljoyn_msgarg>(callbacks.property_get, context, ifcName, propName, (alljoyn_msgarg)(&val));
+                ret = DEFERRED_CALLBACK_EXECUTE(dcb);
+            }
         }
         return ret;
     }
@@ -124,9 +128,13 @@ class BusObjectC : public BusObject {
     {
         QStatus ret = ER_BUS_NO_SUCH_PROPERTY;
         if (callbacks.property_set != NULL) {
-            DeferredCallback_4<QStatus, const void*, const char*, const char*, alljoyn_msgarg>* dcb =
-                new DeferredCallback_4<QStatus, const void*, const char*, const char*, alljoyn_msgarg>(callbacks.property_set, context, ifcName, propName, (alljoyn_msgarg)(&val));
-            ret = DEFERRED_CALLBACK_EXECUTE(dcb);
+            if (!DeferredCallback::sMainThreadCallbacksOnly) {
+                ret = callbacks.property_set(context, ifcName, propName, (alljoyn_msgarg)(&val));
+            } else {
+                DeferredCallback_4<QStatus, const void*, const char*, const char*, alljoyn_msgarg>* dcb =
+                    new DeferredCallback_4<QStatus, const void*, const char*, const char*, alljoyn_msgarg>(callbacks.property_set, context, ifcName, propName, (alljoyn_msgarg)(&val));
+                ret = DEFERRED_CALLBACK_EXECUTE(dcb);
+            }
         }
         return ret;
     }
@@ -136,9 +144,13 @@ class BusObjectC : public BusObject {
     virtual void ObjectRegistered(void)
     {
         if (callbacks.object_registered != NULL) {
-            DeferredCallback_1<void, const void*>* dcb =
-                new DeferredCallback_1<void, const void*>(callbacks.object_registered, context);
-            DEFERRED_CALLBACK_EXECUTE(dcb);
+            if (!DeferredCallback::sMainThreadCallbacksOnly) {
+                callbacks.object_registered(context);
+            } else {
+                DeferredCallback_1<void, const void*>* dcb =
+                    new DeferredCallback_1<void, const void*>(callbacks.object_registered, context);
+                DEFERRED_CALLBACK_EXECUTE(dcb);
+            }
         }
     }
 
@@ -148,9 +160,13 @@ class BusObjectC : public BusObject {
         BusObject::ObjectUnregistered();
 
         if (callbacks.object_unregistered != NULL) {
-            DeferredCallback_1<void, const void*>* dcb =
-                new DeferredCallback_1<void, const void*>(callbacks.object_unregistered, context);
-            DEFERRED_CALLBACK_EXECUTE(dcb);
+            if (!DeferredCallback::sMainThreadCallbacksOnly) {
+                callbacks.object_unregistered(context);
+            } else {
+                DeferredCallback_1<void, const void*>* dcb =
+                    new DeferredCallback_1<void, const void*>(callbacks.object_unregistered, context);
+                DEFERRED_CALLBACK_EXECUTE(dcb);
+            }
         }
     }
 
@@ -174,9 +190,13 @@ class BusObjectC : public BusObject {
 
         /* Look up the C callback via map and invoke */
         alljoyn_messagereceiver_methodhandler_ptr remappedHandler = callbackMap[member];
-        DeferredCallback_3<void, alljoyn_busobject, const alljoyn_interfacedescription_member*, alljoyn_message>* dcb =
-            new DeferredCallback_3<void, alljoyn_busobject, const alljoyn_interfacedescription_member*, alljoyn_message>(remappedHandler, (alljoyn_busobject) this, &c_member, (alljoyn_message) & message);
-        DEFERRED_CALLBACK_EXECUTE(dcb);
+        if (!DeferredCallback::sMainThreadCallbacksOnly) {
+            remappedHandler((alljoyn_busobject) this, &c_member, (alljoyn_message)(&message));
+        } else {
+            DeferredCallback_3<void, alljoyn_busobject, const alljoyn_interfacedescription_member*, alljoyn_message>* dcb =
+                new DeferredCallback_3<void, alljoyn_busobject, const alljoyn_interfacedescription_member*, alljoyn_message>(remappedHandler, (alljoyn_busobject) this, &c_member, (alljoyn_message)(&message));
+            DEFERRED_CALLBACK_EXECUTE(dcb);
+        }
     }
 
     map<const ajn::InterfaceDescription::Member*, alljoyn_messagereceiver_methodhandler_ptr> callbackMap;

@@ -312,12 +312,12 @@ void alljoyn_msgarg_clear(alljoyn_msgarg arg)
     ((ajn::MsgArgC*)arg)->Clear();
 }
 
-allJoyn_typeid alljoyn_msgarg_gettype(alljoyn_msgarg arg)
+alljoyn_typeid alljoyn_msgarg_gettype(alljoyn_msgarg arg)
 {
     if (!arg) {
         return ALLJOYN_INVALID;
     }
-    return (allJoyn_typeid)((ajn::MsgArgC*)arg)->typeId;
+    return (alljoyn_typeid)((ajn::MsgArgC*)arg)->typeId;
 }
 
 void alljoyn_msgarg_stabilize(alljoyn_msgarg arg)
@@ -531,18 +531,18 @@ extern AJ_API QStatus alljoyn_msgarg_get_signature_array(const alljoyn_msgarg ar
 }
 
 extern AJ_API size_t alljoyn_msgarg_get_array_numberofelements(const alljoyn_msgarg arg) {
-    assert(ALLJOYN_ARRAY == ((ajn::MsgArgC*)arg)->typeId);
+    assert(ALLJOYN_ARRAY == (alljoyn_typeid)((ajn::MsgArgC*)arg)->typeId);
     return ((ajn::MsgArgC*)arg)->v_array.GetNumElements();
 }
 
 extern AJ_API void   alljoyn_msgarg_get_array_element(const alljoyn_msgarg arg, size_t index, alljoyn_msgarg* element) {
-    assert(ALLJOYN_ARRAY == ((ajn::MsgArgC*)arg)->typeId);
+    assert(ALLJOYN_ARRAY == (alljoyn_typeid)((ajn::MsgArgC*)arg)->typeId);
     assert(index < ((ajn::MsgArgC*)arg)->v_array.GetNumElements());
     *element = (alljoyn_msgarg) & (((ajn::MsgArgC*)arg)->v_array.GetElements()[index]);
 }
 
 extern AJ_API const char* alljoyn_msgarg_get_array_elementsignature(const alljoyn_msgarg arg, size_t index) {
-    assert(ALLJOYN_ARRAY == ((ajn::MsgArgC*)arg)->typeId);
+    assert(ALLJOYN_ARRAY == (alljoyn_typeid)((ajn::MsgArgC*)arg)->typeId);
     return ((ajn::MsgArgC*)arg)->v_array.GetElemSig();
 }
 

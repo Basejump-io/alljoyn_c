@@ -30,7 +30,7 @@ int alljoyn_unity_deferred_callbacks_process()
     return ajn::DeferredCallback::TriggerCallbacks();
 }
 
-void alljoyn_unity_set_deferred_callback_mainthread_only(int mainthread_only)
+void alljoyn_unity_set_deferred_callback_mainthread_only(QCC_BOOL mainthread_only)
 {
-    ajn::DeferredCallback::sMainThreadCallbacksOnly = (mainthread_only == 1 ? true : false);
+    ajn::DeferredCallback::sMainThreadCallbacksOnly = (mainthread_only == QCC_TRUE ? true : false);
 }

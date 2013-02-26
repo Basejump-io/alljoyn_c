@@ -149,7 +149,6 @@ int main(int argc, char** argv, char** envArg)
         NULL
     };
     alljoyn_sessionopts opts;
-    size_t i;
 
     printf("AllJoyn Library version: %s\n", alljoyn_getversion());
     printf("AllJoyn Library build info: %s\n", alljoyn_getbuildinfo());

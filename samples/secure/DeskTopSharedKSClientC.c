@@ -162,7 +162,6 @@ int main(int argc, char** argv, char** envArg)
     QStatus status = ER_OK;
     alljoyn_interfacedescription testIntf = NULL;
     char* connectArgs = "unix:abstract=alljoyn";
-    size_t i;
     alljoyn_buslistener_callbacks callbacks = {
         NULL,
         NULL,
