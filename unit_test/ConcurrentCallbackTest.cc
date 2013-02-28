@@ -90,6 +90,7 @@ TEST(ConcurrentCallbackTest, enableconcurrentcallbacks_not_used)
     status = alljoyn_busattachment_join(s_bus);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     alljoyn_busattachment_destroy(s_bus);
+    alljoyn_buslistener_destroy(buslistener);
 }
 
 static void name_owner_changed_enableconcurrentcallbacks(const void* context, const char* busName, const char* previousOwner, const char* newOwner) {
@@ -149,4 +150,5 @@ TEST(ConcurrentCallbackTest, enableconcurrentcallbacks_used)
     status = alljoyn_busattachment_join(s_bus);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     alljoyn_busattachment_destroy(s_bus);
+    alljoyn_buslistener_destroy(buslistener);
 }

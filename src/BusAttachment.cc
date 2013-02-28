@@ -139,8 +139,15 @@ QStatus alljoyn_busattachment_joinsessionasync(alljoyn_busattachment bus,
                                                alljoyn_busattachment_joinsessioncb_ptr callback,
                                                void* context)
 {
+    /*
+     * the instance of the ajn::JoinsessionCallbackContext is freed when the
+     * JoinSessionCB is called.
+     */
     return ((ajn::BusAttachmentC*)bus)->JoinSessionAsync(sessionHost, (ajn::SessionPort)sessionPort,
-                                                         (ajn::SessionListener*)listener, *((ajn::SessionOpts*)opts), (ajn::BusAttachmentC*)bus, (void*)new ajn::JoinsessionCallbackContext(callback, context));
+                                                         (ajn::SessionListener*)listener,
+                                                         *((ajn::SessionOpts*)opts),
+                                                         (ajn::BusAttachmentC*)bus,
+                                                         (void*)new ajn::JoinsessionCallbackContext(callback, context));
 }
 
 QStatus alljoyn_busattachment_registerbusobject(alljoyn_busattachment bus, alljoyn_busobject obj)

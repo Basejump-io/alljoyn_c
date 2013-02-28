@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2010-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2010-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -40,8 +40,17 @@ class ProxyBusObjectListenerC : public ajn::ProxyBusObject::Listener {
   public:
     void IntrospectCB(QStatus status, ajn::ProxyBusObject* obj, void* context)
     {
+        /*
+         * The IntrospectCallbackContext that found in the context pointer is
+         * allocated in when the user calls alljoyn_proxybusobject_introspectremoteobjectasync
+         * as soon as the IntrospectCB is received this context pointer will not be
+         * used again and must be freed.  we don't call delete here the instance
+         * of the IntrospectCallbackContext will cause a memory leak.
+         */
         IntrospectCallbackContext* in = (IntrospectCallbackContext*)context;
         in->replyhandler_ptr(status, (alljoyn_proxybusobject)obj, in->context);
+        in->replyhandler_ptr = NULL;
+        delete in;
     }
 };
 }

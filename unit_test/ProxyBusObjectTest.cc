@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2012, Qualcomm Innovation Center, Inc.
+ * Copyright 2012-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -34,22 +34,26 @@ static QCC_BOOL name_owner_changed_flag = QCC_FALSE;
 static void ping_method(alljoyn_busobject bus, const alljoyn_interfacedescription_member* member, alljoyn_message msg)
 {
     alljoyn_msgarg outArg = alljoyn_msgarg_create();
-    outArg = alljoyn_message_getarg(msg, 0);
+    alljoyn_msgarg inArg = alljoyn_message_getarg(msg, 0);
     const char* str;
-    alljoyn_msgarg_get(outArg, "s", &str);
+    alljoyn_msgarg_get(inArg, "s", &str);
+    alljoyn_msgarg_set(outArg, "s", str);
     QStatus status = alljoyn_busobject_methodreply_args(bus, msg, outArg, 1);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_msgarg_destroy(outArg);
 }
 
 static void chirp_method(alljoyn_busobject bus, const alljoyn_interfacedescription_member* member, alljoyn_message msg)
 {
     chirp_method_flag = QCC_TRUE;
     alljoyn_msgarg outArg = alljoyn_msgarg_create();
-    outArg = alljoyn_message_getarg(msg, 0);
+    alljoyn_msgarg inArg = alljoyn_message_getarg(msg, 0);
     const char* str;
-    alljoyn_msgarg_get(outArg, "s", &str);
+    alljoyn_msgarg_get(inArg, "s", &str);
+    alljoyn_msgarg_set(outArg, "s", str);
     QStatus status = alljoyn_busobject_methodreply_args(bus, msg, NULL, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_msgarg_destroy(outArg);
 }
 
 /* NameOwnerChanged callback */
@@ -113,7 +117,7 @@ class ProxyBusObjectTest : public testing::Test {
             NULL,
             NULL
         };
-        alljoyn_busobject testObj = alljoyn_busobject_create(OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
+        testObj = alljoyn_busobject_create(OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
         const alljoyn_interfacedescription exampleIntf = alljoyn_busattachment_getinterface(servicebus, INTERFACE_NAME);
         ASSERT_TRUE(exampleIntf);
 
@@ -165,11 +169,13 @@ class ProxyBusObjectTest : public testing::Test {
          */
         alljoyn_busattachment_destroy(servicebus);
         alljoyn_buslistener_destroy(buslistener);
+        alljoyn_busobject_destroy(testObj);
     }
 
     QStatus status;
     alljoyn_busattachment bus;
 
+    alljoyn_busobject testObj;
     alljoyn_busattachment servicebus;
     alljoyn_buslistener buslistener;
 };
@@ -397,6 +403,7 @@ TEST_F(ProxyBusObjectTest, addinterface) {
         "</interface>\n";
     EXPECT_STREQ(expectedIntrospect, introspect);
     free(introspect);
+    alljoyn_proxybusobject_destroy(proxyObj);
 }
 
 TEST_F(ProxyBusObjectTest, methodcall) {

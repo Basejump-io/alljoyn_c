@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2012, Qualcomm Innovation Center, Inc.
+ * Copyright 2012-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ class SessionTest : public testing::Test {
             NULL, /* BusObject Registered CB */
             NULL  /* BusObject Unregistered CB */
         };
-        alljoyn_busobject testObj = alljoyn_busobject_create(OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
+        testObj = alljoyn_busobject_create(OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
 
         status = alljoyn_busobject_addinterface(testObj, testIntf);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -167,26 +167,22 @@ class SessionTest : public testing::Test {
         alljoyn_sessionport sp = SESSION_PORT;
         status = alljoyn_busattachment_bindsessionport(servicebus, &sp, opts, sessionPortListener);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
-
         /* Advertise Name */
         status = alljoyn_busattachment_advertisename(servicebus, OBJECT_NAME, alljoyn_sessionopts_transports(opts));
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+        alljoyn_sessionopts_destroy(opts);
     }
 
     void TearDownSessionTestService()
     {
-        //alljoyn_busattachment_unregisterbuslistener(servicebus, buslistener);
-        /*
-         * must destroy the busattachment before destroying the buslistener or
-         * the code will segfault when the code tries to call the bus_stopping
-         * callback.
-         */
         alljoyn_busattachment_destroy(servicebus);
-//        alljoyn_buslistener_destroy(buslistener);
+        alljoyn_sessionportlistener_destroy(sessionPortListener);
+        alljoyn_busobject_destroy(testObj);
     }
 
     QStatus status;
     alljoyn_busattachment bus;
+    alljoyn_busobject testObj;
 
     alljoyn_busattachment servicebus;
     alljoyn_buslistener buslistener;
@@ -242,6 +238,7 @@ TEST_F(SessionTest, joinsession) {
     //joincompleted_flag = QCC_TRUE;
 
     alljoyn_busattachment_unregisterbuslistener(bus, buslistener);
+    alljoyn_buslistener_destroy(buslistener);
     TearDownSessionTestService();
 }
 
@@ -295,6 +292,7 @@ TEST_F(SessionTest, joinsessionasync) {
     alljoyn_sessionopts_destroy(opts);
 
     alljoyn_busattachment_unregisterbuslistener(bus, buslistener);
+    alljoyn_buslistener_destroy(buslistener);
     TearDownSessionTestService();
 }
 

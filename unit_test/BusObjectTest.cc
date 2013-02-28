@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2012, Qualcomm Innovation Center, Inc.
+ * Copyright 2012-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -96,22 +96,26 @@ static QCC_BOOL chirp_method_flag = QCC_FALSE;
 static void ping_method(alljoyn_busobject bus, const alljoyn_interfacedescription_member* member, alljoyn_message msg)
 {
     alljoyn_msgarg outArg = alljoyn_msgarg_create();
-    outArg = alljoyn_message_getarg(msg, 0);
+    alljoyn_msgarg inArg = alljoyn_message_getarg(msg, 0);
     const char* str;
-    alljoyn_msgarg_get(outArg, "s", &str);
+    alljoyn_msgarg_get(inArg, "s", &str);
+    alljoyn_msgarg_set(outArg, "s", str);
     QStatus status = alljoyn_busobject_methodreply_args(bus, msg, outArg, 1);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_msgarg_destroy(outArg);
 }
 
 static void chirp_method(alljoyn_busobject bus, const alljoyn_interfacedescription_member* member, alljoyn_message msg)
 {
-    chirp_method_flag = QCC_TRUE;
     alljoyn_msgarg outArg = alljoyn_msgarg_create();
-    outArg = alljoyn_message_getarg(msg, 0);
+    alljoyn_msgarg inArg = alljoyn_message_getarg(msg, 0);
     const char* str;
-    alljoyn_msgarg_get(outArg, "s", &str);
+    alljoyn_msgarg_get(inArg, "s", &str);
+    alljoyn_msgarg_set(outArg, "s", str);
     QStatus status = alljoyn_busobject_methodreply_args(bus, msg, NULL, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    chirp_method_flag = QCC_TRUE;
+    alljoyn_msgarg_destroy(outArg);
 }
 
 class BusObjectTest : public testing::Test {
@@ -173,7 +177,7 @@ class BusObjectTest : public testing::Test {
             &busobject_registered,
             &busobject_unregistered
         };
-        alljoyn_busobject testObj = alljoyn_busobject_create(OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
+        testObj = alljoyn_busobject_create(OBJECT_PATH, QCC_FALSE, &busObjCbs, NULL);
 
         status = alljoyn_busobject_addinterface(testObj, testIntf);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -205,7 +209,6 @@ class BusObjectTest : public testing::Test {
 
     void TearDownBusObjectTestService()
     {
-        //alljoyn_busattachment_unregisterbuslistener(servicebus, buslistener);
         /*
          * must destroy the busattachment before destroying the buslistener or
          * the code will segfault when the code tries to call the bus_stopping
@@ -213,11 +216,12 @@ class BusObjectTest : public testing::Test {
          */
         alljoyn_busattachment_destroy(servicebus);
         alljoyn_buslistener_destroy(buslistener);
+        alljoyn_busobject_destroy(testObj);
     }
 
     QStatus status;
     alljoyn_busattachment bus;
-
+    alljoyn_busobject testObj;
     alljoyn_busattachment servicebus;
     alljoyn_buslistener buslistener;
 };
@@ -287,7 +291,8 @@ TEST_F(BusObjectTest, get_property_handler)
     status = alljoyn_msgarg_get(value, "u", &return_value);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     EXPECT_EQ((uint32_t)42, return_value);
-
+    alljoyn_msgarg_destroy(value);
+    alljoyn_proxybusobject_destroy(proxyObj);
     TearDownBusObjectTestService();
 }
 
@@ -318,6 +323,7 @@ TEST_F(BusObjectTest, set_property_handler)
     EXPECT_EQ((uint32_t)98, prop3);
     alljoyn_msgarg_destroy(value);
 
+    alljoyn_proxybusobject_destroy(proxyObj);
     TearDownBusObjectTestService();
 }
 
@@ -348,7 +354,8 @@ TEST_F(BusObjectTest, getall_properties)
     status = alljoyn_msgarg_get(variant_arg, "u", &num);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     EXPECT_EQ((uint32_t)42, num);
-
+    alljoyn_msgarg_destroy(value);
+    alljoyn_proxybusobject_destroy(proxyObj);
     TearDownBusObjectTestService();
 }
 
@@ -465,6 +472,7 @@ TEST_F(BusObjectTest, addmethodhandler)
     /* cleanup */
     alljoyn_busattachment_destroy(servicebus);
     alljoyn_buslistener_destroy(buslistener);
+    alljoyn_busobject_destroy(testObj);
 }
 
 TEST_F(BusObjectTest, addmethodhandlers)
@@ -582,6 +590,7 @@ TEST_F(BusObjectTest, addmethodhandlers)
     /* cleanup */
     alljoyn_busattachment_destroy(servicebus);
     alljoyn_buslistener_destroy(buslistener);
+    alljoyn_busobject_destroy(testObj);
 }
 
 TEST_F(BusObjectTest, addmethodhandler_addmethodhandlers_mix)
@@ -701,4 +710,5 @@ TEST_F(BusObjectTest, addmethodhandler_addmethodhandlers_mix)
     /* cleanup */
     alljoyn_busattachment_destroy(servicebus);
     alljoyn_buslistener_destroy(buslistener);
+    alljoyn_busobject_destroy(testObj);
 }

@@ -6,7 +6,7 @@
  */
 
 /******************************************************************************
- * Copyright 2012, Qualcomm Innovation Center, Inc.
+ * Copyright 2012-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,9 +48,18 @@ class MessageReceiverC : public MessageReceiver {
   public:
     void ReplyHandler(ajn::Message& message, void* context)
     {
+        /*
+         * The replyhandler_ptr in the context pointer is allocated as part
+         * of the alljoyn_proxybusobject_methodcallasync function call or the
+         * alljoyn_proxybusobject_methodcallasync_member function call.
+         * Once the function alljoyn_messagereceiver_replyhandler_ptr has been
+         * called the MessageReceiverReplyHandlerCallbackContext instance must
+         * be deleted or it will result in a memory leak.
+         */
         MessageReceiverReplyHandlerCallbackContext* in = (MessageReceiverReplyHandlerCallbackContext*)context;
         (in->replyhandler_ptr)((alljoyn_message) & message, in->context);
-
+        in->replyhandler_ptr = NULL;
+        delete in;
     }
 };
 }

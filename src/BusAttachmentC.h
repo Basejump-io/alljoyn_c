@@ -106,8 +106,17 @@ class BusAttachmentC : public BusAttachment, public BusAttachment::JoinSessionAs
     QStatus UnregisterAllHandlersC();
 
     void JoinSessionCB(QStatus status, SessionId sessionId, const SessionOpts& opts, void* context) {
+        /*
+         * The JoinsessionCallback in the context pointer is allocated as part
+         * of the alljoyn_busattachment_joinsessionasync function call.  It
+         * once the function joinsessioncb_ptr has been called the
+         * JoinsessionCallbackContext instance must be deleted or it will result
+         * in a memory leak.
+         */
         JoinsessionCallbackContext* in = (JoinsessionCallbackContext*)context;
         (in->joinsessioncb_ptr)(status, (alljoyn_sessionid)sessionId, (const alljoyn_sessionopts)&opts, in->context);
+        in->joinsessioncb_ptr = NULL;
+        delete in;
     }
 
   private:

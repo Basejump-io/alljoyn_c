@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2012, Qualcomm Innovation Center, Inc.
+ * Copyright 2012-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -175,31 +175,41 @@ TEST(MsgArgTest, Variants)
 
     QStatus status = ER_OK;
     alljoyn_msgarg arg = NULL;
+    alljoyn_msgarg arg2 = NULL;
     arg = alljoyn_msgarg_create();
 
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
-    status = alljoyn_msgarg_set(arg, "v", alljoyn_msgarg_create_and_set("i", 420));
+    arg2 = alljoyn_msgarg_create_and_set("i", 420);
+    status = alljoyn_msgarg_set(arg, "v", arg2);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     status = alljoyn_msgarg_get(arg, "u", &i);
     EXPECT_EQ(ER_BUS_SIGNATURE_MISMATCH, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_msgarg_destroy(arg2);
 
-    status = alljoyn_msgarg_set(arg, "v", alljoyn_msgarg_create_and_set("d", &d));
+    arg2 = alljoyn_msgarg_create_and_set("d", &d);
+    status = alljoyn_msgarg_set(arg, "v", arg2);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
     status = alljoyn_msgarg_get(arg, "i", &i);
     EXPECT_EQ(ER_BUS_SIGNATURE_MISMATCH, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_msgarg_get(arg, "s", &str);
     EXPECT_EQ(ER_BUS_SIGNATURE_MISMATCH, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_msgarg_get(arg, "d", &dt);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_msgarg_destroy(arg2);
 
-    status = alljoyn_msgarg_set(arg, "v", alljoyn_msgarg_create_and_set("s", s));
+    arg2 = alljoyn_msgarg_create_and_set("s", s);
+    status = alljoyn_msgarg_set(arg, "v", arg2);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
     status = alljoyn_msgarg_get(arg, "i", &i);
     EXPECT_EQ(ER_BUS_SIGNATURE_MISMATCH, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_msgarg_get(arg, "s", &str);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     ASSERT_STREQ(s, str);
+    alljoyn_msgarg_destroy(arg2);
+    alljoyn_msgarg_destroy(arg);
 }
 
 TEST(MsgArgTest, arrays_of_scalars) {
@@ -234,6 +244,7 @@ TEST(MsgArgTest, arrays_of_scalars) {
         for (size_t i = 0; i < lay; ++i) {
             EXPECT_EQ(ay[i], pay[i]);
         }
+        alljoyn_msgarg_destroy(arg);
     }
     {
         alljoyn_msgarg arg = alljoyn_msgarg_create();
@@ -248,6 +259,7 @@ TEST(MsgArgTest, arrays_of_scalars) {
             EXPECT_EQ(ab[i], pab[i]) << "i = " << i << " ab[i] = " << ((ab[i]) ? "true" : "false")
                                      << " pab[i] = " << ((pab[i]) ? "true" : "false");
         }
+        alljoyn_msgarg_destroy(arg);
     }
     {
         alljoyn_msgarg arg = alljoyn_msgarg_create();
@@ -261,6 +273,7 @@ TEST(MsgArgTest, arrays_of_scalars) {
         for (size_t i = 0; i < lan; ++i) {
             EXPECT_EQ(an[i], pan[i]);
         }
+        alljoyn_msgarg_destroy(arg);
     }
     {
         alljoyn_msgarg arg = alljoyn_msgarg_create();
@@ -274,6 +287,7 @@ TEST(MsgArgTest, arrays_of_scalars) {
         for (size_t i = 0; i < lai; ++i) {
             EXPECT_EQ(ai[i], pai[i]);
         }
+        alljoyn_msgarg_destroy(arg);
     }
     {
         alljoyn_msgarg arg = alljoyn_msgarg_create();
@@ -287,6 +301,7 @@ TEST(MsgArgTest, arrays_of_scalars) {
         for (size_t i = 0; i < lax; ++i) {
             EXPECT_EQ(ax[i], pax[i]);
         }
+        alljoyn_msgarg_destroy(arg);
     }
     {
         alljoyn_msgarg arg = alljoyn_msgarg_create();
@@ -300,6 +315,7 @@ TEST(MsgArgTest, arrays_of_scalars) {
         for (size_t i = 0; i < lat; ++i) {
             EXPECT_EQ(at[i], pat[i]);
         }
+        alljoyn_msgarg_destroy(arg);
     }
     {
         alljoyn_msgarg arg = alljoyn_msgarg_create();
@@ -313,6 +329,7 @@ TEST(MsgArgTest, arrays_of_scalars) {
         for (size_t i = 0; i < lad; ++i) {
             EXPECT_EQ(ad[i], pad[i]);
         }
+        alljoyn_msgarg_destroy(arg);
     }
 }
 
@@ -388,16 +405,22 @@ TEST(MsgArgTest, Dictionary)
     QStatus status = ER_OK;
     const char*keys[] = { "red", "green", "blue", "yellow" };
     //size_t numEntries = sizeof(keys) / sizeof(keys[0]);
-    alljoyn_msgarg dictEntries;
+    alljoyn_msgarg dictEntries = NULL;
+    alljoyn_msgarg values = NULL;
     dictEntries = alljoyn_msgarg_array_create(sizeof(keys) / sizeof(keys[0]));
+    values = alljoyn_msgarg_array_create(sizeof(keys) / sizeof(keys[0]));
+    alljoyn_msgarg_set(alljoyn_msgarg_array_element(values, 0), "s", keys[0]);
+    alljoyn_msgarg_set(alljoyn_msgarg_array_element(values, 1), "(ss)", keys[1], "bean");
+    alljoyn_msgarg_set(alljoyn_msgarg_array_element(values, 2), "s", keys[2]);
+    alljoyn_msgarg_set(alljoyn_msgarg_array_element(values, 3), "(ss)", keys[3], "mellow");
 
-    status = alljoyn_msgarg_set(alljoyn_msgarg_array_element(dictEntries, 0), "{iv}", 1, alljoyn_msgarg_create_and_set("s", keys[0]));
+    status = alljoyn_msgarg_set(alljoyn_msgarg_array_element(dictEntries, 0), "{iv}", 1, alljoyn_msgarg_array_element(values, 0));
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
-    status = alljoyn_msgarg_set(alljoyn_msgarg_array_element(dictEntries, 1), "{iv}", 1, alljoyn_msgarg_create_and_set("(ss)", keys[1], "bean"));
+    status = alljoyn_msgarg_set(alljoyn_msgarg_array_element(dictEntries, 1), "{iv}", 1, alljoyn_msgarg_array_element(values, 1));
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
-    status = alljoyn_msgarg_set(alljoyn_msgarg_array_element(dictEntries, 2), "{iv}", 1, alljoyn_msgarg_create_and_set("s", keys[2]));
+    status = alljoyn_msgarg_set(alljoyn_msgarg_array_element(dictEntries, 2), "{iv}", 1, alljoyn_msgarg_array_element(values, 2));
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
-    status = alljoyn_msgarg_set(alljoyn_msgarg_array_element(dictEntries, 3), "{iv}", 1, alljoyn_msgarg_create_and_set("(ss)", keys[3], "mellow"));
+    status = alljoyn_msgarg_set(alljoyn_msgarg_array_element(dictEntries, 3), "{iv}", 1, alljoyn_msgarg_array_element(values, 3));
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     alljoyn_msgarg dict = alljoyn_msgarg_create();
@@ -430,6 +453,7 @@ TEST(MsgArgTest, Dictionary)
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     }
     alljoyn_msgarg_destroy(dictEntries);
+    alljoyn_msgarg_destroy(values);
     alljoyn_msgarg_destroy(dict);
 }
 

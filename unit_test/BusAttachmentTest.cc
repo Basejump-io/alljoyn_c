@@ -223,6 +223,7 @@ TEST(BusAttachmentTest, registersignalhandler_basic) {
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busobject_signal(testObj, NULL, 0, my_signal_member, arg, 1, 0, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_msgarg_destroy(arg);
 
     //Wait upto 2 seconds for the signal to complete.
     for (int i = 0; i < 200; ++i) {
@@ -238,6 +239,7 @@ TEST(BusAttachmentTest, registersignalhandler_basic) {
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busattachment_join(bus);
     alljoyn_busattachment_destroy(bus);
+    alljoyn_busobject_destroy(testObj);
 }
 
 TEST(BusAttachmentTest, registersignalhandler_multiple_signals) {
@@ -303,6 +305,7 @@ TEST(BusAttachmentTest, registersignalhandler_multiple_signals) {
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busobject_signal(testObj, NULL, 0, my_signal_member, arg, 1, 0, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_msgarg_destroy(arg);
 
     //Wait upto 2 seconds for the signal to complete.
     for (int i = 0; i < 200; ++i) {
@@ -319,6 +322,7 @@ TEST(BusAttachmentTest, registersignalhandler_multiple_signals) {
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busattachment_join(bus);
     alljoyn_busattachment_destroy(bus);
+    alljoyn_busobject_destroy(testObj);
 }
 
 TEST(BusAttachmentTest, unregistersignalhandler) {
@@ -412,7 +416,7 @@ TEST(BusAttachmentTest, unregistersignalhandler) {
         }
         qcc::Sleep(10);
     }
-
+    alljoyn_msgarg_destroy(arg);
     //wait a little longer to make sure the signal still did not come through
     qcc::Sleep(50);
     EXPECT_TRUE(registersignalhandler_flag);
@@ -422,6 +426,7 @@ TEST(BusAttachmentTest, unregistersignalhandler) {
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busattachment_join(bus);
     alljoyn_busattachment_destroy(bus);
+    alljoyn_busobject_destroy(testObj);
 }
 
 TEST(BusAttachmentTest, register_unregister_signalhandler_with_sourcePath) {
@@ -575,6 +580,7 @@ TEST(BusAttachmentTest, register_unregister_signalhandler_with_sourcePath) {
     status = alljoyn_busobject_signal(testObjB, NULL, 0, my_signal_member, arg, 1, 0, 0);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
+    alljoyn_msgarg_destroy(arg);
     //Wait upto 2 seconds for the signal to complete.
     for (int i = 0; i < 200; ++i) {
 
@@ -597,6 +603,8 @@ TEST(BusAttachmentTest, register_unregister_signalhandler_with_sourcePath) {
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busattachment_join(bus);
     alljoyn_busattachment_destroy(bus);
+    alljoyn_busobject_destroy(testObjA);
+    alljoyn_busobject_destroy(testObjB);
 }
 
 TEST(BusAttachmentTest, unregisterallhandlers) {
@@ -683,6 +691,8 @@ TEST(BusAttachmentTest, unregisterallhandlers) {
 
     status = alljoyn_busobject_signal(testObj, NULL, 0, my_signal_member, arg, 1, 0, 0);
 
+    alljoyn_msgarg_destroy(arg);
+
     //wait a little while to make sure the signal still did not come through
     qcc::Sleep(100);
     EXPECT_FALSE(registersignalhandler_flag);
@@ -692,6 +702,7 @@ TEST(BusAttachmentTest, unregisterallhandlers) {
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busattachment_join(bus);
     alljoyn_busattachment_destroy(bus);
+    alljoyn_busobject_destroy(testObj);
 }
 
 

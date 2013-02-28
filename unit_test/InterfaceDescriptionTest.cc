@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2012, Qualcomm Innovation Center, Inc.
+ * Copyright 2012-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -590,6 +590,7 @@ TEST(InterfaceDescriptionTest, alljoyn_interfacedescription_property_eql)
     EXPECT_TRUE(alljoyn_interfacedescription_property_eql(propa, propa2));
 
     EXPECT_FALSE(alljoyn_interfacedescription_property_eql(propa, propb));
+    alljoyn_busattachment_destroy(bus);
 }
 
 TEST(InterfaceDescriptionTest, interface_annotations)

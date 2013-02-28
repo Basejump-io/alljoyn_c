@@ -5,7 +5,7 @@
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -82,6 +82,10 @@ QStatus alljoyn_proxybusobject_introspectremoteobject(alljoyn_proxybusobject pro
 
 QStatus alljoyn_proxybusobject_introspectremoteobjectasync(alljoyn_proxybusobject proxyObj, alljoyn_proxybusobject_listener_introspectcb_ptr callback, void* context)
 {
+    /*
+     * The new ajn::IntrospectCallbackContext must be freed in inside the
+     * ajn::ProxyBusObjectListenerC::IntrospectCB.
+     */
     return ((ajn::ProxyBusObject*)proxyObj)->IntrospectRemoteObjectAsync(&proxyObjListener,
                                                                          static_cast<ajn::ProxyBusObject::Listener::IntrospectCB>(&ajn::ProxyBusObjectListenerC::IntrospectCB),
                                                                          (void*) new ajn::IntrospectCallbackContext(callback, context));
@@ -162,6 +166,10 @@ QStatus alljoyn_proxybusobject_methodcallasync(alljoyn_proxybusobject proxyObj,
                                                uint32_t timeout,
                                                uint8_t flags)
 {
+    /*
+     * the instance of the ajn::MessageReceiverReplyHandlerCallbackContext is
+     * freed when the message ReplyHandler is called.
+     */
     return ((ajn::ProxyBusObject*)proxyObj)->MethodCallAsync(ifaceName,
                                                              methodName,
                                                              &msgReceverC,
