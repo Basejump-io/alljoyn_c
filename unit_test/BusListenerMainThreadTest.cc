@@ -119,7 +119,8 @@ TEST_F(BusListenerMainThreadTest, listner_registered_unregistered) {
     EXPECT_TRUE(listener_unregistered_flag);
 }
 
-TEST_F(BusListenerMainThreadTest, bus_stopping_disconnected) {
+//ALLJOYN-1738
+TEST_F(BusListenerMainThreadTest, DISABLED_bus_stopping_disconnected) {
 
     status = alljoyn_busattachment_start(bus);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -167,7 +168,8 @@ TEST_F(BusListenerMainThreadTest, bus_stopping_disconnected) {
     EXPECT_TRUE(listener_unregistered_flag);
 }
 
-TEST_F(BusListenerMainThreadTest, found_lost_advertised_name) {
+// ALLJOYN-1738
+TEST_F(BusListenerMainThreadTest, DISABLED_found_lost_advertised_name) {
     status = alljoyn_busattachment_start(bus);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busattachment_connect(bus, ajn::getConnectArg().c_str());
@@ -245,7 +247,8 @@ TEST_F(BusListenerMainThreadTest, found_lost_advertised_name) {
     alljoyn_sessionopts_destroy(opts);
 }
 
-TEST_F(BusListenerMainThreadTest, name_owner_changed) {
+// ALLJOYN-1738
+TEST_F(BusListenerMainThreadTest, DISABLED_name_owner_changed) {
     status = alljoyn_busattachment_start(bus);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     status = alljoyn_busattachment_connect(bus, ajn::getConnectArg().c_str());
