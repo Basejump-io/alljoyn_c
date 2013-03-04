@@ -10,7 +10,7 @@
  */
 
 /******************************************************************************
- * Copyright 2010-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2010-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -110,13 +110,7 @@ void cat_method(alljoyn_busobject bus, const alljoyn_interfacedescription_member
     if (ER_OK != status) {
         printf("Ping: Error reading alljoyn_message\n");
     }
-    /*
-     * strncat appends the number of characters plus a terminating nul
-     * character thus sizeof(result)-1
-     */
-    strncat(result, str1, sizeof(result) - 1);
-    strncat(result, str2, sizeof(result) - 1);
-
+    snprintf(result, sizeof(result), "%s%s", str1, str2);
     outArg = alljoyn_msgarg_create_and_set("s", result);
     status = alljoyn_busobject_methodreply_args(bus, msg, outArg, 1);
     if (ER_OK != status) {
