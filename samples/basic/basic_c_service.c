@@ -87,7 +87,7 @@ QCC_BOOL accept_session_joiner(const void* context, alljoyn_sessionport sessionP
         printf("Rejecting join attempt on unexpected session port %d\n", sessionPort);
     } else {
         printf("Accepting join session request from %s (opts.proximity=%x, opts.traffic=%x, opts.transports=%x)\n",
-               joiner, alljoyn_sessionopts_proximity(opts), alljoyn_sessionopts_traffic(opts), alljoyn_sessionopts_transports(opts));
+               joiner, alljoyn_sessionopts_get_proximity(opts), alljoyn_sessionopts_get_traffic(opts), alljoyn_sessionopts_get_transports(opts));
         ret = QCC_TRUE;
     }
     return ret;
@@ -245,7 +245,7 @@ int main(int argc, char** argv, char** envArg)
 
     /* Advertise name */
     if (ER_OK == status) {
-        status = alljoyn_busattachment_advertisename(g_msgBus, OBJECT_NAME, alljoyn_sessionopts_transports(opts));
+        status = alljoyn_busattachment_advertisename(g_msgBus, OBJECT_NAME, alljoyn_sessionopts_get_transports(opts));
         if (status != ER_OK) {
             printf("Failed to advertise name %s (%s)\n", OBJECT_NAME, QCC_StatusText(status));
         }

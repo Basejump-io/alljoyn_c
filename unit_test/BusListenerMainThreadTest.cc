@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2012, Qualcomm Innovation Center, Inc.
+ * Copyright 2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -189,7 +189,7 @@ TEST_F(BusListenerMainThreadTest, DISABLED_found_lost_advertised_name) {
     status = alljoyn_busattachment_findadvertisedname(bus, OBJECT_NAME);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
-    status = alljoyn_busattachment_advertisename(bus, OBJECT_NAME, alljoyn_sessionopts_transports(opts));
+    status = alljoyn_busattachment_advertisename(bus, OBJECT_NAME, alljoyn_sessionopts_get_transports(opts));
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
 
     for (size_t i = 0; i < 200; ++i) {
@@ -201,7 +201,7 @@ TEST_F(BusListenerMainThreadTest, DISABLED_found_lost_advertised_name) {
     }
     EXPECT_TRUE(found_advertised_name_flag);
 
-    status = alljoyn_busattachment_canceladvertisename(bus, OBJECT_NAME, alljoyn_sessionopts_transports(opts));
+    status = alljoyn_busattachment_canceladvertisename(bus, OBJECT_NAME, alljoyn_sessionopts_get_transports(opts));
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     for (size_t i = 0; i < 200; ++i) {
         alljoyn_unity_deferred_callbacks_process();

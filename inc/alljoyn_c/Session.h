@@ -86,44 +86,83 @@ extern AJ_API alljoyn_sessionopts alljoyn_sessionopts_create(uint8_t traffic, QC
 extern AJ_API void alljoyn_sessionopts_destroy(alljoyn_sessionopts opts);
 
 /**
- * Accessor for the traffic member of alljoyn_sessionopts.
+ * Get accessor for the traffic member of alljoyn_sessionopts.
  *
  * @param opts alljoyn_sessionopts
  *
  * @return Traffic type specified by the specified alljoyn_sessionopts.
  */
-extern AJ_API uint8_t alljoyn_sessionopts_traffic(const alljoyn_sessionopts opts);
+extern AJ_API uint8_t alljoyn_sessionopts_get_traffic(const alljoyn_sessionopts opts);
 
 /**
- * Accessor for the isMultipoint member of alljoyn_sessionopts.
+ * Set accessor for the traffic member of alljoyn_sessionopts.
+ *
+ * @param opts alljoyn_sessionopts
+ * @param traffic Traffic type to set in the alljoyn_sessionopts.
+ */
+extern AJ_API void alljoyn_sessionopts_set_traffic(alljoyn_sessionopts opts, uint8_t traffic);
+
+/**
+ * Get accessor for the isMultipoint member of alljoyn_sessionopts.
  *
  * @param opts alljoyn_sessionopts
  *
  * @return Multipoint value specified by the specified alljoyn_sessionopts.
  */
-extern AJ_API QCC_BOOL alljoyn_sessionopts_multipoint(const alljoyn_sessionopts opts);
+extern AJ_API QCC_BOOL alljoyn_sessionopts_get_multipoint(const alljoyn_sessionopts opts);
 
 /**
- * Accessor for the proximity member of alljoyn_sessionopts.
+ * Set accessor for the isMultipoint member of alljoyn_sessionopts.
+ *
+ * @param opts alljoyn_sessionopts
+ * @param isMultipoint Multipoint value to set in the alljoyn_sessionopts.
+ */
+extern AJ_API void alljoyn_sessionopts_set_multipoint(alljoyn_sessionopts opts, QCC_BOOL isMultipoint);
+
+/**
+ * Get accessor for the proximity member of alljoyn_sessionopts.
  *
  * @param opts alljoyn_sessionopts
  *
  * @return Proximity specified by the specified alljoyn_sessionopts.
  */
-extern AJ_API uint8_t alljoyn_sessionopts_proximity(const alljoyn_sessionopts opts);
+extern AJ_API uint8_t alljoyn_sessionopts_get_proximity(const alljoyn_sessionopts opts);
 
 /**
- * Accessor for the transports member of alljoyn_sessionopts.
+ * Set accessor for the proximity member of alljoyn_sessionopts.
+ *
+ * @param opts alljoyn_sessionopts
+ * @param proximity Proximity value to set in the alljoyn_sessionopts.
+ */
+extern AJ_API void alljoyn_sessionopts_set_proximity(alljoyn_sessionopts opts, uint8_t proximity);
+
+/**
+ * Get accessor for the transports member of alljoyn_sessionopts.
  *
  * @param opts alljoyn_sessionopts
  *
  * @return Transports allowed by the specified alljoyn_sessionopts.
  */
-extern AJ_API alljoyn_transportmask alljoyn_sessionopts_transports(const alljoyn_sessionopts opts);
+extern AJ_API alljoyn_transportmask alljoyn_sessionopts_get_transports(const alljoyn_sessionopts opts);
+
+/**
+ * Set accessor for the transports member of alljoyn_sessionopts.
+ *
+ * @param opts alljoyn_sessionopts
+ * @param transports change the transports allowed by the specified alljoyn_sessionopts.
+ */
+extern AJ_API void alljoyn_sessionopts_set_transports(alljoyn_sessionopts opts, alljoyn_transportmask transports);
 
 /**
  * Determine whether one alljoyn_sessionopts is compatible with the alljoyn_sessionopts
  * offered by other
+ *
+ * Compatibility means that the alljoyn_sessionopts share at least one of each
+ *  - transport type
+ *  - traffic type
+ *  - proximity type
+ *
+ * Note that multipoint support is not a condition of compatibility
  *
  * @param one    Options to be compared against other.
  * @param other  Options to be compared against one.

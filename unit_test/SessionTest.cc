@@ -37,13 +37,8 @@ alljoyn_sessionid joinsessionid_alt;
 static QCC_BOOL accept_session_joiner(const void* context, alljoyn_sessionport sessionPort,
                                       const char* joiner,  const alljoyn_sessionopts opts)
 {
-    //printf("accept_session_joiner\n");
     QCC_BOOL ret = QCC_FALSE;
-    if (sessionPort != SESSION_PORT) {
-        //printf("Rejecting join attempt on unexpected session port %d\n", sessionPort);
-    } else {
-        //printf("Accepting join session request from %s (opts.proximity=%x, opts.traffic=%x, opts.transports=%x)\n",
-        //       joiner, alljoyn_sessionopts_proximity(opts), alljoyn_sessionopts_traffic(opts), alljoyn_sessionopts_transports(opts));
+    if (sessionPort == SESSION_PORT) {
         ret = QCC_TRUE;
     }
     return ret;
@@ -168,7 +163,7 @@ class SessionTest : public testing::Test {
         status = alljoyn_busattachment_bindsessionport(servicebus, &sp, opts, sessionPortListener);
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
         /* Advertise Name */
-        status = alljoyn_busattachment_advertisename(servicebus, OBJECT_NAME, alljoyn_sessionopts_transports(opts));
+        status = alljoyn_busattachment_advertisename(servicebus, OBJECT_NAME, alljoyn_sessionopts_get_transports(opts));
         EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
         alljoyn_sessionopts_destroy(opts);
     }
