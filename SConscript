@@ -52,8 +52,15 @@ env.Append(CPPPATH = [env.Dir('src')])
 libs = env.SConscript('$OBJDIR/SConscript')
 dlibs = env.Install('$DISTDIR/lib', libs)
 env.Append(LIBPATH = [env.Dir('$DISTDIR/lib')])
-env['ALLJOYN_C_LIB_SHARED'] = dlibs[0]
-env['ALLJOYN_C_LIB_STATIC'] = dlibs[1]
+# the variable dlibs contains the file nodes for the  static library and the 
+# shared library however it may contain more files such as .pdb files on windows.  
+# Search through the list and assign the static library to the ALLJOYN_C_LIB_STATIC 
+# env variable and the shared library to ALLJOYN_C_LIB_SHARED env variable.
+for x in dlibs: 
+    if env['LIBSUFFIX'] in str(x):
+        env['ALLJOYN_C_LIB_STATIC'] = x;
+    if env['SHLIBSUFFIX'] in str(x):
+        env['ALLJOYN_C_LIB_SHARED'] = x;
 
 # Build docs
 env.SConscript('docs/SConscript')
