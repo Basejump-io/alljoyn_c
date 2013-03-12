@@ -34,11 +34,17 @@ if not env.has_key('_ALLJOYNCORE_'):
 env.VariantDir('$OBJDIR', 'src', duplicate = 0)
 env.VariantDir('$OBJDIR/samples', 'samples', duplicate = 0)
 
+# The return value is the collection of files installed in the build destination.
+returnValue = []
+
 # Install headers
 alljoyn_core_headers = env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/DBusStdDefines.h')
 alljoyn_core_headers += env.Install('inc/alljoyn_c', '$DISTDIR/inc/alljoyn/Status.h')
 
+returnValue += alljoyn_core_headers
+
 c_headers = env.Install('$DISTDIR/inc/alljoyn_c', env.Glob('inc/alljoyn_c/*.h'))
+returnValue += c_headers
 
 env.Depends(c_headers, alljoyn_core_headers)
 
@@ -51,6 +57,8 @@ env.Append(CPPPATH = [env.Dir('src')])
 # AllJoyn Libraries
 libs = env.SConscript('$OBJDIR/SConscript')
 dlibs = env.Install('$DISTDIR/lib', libs)
+returnValue += dlibs
+
 env.Append(LIBPATH = [env.Dir('$DISTDIR/lib')])
 # the variable dlibs contains the file nodes for the  static library and the 
 # shared library however it may contain more files such as .pdb files on windows.  
@@ -67,7 +75,9 @@ env.SConscript('docs/SConscript')
 
 # Sample programs
 progs = env.SConscript('$OBJDIR/samples/SConscript')
-env.Install('$DISTDIR/bin/samples', progs)
+returnValue += env.Install('$DISTDIR/bin/samples', progs)
 
 # Build unit Tests
 env.SConscript('unit_test/SConscript', variant_dir='$OBJDIR/unittest', duplicate=0)
+
+Return('returnValue')
