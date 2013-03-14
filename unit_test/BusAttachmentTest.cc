@@ -17,6 +17,7 @@
 #include <alljoyn_c/BusAttachment.h>
 #include <alljoyn_c/InterfaceDescription.h>
 #include <qcc/Thread.h>
+#include <qcc/Util.h>
 #include "ajTestCommon.h"
 
 TEST(BusAttachmentTest, createinterface) {
@@ -100,6 +101,45 @@ TEST(BusAttachmentTest, getconcurrency) {
     EXPECT_EQ(8u, concurrency) << "  Expected a concurrency of 8 got " << concurrency;
 
     alljoyn_busattachment_destroy(bus);
+}
+
+TEST(BusAttachmentTest, isconnected)
+{
+    QStatus status;
+    alljoyn_busattachment bus;
+    size_t i;
+
+    QCC_BOOL allow_remote[2] = { QCC_FALSE, QCC_TRUE };
+
+    for (i = 0; i < ArraySize(allow_remote); i++) {
+        status = ER_FAIL;
+        bus = NULL;
+
+        bus = alljoyn_busattachment_create("BusAttachmentTest", allow_remote[i]);
+
+        status = alljoyn_busattachment_start(bus);
+        EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+        EXPECT_FALSE(alljoyn_busattachment_isconnected(bus));
+
+        status = alljoyn_busattachment_connect(bus, ajn::getConnectArg().c_str());
+        EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+        if (ER_OK == status) {
+            EXPECT_TRUE(alljoyn_busattachment_isconnected(bus));
+        }
+
+        status = alljoyn_busattachment_disconnect(bus, ajn::getConnectArg().c_str());
+        EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+        if (ER_OK == status) {
+            EXPECT_FALSE(alljoyn_busattachment_isconnected(bus));
+        }
+
+        status = alljoyn_busattachment_stop(bus);
+        EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+        status = alljoyn_busattachment_join(bus);
+        EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+        alljoyn_busattachment_destroy(bus);
+    }
 }
 
 TEST(BusAttachmentTest, getconnectspec)
