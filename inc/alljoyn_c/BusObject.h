@@ -282,10 +282,11 @@ extern AJ_API QStatus alljoyn_busobject_methodreply_status(alljoyn_busobject bus
  * @param signal           Interface member of signal being emitted.
  * @param args             The arguments for the signal (can be NULL)
  * @param numArgs          The number of arguments
- * @param timeToLive       If non-zero this specifies in milliseconds the useful lifetime for this
- *                         signal. If delivery of the signal is delayed beyond the timeToLive due to
- *                         network congestion or other factors the signal may be discarded. There is
- *                         no guarantee that expired signals will not still be delivered.
+ * @param timeToLive       If non-zero this specifies the useful lifetime for this signal.
+ *                         The units are milliseconds for non-sessionless signals and seconds for
+ *                         sessionless signals. If delivery of the signal is delayed beyond the
+ *                         timeToLive due to network congestion or other factors the signal may be
+ *                         discarded. There is no guarantee that expired signals will not still be delivered.
  * @param flags            Logical OR of the message flags for this signals. The following flags apply to signals:
  *                         - If #ALLJOYN_MESSAGE_FLAG_GLOBAL_BROADCAST is set broadcast signal (null destination) will be forwarded across bus-to-bus connections.
  *                         - If #ALLJOYN_MESSAGE_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
