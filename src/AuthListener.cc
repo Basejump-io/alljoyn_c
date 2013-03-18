@@ -75,6 +75,49 @@ class AuthListenerCallbackC : public AuthListener {
     const void* context;
 };
 
+class AuthListenerAsyncCallbackC : public AuthListener {
+  public:
+    AuthListenerAsyncCallbackC(const alljoyn_authlistenerasync_callbacks* callbacks_in, const void* context_in)
+    {
+        memcpy(&callbacks, callbacks_in, sizeof(alljoyn_authlistener_callbacks));
+        context = context_in;
+    }
+
+    virtual QStatus RequestCredentialsAsync(const char* authMechanism, const char* authPeer,
+                                            uint16_t authCount, const char* userName, uint16_t credMask,
+                                            void* authContext)
+    {
+        assert(callbacks.request_credentials != NULL && "request_credentials callback must be specified");
+        QStatus ret = callbacks.request_credentials(context, authMechanism, authPeer, authCount, userName, credMask, authContext);
+        return ret;
+    }
+
+    virtual QStatus VerifyCredentialsAsync(const char* authMechanism, const char* authPeer,
+                                           const Credentials& credentials, void* authContext) {
+        QStatus ret = ER_NOT_IMPLEMENTED;
+        if (callbacks.verify_credentials != NULL) {
+            ret = callbacks.verify_credentials(context, authMechanism, authPeer, (alljoyn_credentials)(&credentials), authContext);
+        }
+        return ret;
+    }
+
+    virtual void SecurityViolation(QStatus status, const Message& msg)
+    {
+        if (callbacks.security_violation != NULL) {
+            callbacks.security_violation(context, status, (alljoyn_message)(&msg));
+        }
+    }
+
+    virtual void AuthenticationComplete(const char* authMechanism, const char* peerName, bool success)
+    {
+        assert(callbacks.authentication_complete != NULL && "authentication_complete callback must be specified");
+        callbacks.authentication_complete(context, authMechanism, peerName, (success == true ? QCC_TRUE : QCC_FALSE));
+    }
+  private:
+    alljoyn_authlistenerasync_callbacks callbacks;
+    const void* context;
+};
+
 }
 
 struct _alljoyn_authlistener_handle {
@@ -92,6 +135,26 @@ void alljoyn_authlistener_destroy(alljoyn_authlistener listener)
     delete (ajn::AuthListenerCallbackC*)listener;
 }
 
+alljoyn_authlistener alljoyn_authlistenerasync_create(const alljoyn_authlistenerasync_callbacks* callbacks, const void* context)
+{
+    return (alljoyn_authlistener) new ajn::AuthListenerAsyncCallbackC(callbacks, context);
+}
+
+void alljoyn_authlistenerasync_destroy(alljoyn_authlistener listener)
+{
+    assert(listener != NULL && "listener parameter must not be NULL");
+    delete (ajn::AuthListenerAsyncCallbackC*)listener;
+}
+
+extern AJ_API QStatus alljoyn_authlistener_requestcredentialsresponse(alljoyn_authlistener listener, void* authContext, QCC_BOOL accept, alljoyn_credentials credentials)
+{
+    return ((ajn::AuthListenerAsyncCallbackC*)listener)->RequestCredentialsResponse(authContext, (accept == QCC_TRUE) ? true : false, *((ajn::AuthListener::Credentials*)credentials));
+}
+
+QStatus alljoyn_authlistener_verifycredentialsresponse(alljoyn_authlistener listener, void* authContext, QCC_BOOL accept)
+{
+    return ((ajn::AuthListenerAsyncCallbackC*)listener)->VerifyCredentialsResponse(authContext, (accept == QCC_TRUE) ? true : false);
+}
 struct _alljoyn_credentials_handle {
     /* Empty by design, this is just to allow the type restrictions to save coders from themselves */
 };

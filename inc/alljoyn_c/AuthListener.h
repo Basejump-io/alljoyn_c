@@ -65,7 +65,8 @@ static const uint16_t ALLJOYN_CRED_ONE_TIME_PWD = 0x2001; /**< Indicates the cre
  * the request is for credentials for that specific user. A count allows the listener to decide
  * whether to allow or reject multiple authentication attempts to the same peer.
  *
- * An implementation must provide RequestCredentials or RequestCredentialsAsync but not both.
+ * An implementation must provide an alljoyn_authlistener_callbacks or
+ * an alljoyn_authlistenerasync_callbacks but not both..
  *
  * @param context        The context pointer passed into the alljoyn_authlistener_create function
  * @param authMechanism  The name of the authentication mechanism issuing the request.
@@ -84,6 +85,44 @@ static const uint16_t ALLJOYN_CRED_ONE_TIME_PWD = 0x2001; /**< Indicates the cre
  */
 typedef QCC_BOOL (*alljoyn_authlistener_requestcredentials_ptr)(const void* context, const char* authMechanism, const char* peerName, uint16_t authCount,
                                                                 const char* userName, uint16_t credMask, alljoyn_credentials credentials);
+
+/**
+ * Authentication mechanism asynchronous request for credentials. If the user name is not an empty string
+ * the request is for credentials for that specific user. A count allows the listener to decide
+ * whether to allow or reject multiple authentication attempts to the same peer.
+ *
+ * An implementation must provide an alljoyn_authlistener_callbacks or
+ * an alljoyn_authlistenerasync_callbacks but not both.
+ *
+ * @param context        The context pointer passed into the alljoyn_authlistenerasync_create function
+ * @param authMechanism  The name of the authentication mechanism issuing the request.
+ * @param peerName       The name of the remote peer being authenticated.  On the initiating
+ *                       side this will be a well-known-name for the remote peer. On the
+ *                       accepting side this will be the unique bus name for the remote peer.
+ * @param authCount      Count (starting at 1) of the number of authentication request attempts made.
+ * @param userName       The user name for the credentials being requested.
+ * @param credMask       A bit mask identifying the credentials being requested.
+ * @param authContext    Callback context for associating the request with the returned credentials.
+ *
+ * @return  Return
+ *      - ER_OK if the request is handled.
+ *      - ER_NOT_IMPLEMENTED if implementation not found (default)
+ */
+typedef QStatus (*alljoyn_authlistener_requestcredentialsasync_ptr)(const void* context, const char* authMechanism, const char* peerName, uint16_t authCount, const char* userName, uint16_t credMask, void* authContext);
+
+/**
+ * Respond to a call to alljoyn_authlistener_requestcredentialsasync_ptr.
+ *
+ * @param listener      The alljoyn_authlistener responding to the authlistener_requestcredentialsasync
+ * @param authContext    Context that was passed in the call out to alljoyn_authlistener_requestcredentialsasync_ptr.
+ * @param accept         Returns true to accept the credentials request or false to reject it.
+ * @param credentials    The credentials being returned if accept is true.
+ *
+ * @return   Returns ER_OK if the credential verification response was expected. Returns an error status if
+ *           the credentials verification response was not expected.
+ */
+extern AJ_API QStatus alljoyn_authlistener_requestcredentialsresponse(alljoyn_authlistener listener, void* authContext, QCC_BOOL accept, alljoyn_credentials credentials);
+
 /**
  * Type for the VerifyCredentials callback.
  *
@@ -101,6 +140,35 @@ typedef QCC_BOOL (*alljoyn_authlistener_requestcredentials_ptr)(const void* cont
  */
 typedef QCC_BOOL (*alljoyn_authlistener_verifycredentials_ptr)(const void* context, const char* authMechanism, const char* peerName,
                                                                const alljoyn_credentials credentials);
+
+/**
+ * Authentication mechanism asynchronous request for verification of credentials from a remote peer.
+ *
+ * @param context        The context pointer passed into the alljoyn_authlistenerasync_create function.
+ * @param authMechanism  The name of the authentication mechanism issuing the request.
+ * @param peerName       The name of the remote peer being authenticated.  On the initiating
+ *                       side this will be a well-known-name for the remote peer. On the
+ *                       accepting side this will be the unique bus name for the remote peer.
+ * @param credentials    The credentials to be verified.
+ * @param authContext    Callback context for associating the request with the verification response.
+ *
+ * @return  Return
+ *  - ER_OK if the request is handled.
+ *  - ER_NOT_IMPLEMENTED (default)
+ */
+typedef QStatus (*alljoyn_authlistener_verifycredentialsasync_ptr)(const void* context, const char* authMechanism, const char* peerName, const alljoyn_credentials credentials, void* authContext);
+
+/**
+ * Respond to a call to alljoyn_authlistener_verifycredentialsasync_ptr.
+ *
+ * @param listener      The alljoyn_authlistener responding to the authlistener_verifycredentialsasync.
+ * @param authContext    Context that was passed in the call out to alljoyn_authlistener_verifycredentialsasync_ptr.
+ * @param accept         Returns true to accept the credentials or false to reject it.
+ *
+ * @return   Returns ER_OK if the credential verification response was expected. Returns an error status if
+ *           the credentials verification response was not expected.
+ */
+extern AJ_API QStatus alljoyn_authlistener_verifycredentialsresponse(alljoyn_authlistener listener, void* authContext, QCC_BOOL accept);
 /**
  * Type for the SecurityViolation callback.
  *
@@ -131,6 +199,9 @@ typedef void (*alljoyn_authlistener_authenticationcomplete_ptr)(const void* cont
 
 /**
  * Structure used during alljoyn_authlistener_create to provide callbacks into C.
+ * An implementation must provide alljoyn_authlistener_requestcredentials_ptr
+ * and alljoyn_authlistener_authenticationcomplete_ptr. Other values can be set
+ * to NULL if they are not needed.
  */
 typedef struct {
     /**
@@ -152,6 +223,32 @@ typedef struct {
 } alljoyn_authlistener_callbacks;
 
 /**
+ * Structure used during alljoyn_authlistenerasync_create to provide callbacks into C.
+ * An implementation must provide alljoyn_authlistener_requestcredentialsasync_ptr
+ * and alljoyn_authlistener_authenticationcomplete_ptr. Other values can be set
+ * to NULL if they are not needed.
+ */
+typedef struct {
+    /**
+     * Authentication mechanism asynchronous request for credentials.
+     */
+    alljoyn_authlistener_requestcredentialsasync_ptr request_credentials;
+    /**
+     * Authentication mechanism asynchronous request for verification of credentials from a remote peer
+     */
+    alljoyn_authlistener_verifycredentialsasync_ptr verify_credentials;
+    /**
+     * Optional function that if implemented allows an application to monitor security violations.
+     */
+    alljoyn_authlistener_securityviolation_ptr security_violation;
+    /**
+     * Reports successful or unsuccessful completion of authentication.
+     */
+    alljoyn_authlistener_authenticationcomplete_ptr authentication_complete;
+
+} alljoyn_authlistenerasync_callbacks;
+
+/**
  * Create an alljoyn_authlistener which will trigger the provided callbacks, passing along the provided context.
  *
  * @param callbacks Callbacks to trigger for associated events.
@@ -162,11 +259,28 @@ typedef struct {
 extern AJ_API alljoyn_authlistener alljoyn_authlistener_create(const alljoyn_authlistener_callbacks* callbacks, const void* context);
 
 /**
+ * Create an alljoyn_authlistener which will trigger the provided callbacks, passing along the provided context.
+ *
+ * @param callbacks Callbacks to trigger for associated events.
+ * @param context   Context to pass to callback functions
+ *
+ * @return Handle to newly allocated alljoyn_authlistener.
+ */
+extern AJ_API alljoyn_authlistener alljoyn_authlistenerasync_create(const alljoyn_authlistenerasync_callbacks* callbacks, const void* context);
+
+/**
  * Destroy an alljoyn_authlistener.
  *
  * @param listener alljoyn_authlistener to destroy.
  */
 extern AJ_API void alljoyn_authlistener_destroy(alljoyn_authlistener listener);
+
+/**
+ * Destroy an alljoyn_authlistener.
+ *
+ * @param listener alljoyn_authlistener to destroy.
+ */
+extern AJ_API void alljoyn_authlistenerasync_destroy(alljoyn_authlistener listener);
 
 /**
  * Create credentials
