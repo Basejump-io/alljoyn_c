@@ -291,3 +291,139 @@ TEST_F(SessionTest, joinsessionasync) {
     TearDownSessionTestService();
 }
 
+TEST_F(SessionTest, setLinkTimeout)
+{
+    SetUpSessionTestService();
+
+    /* Create a bus listener */
+    alljoyn_buslistener_callbacks callbacks = {
+        NULL,         /* listener registered CB */
+        NULL,         /* listener unregistered CB */
+        &found_advertised_name,         /* found advertised name CB */
+        NULL,         /* lost advertised name CB */
+        NULL,         /* name owner changed CB */
+        NULL,         /* bus stopping CB*/
+        NULL         /* bus disconnected CB */
+    };
+
+    buslistener = alljoyn_buslistener_create(&callbacks, NULL);
+    alljoyn_busattachment_registerbuslistener(bus, buslistener);
+
+    foundadvertisedname_flag = QCC_FALSE;
+    sessionjoined_flag = QCC_FALSE;
+    /* Begin discover of the well-known name */
+    status = alljoyn_busattachment_findadvertisedname(bus, OBJECT_NAME);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    for (size_t i = 0; i < 200; ++i) {
+        if (foundadvertisedname_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+    EXPECT_TRUE(foundadvertisedname_flag);
+
+    /* We found a remote bus that is advertising basic service's  well-known name so connect to it */
+    alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES,
+                                                          QCC_FALSE, ALLJOYN_PROXIMITY_ANY,
+                                                          ALLJOYN_TRANSPORT_ANY);
+    alljoyn_sessionid sid;
+    status = alljoyn_busattachment_joinsession(bus, OBJECT_NAME, SESSION_PORT, NULL, &sid, opts);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    for (size_t i = 0; i < 200; ++i) {
+        if (sessionjoined_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+    EXPECT_EQ(sid, joinsessionid);
+    EXPECT_TRUE(sessionjoined_flag);
+    // setting the linkTimeout to 2 min.  This value is high enough that the
+    // it should not be changed by the underlying transport.
+    uint32_t linkTimeout = 120;
+    status = alljoyn_busattachment_setlinktimeout(bus, sid, &linkTimeout);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    EXPECT_EQ(120u, linkTimeout);
+
+    alljoyn_sessionopts_destroy(opts);
+
+    alljoyn_busattachment_unregisterbuslistener(bus, buslistener);
+    alljoyn_buslistener_destroy(buslistener);
+    TearDownSessionTestService();
+}
+
+QCC_BOOL setlinktimeout_flag = QCC_FALSE;
+void alljoyn_busattachment_setlinktimeoutcb(QStatus status, uint32_t timeout, void* context)
+{
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    EXPECT_EQ(120u, timeout);
+    EXPECT_STREQ("String passed as context.", (const char*)context);
+    setlinktimeout_flag = QCC_TRUE;
+}
+
+TEST_F(SessionTest, setLinkTimeoutasync)
+{
+    SetUpSessionTestService();
+
+    /* Create a bus listener */
+    alljoyn_buslistener_callbacks callbacks = {
+        NULL,         /* listener registered CB */
+        NULL,         /* listener unregistered CB */
+        &found_advertised_name,         /* found advertised name CB */
+        NULL,         /* lost advertised name CB */
+        NULL,         /* name owner changed CB */
+        NULL,         /* bus stopping CB*/
+        NULL         /* bus disconnected CB */
+    };
+
+    buslistener = alljoyn_buslistener_create(&callbacks, NULL);
+    alljoyn_busattachment_registerbuslistener(bus, buslistener);
+
+    foundadvertisedname_flag = QCC_FALSE;
+    sessionjoined_flag = QCC_FALSE;
+    /* Begin discover of the well-known name */
+    status = alljoyn_busattachment_findadvertisedname(bus, OBJECT_NAME);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    for (size_t i = 0; i < 200; ++i) {
+        if (foundadvertisedname_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+    EXPECT_TRUE(foundadvertisedname_flag);
+
+    /* We found a remote bus that is advertising basic service's  well-known name so connect to it */
+    alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES,
+                                                          QCC_FALSE, ALLJOYN_PROXIMITY_ANY,
+                                                          ALLJOYN_TRANSPORT_ANY);
+    alljoyn_sessionid sid;
+    status = alljoyn_busattachment_joinsession(bus, OBJECT_NAME, SESSION_PORT, NULL, &sid, opts);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    for (size_t i = 0; i < 200; ++i) {
+        if (sessionjoined_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+    EXPECT_EQ(sid, joinsessionid);
+    EXPECT_TRUE(sessionjoined_flag);
+    // setting the linkTimeout to 2 min.  This value is high enough that the
+    // it should not be changed by the underlying transport.
+    setlinktimeout_flag = QCC_FALSE;
+    uint32_t linkTimeout = 120;
+    status = alljoyn_busattachment_setlinktimeoutasync(bus, sid, linkTimeout,
+                                                       alljoyn_busattachment_setlinktimeoutcb,
+                                                       (void*)"String passed as context.");
+    for (size_t i = 0; i < 200; ++i) {
+        if (setlinktimeout_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+
+    EXPECT_TRUE(setlinktimeout_flag);
+    alljoyn_sessionopts_destroy(opts);
+
+    alljoyn_busattachment_unregisterbuslistener(bus, buslistener);
+    alljoyn_buslistener_destroy(buslistener);
+    TearDownSessionTestService();
+}

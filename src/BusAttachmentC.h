@@ -61,11 +61,29 @@ class JoinsessionCallbackContext {
 };
 
 /*
+ * When setting up a setlinktimeout callback handler for C a
+ * alljoyn_busattachment_setlinktimeoutcb_ptr function pointer will be passed in
+ * as the callback handler.  AllJoyn expects a method handler.  The function
+ * handler will be passed as the part of the void* context that is passed to the
+ * internal callback handler and then is used to map the internal callback handler
+ * to the user defined setlinktimeout callback function pointer.
+ */
+class SetLinkTimeoutContext {
+  public:
+    SetLinkTimeoutContext(alljoyn_busattachment_setlinktimeoutcb_ptr setlinktimeoutcb_ptr, void* context) :
+        setlinktimeoutcb_ptr(setlinktimeoutcb_ptr), context(context)
+    { }
+
+    alljoyn_busattachment_setlinktimeoutcb_ptr setlinktimeoutcb_ptr;
+    void* context;
+};
+
+/*
  * This class is a child of BusAttachment.  This class contains extra methods needed
  * to map 'C++' callback methods to 'C' callback functions used for signals and
  * other async method calls.
  */
-class BusAttachmentC : public BusAttachment, public BusAttachment::JoinSessionAsyncCB {
+class BusAttachmentC : public BusAttachment, public BusAttachment::JoinSessionAsyncCB, public BusAttachment::SetLinkTimeoutAsyncCB {
   public:
     BusAttachmentC(const char* applicationName, bool allowRemoteMessages = false, uint32_t concurrency = 4) :
         BusAttachment(applicationName, allowRemoteMessages, concurrency) { }
@@ -108,14 +126,28 @@ class BusAttachmentC : public BusAttachment, public BusAttachment::JoinSessionAs
     void JoinSessionCB(QStatus status, SessionId sessionId, const SessionOpts& opts, void* context) {
         /*
          * The JoinsessionCallback in the context pointer is allocated as part
-         * of the alljoyn_busattachment_joinsessionasync function call.  It
-         * once the function joinsessioncb_ptr has been called the
+         * of the alljoyn_busattachment_joinsessionasync function call. Once the
+         * function joinsessioncb_ptr has been called the
          * JoinsessionCallbackContext instance must be deleted or it will result
          * in a memory leak.
          */
         JoinsessionCallbackContext* in = (JoinsessionCallbackContext*)context;
         (in->joinsessioncb_ptr)(status, (alljoyn_sessionid)sessionId, (const alljoyn_sessionopts)&opts, in->context);
         in->joinsessioncb_ptr = NULL;
+        delete in;
+    }
+
+    void SetLinkTimeoutCB(QStatus status, uint32_t timeout, void* context) {
+        /*
+         * The setlinktimeoutcb_ptr in the context pointer is allocated as part
+         * of the alljoyn_busattachment_setlinktimeoutasync function call. Once
+         * the function setlintimeoutcb_ptr has been called the
+         * SetLinkTimeoutContext instance must be deleted or it will result
+         * in a memory leak.
+         */
+        SetLinkTimeoutContext* in = (SetLinkTimeoutContext*)context;
+        (in->setlinktimeoutcb_ptr)(status, timeout, in->context);
+        in->setlinktimeoutcb_ptr = NULL;
         delete in;
     }
 

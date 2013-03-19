@@ -54,6 +54,17 @@ typedef struct _alljoyn_busattachment_handle*               alljoyn_busattachmen
 typedef void (*alljoyn_busattachment_joinsessioncb_ptr)(QStatus status, alljoyn_sessionid sessionId, const alljoyn_sessionopts opts, void* context);
 
 /**
+ * Type for the setlinktimeout callback used with the asynchronous setlinktimeout request.
+ *
+ *
+ * Called when alljoyn_busattachment_setlinktimeoutasync() completes.
+ *
+ * @param status       ER_OK if successful
+ * @param timeout      Timeout value (possibly adjusted from original request).
+ * @param context      User defined context which will be passed as-is to callback.
+ */
+typedef void (*alljoyn_busattachment_setlinktimeoutcb_ptr)(QStatus status, uint32_t timeout, void* context);
+/**
  * Allocate an alljoyn_busattachment.
  *
  * By default this will create an alljoyn_busattachment capable of handling 4 concurrent method and signal handlers.
@@ -966,6 +977,39 @@ extern AJ_API QStatus alljoyn_busattachment_leavesession(alljoyn_busattachment b
  */
 extern AJ_API QStatus alljoyn_busattachment_setlinktimeout(alljoyn_busattachment bus, alljoyn_sessionid sessionid, uint32_t* linkTimeout);
 
+/**
+ * Set the link timeout for a session.
+ *
+ * Link timeout is the maximum number of seconds that an unresponsive
+ * daemon-to-daemon connection will be monitored before declaring the session
+ * lost (via SessionLost callback). Link timeout defaults to 0 which indicates
+ * that AllJoyn link monitoring is disabled.
+ *
+ * Each transport type defines a lower bound on link timeout to avoid defeating
+ * transport specific power management algorithms.
+ *
+ * This call executes asynchronously. When the alljoyn_busattachment_setlinktimeoutasync
+ * response is received, the callback will be called.
+ *
+ * @param[in] bus           The bus containing the link to modify.
+ * @param[in] sessionid     Id of session whose link timeout will be modified.
+ * @param[in] linkTimeout   Max number of seconds that a link can be unresponsive before being
+ *                          declared lost. 0 indicates that AllJoyn link monitoring will be disabled. On
+ *                          return, this value will be the resulting (possibly upward) adjusted linkTimeout
+ *                          value that acceptable to the underlying transport.
+ * @param[in]  callback     alljoyn_busattachment_setlinktimeoutcb_ptr function
+ *                          Called when alljoyn_busattachment_setlinktimeoutasync
+ *                          response is received.
+ * @param[in]  context      User defined context which will be passed as-is to callback.
+ *
+ * @return
+ *      - #ER_OK iff method call to local daemon response was was successful.
+ *      - #ER_BUS_NOT_CONNECTED if a connection has not been made with a local bus.
+ *      - Other error status codes indicating a failure.
+ */
+extern AJ_API QStatus alljoyn_busattachment_setlinktimeoutasync(alljoyn_busattachment bus, alljoyn_sessionid sessionid,
+                                                                uint32_t linkTimeout, alljoyn_busattachment_setlinktimeoutcb_ptr callback,
+                                                                void* context);
 /**
  * Determine whether a given well-known name exists on the bus.
  * This method is a shortcut/helper that issues an org.freedesktop.DBus.NameHasOwner method call to the daemon

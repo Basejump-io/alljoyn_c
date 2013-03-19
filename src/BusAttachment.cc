@@ -329,6 +329,21 @@ QStatus alljoyn_busattachment_setlinktimeout(alljoyn_busattachment bus, alljoyn_
     return ((ajn::BusAttachmentC*)bus)->SetLinkTimeout(sessionid, *linkTimeout);
 }
 
+QStatus alljoyn_busattachment_setlinktimeoutasync(alljoyn_busattachment bus,
+                                                  alljoyn_sessionid sessionid,
+                                                  uint32_t linkTimeout,
+                                                  alljoyn_busattachment_setlinktimeoutcb_ptr callback,
+                                                  void* context)
+{
+    /*
+     * the instance of the ajn::SetLinkTimeoutContext is freed when the
+     * SetLinkTimeoutCB is called.
+     */
+    return ((ajn::BusAttachmentC*)bus)->SetLinkTimeoutAsync(sessionid, linkTimeout,
+                                                            (ajn::BusAttachmentC*)bus,
+                                                            (void*)new ajn::SetLinkTimeoutContext(callback, context));
+}
+
 QStatus alljoyn_busattachment_namehasowner(alljoyn_busattachment bus, const char* name, QCC_BOOL* hasOwner)
 {
     bool result;
