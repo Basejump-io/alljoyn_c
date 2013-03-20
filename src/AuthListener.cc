@@ -88,7 +88,7 @@ class AuthListenerAsyncCallbackC : public AuthListener {
                                             void* authContext)
     {
         assert(callbacks.request_credentials != NULL && "request_credentials callback must be specified");
-        QStatus ret = callbacks.request_credentials(context, authMechanism, authPeer, authCount, userName, credMask, authContext);
+        QStatus ret = callbacks.request_credentials(context, (alljoyn_authlistener) this, authMechanism, authPeer, authCount, userName, credMask, authContext);
         return ret;
     }
 
@@ -96,7 +96,7 @@ class AuthListenerAsyncCallbackC : public AuthListener {
                                            const Credentials& credentials, void* authContext) {
         QStatus ret = ER_NOT_IMPLEMENTED;
         if (callbacks.verify_credentials != NULL) {
-            ret = callbacks.verify_credentials(context, authMechanism, authPeer, (alljoyn_credentials)(&credentials), authContext);
+            ret = callbacks.verify_credentials(context, (alljoyn_authlistener) this, authMechanism, authPeer, (alljoyn_credentials)(&credentials), authContext);
         }
         return ret;
     }

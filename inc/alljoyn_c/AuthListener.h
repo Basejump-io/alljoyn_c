@@ -95,6 +95,8 @@ typedef QCC_BOOL (*alljoyn_authlistener_requestcredentials_ptr)(const void* cont
  * an alljoyn_authlistenerasync_callbacks but not both.
  *
  * @param context        The context pointer passed into the alljoyn_authlistenerasync_create function
+ * @param listener       The alljoyn_authlistener used to call this function pointer this should be used
+ *                       when calling alljoyn_authlistener_requestcredentialsresponse.
  * @param authMechanism  The name of the authentication mechanism issuing the request.
  * @param peerName       The name of the remote peer being authenticated.  On the initiating
  *                       side this will be a well-known-name for the remote peer. On the
@@ -108,7 +110,7 @@ typedef QCC_BOOL (*alljoyn_authlistener_requestcredentials_ptr)(const void* cont
  *      - ER_OK if the request is handled.
  *      - ER_NOT_IMPLEMENTED if implementation not found (default)
  */
-typedef QStatus (*alljoyn_authlistener_requestcredentialsasync_ptr)(const void* context, const char* authMechanism, const char* peerName, uint16_t authCount, const char* userName, uint16_t credMask, void* authContext);
+typedef QStatus (*alljoyn_authlistener_requestcredentialsasync_ptr)(const void* context, alljoyn_authlistener listener, const char* authMechanism, const char* peerName, uint16_t authCount, const char* userName, uint16_t credMask, void* authContext);
 
 /**
  * Respond to a call to alljoyn_authlistener_requestcredentialsasync_ptr.
@@ -145,6 +147,8 @@ typedef QCC_BOOL (*alljoyn_authlistener_verifycredentials_ptr)(const void* conte
  * Authentication mechanism asynchronous request for verification of credentials from a remote peer.
  *
  * @param context        The context pointer passed into the alljoyn_authlistenerasync_create function.
+ * @param listener       The alljoyn_authlistener used to call this function pointer this should be used
+ *                       when calling alljoyn_authlistener_verifycredentialsresponse.
  * @param authMechanism  The name of the authentication mechanism issuing the request.
  * @param peerName       The name of the remote peer being authenticated.  On the initiating
  *                       side this will be a well-known-name for the remote peer. On the
@@ -156,7 +160,7 @@ typedef QCC_BOOL (*alljoyn_authlistener_verifycredentials_ptr)(const void* conte
  *  - ER_OK if the request is handled.
  *  - ER_NOT_IMPLEMENTED (default)
  */
-typedef QStatus (*alljoyn_authlistener_verifycredentialsasync_ptr)(const void* context, const char* authMechanism, const char* peerName, const alljoyn_credentials credentials, void* authContext);
+typedef QStatus (*alljoyn_authlistener_verifycredentialsasync_ptr)(const void* context, alljoyn_authlistener listener, const char* authMechanism, const char* peerName, const alljoyn_credentials credentials, void* authContext);
 
 /**
  * Respond to a call to alljoyn_authlistener_verifycredentialsasync_ptr.
