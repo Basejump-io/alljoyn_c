@@ -42,13 +42,13 @@ class KeyStoreListenerCallbackC : public KeyStoreListener {
     virtual QStatus LoadRequest(KeyStore& keyStore)
     {
         assert(callbacks.load_request != NULL && "load_request callback required.");
-        return callbacks.load_request(context, (alljoyn_keystore)(&keyStore));
+        return callbacks.load_request(context, (alljoyn_keystorelistener) this, (alljoyn_keystore)(&keyStore));
     }
 
     virtual QStatus StoreRequest(KeyStore& keyStore)
     {
         assert(callbacks.store_request != NULL && "store_request callback required.");
-        return callbacks.store_request(context, (alljoyn_keystore)(&keyStore));
+        return callbacks.store_request(context, (alljoyn_keystorelistener) this, (alljoyn_keystore)(&keyStore));
     }
   protected:
     alljoyn_keystorelistener_callbacks callbacks;
@@ -82,13 +82,19 @@ QStatus alljoyn_keystorelistener_putkeys(alljoyn_keystorelistener listener, allj
 }
 
 QStatus alljoyn_keystorelistener_getkeys(alljoyn_keystorelistener listener, alljoyn_keystore keyStore,
-                                         char* sink, size_t sink_sz)
+                                         char* sink, size_t* sink_sz)
 {
     qcc::String sinkStr;
     ajn::KeyStore& ks = *((ajn::KeyStore*)keyStore);
     QStatus ret = ((ajn::KeyStoreListener*)listener)->GetKeys(ks, sinkStr);
-    strncpy(sink, sinkStr.c_str(), sink_sz);
-    //prevent sting not being nul terminated.
-    sink[sink_sz - 1] = '\0';
+    if (sink) {
+        strncpy(sink, sinkStr.c_str(), *sink_sz);
+        //prevent sting not being nul terminated.
+        sink[*sink_sz - 1] = '\0';
+    }
+    if (*sink_sz < sinkStr.length() + 1) {
+        ret = ER_BUFFER_TOO_SMALL;
+    }
+    *sink_sz = sinkStr.length() + 1;
     return ret;
 }
