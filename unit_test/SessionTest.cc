@@ -56,7 +56,7 @@ static void joinsessionhandler(QStatus status, alljoyn_sessionid sessionId, cons
 {
     EXPECT_STREQ("A test string to send as the context void*", (char*)context);
     joinsessionid_alt = sessionId;
-    joinsessionhandler_flag = true;
+    joinsessionhandler_flag = QCC_TRUE;
 }
 
 
@@ -91,6 +91,8 @@ class SessionTest : public testing::Test {
     }
 
     virtual void TearDown() {
+        alljoyn_busattachment_stop(bus);
+        alljoyn_busattachment_join(bus);
         EXPECT_NO_FATAL_FAILURE(alljoyn_busattachment_destroy(bus));
     }
 
@@ -170,6 +172,8 @@ class SessionTest : public testing::Test {
 
     void TearDownSessionTestService()
     {
+        alljoyn_busattachment_stop(servicebus);
+        alljoyn_busattachment_join(servicebus);
         alljoyn_busattachment_destroy(servicebus);
         alljoyn_sessionportlistener_destroy(sessionPortListener);
         alljoyn_busobject_destroy(testObj);
@@ -256,6 +260,10 @@ TEST_F(SessionTest, joinsessionasync) {
 
     foundadvertisedname_flag = QCC_FALSE;
     sessionjoined_flag = QCC_FALSE;
+    joinsessionhandler_flag = QCC_FALSE;
+
+    joinsessionid = 0;
+    joinsessionid_alt = 0;
     /* Begin discover of the well-known name */
     status = alljoyn_busattachment_findadvertisedname(bus, OBJECT_NAME);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
@@ -282,6 +290,7 @@ TEST_F(SessionTest, joinsessionasync) {
         qcc::Sleep(5);
     }
     EXPECT_TRUE(sessionjoined_flag);
+    EXPECT_TRUE(joinsessionhandler_flag);
     EXPECT_EQ(joinsessionid_alt, joinsessionid);
 
     alljoyn_sessionopts_destroy(opts);
