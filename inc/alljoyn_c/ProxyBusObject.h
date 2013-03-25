@@ -455,7 +455,7 @@ extern AJ_API QStatus alljoyn_proxybusobject_parsexml(alljoyn_proxybusobject pro
  * function does nothing. Note that peer-to-peer connections are automatically secured when a
  * method call or signal requiring encryption is sent or received.
  *
- * This call causes messages to be send on the bus, therefore it cannot be called within AllJoyn
+ * This call causes messages to be sent on the bus, therefore it cannot be called within AllJoyn
  * callbacks (method/signal/reply handlers or ObjectRegistered callbacks, etc.)
  *
  * @param proxyObj   alljoyn_proxybusobject to explicitly set up a secure a connection
