@@ -712,3 +712,228 @@ TEST_F(BusObjectTest, addmethodhandler_addmethodhandlers_mix)
     alljoyn_buslistener_destroy(buslistener);
     alljoyn_busobject_destroy(testObj);
 }
+
+static QCC_BOOL getpropertycb_flag = QCC_FALSE;
+
+static void getpropertycb_prop1(QStatus status, alljoyn_proxybusobject obj, const alljoyn_msgarg value, void* context) {
+    const char*str;
+    status = alljoyn_msgarg_get(value, "s", &str);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    EXPECT_STREQ(prop1, str);
+    EXPECT_STREQ("AllJoyn Test String.", (char*)context);
+    getpropertycb_flag = QCC_TRUE;
+}
+
+static void getpropertycb_prop2(QStatus status, alljoyn_proxybusobject obj, const alljoyn_msgarg value, void* context) {
+    EXPECT_EQ(ER_BUS_PROPERTY_ACCESS_DENIED, status) << "  Actual Status: " << QCC_StatusText(status);
+    EXPECT_STREQ("AllJoyn Test String.", (char*)context);
+    getpropertycb_flag = QCC_TRUE;
+}
+
+static void getpropertycb_prop3(QStatus status, alljoyn_proxybusobject obj, const alljoyn_msgarg value, void* context) {
+    uint32_t return_value;
+    status = alljoyn_msgarg_get(value, "u", &return_value);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    EXPECT_EQ((uint32_t)42, return_value);
+    EXPECT_STREQ("AllJoyn Test String.", (char*)context);
+    getpropertycb_flag = QCC_TRUE;
+}
+TEST_F(BusObjectTest, get_propertyasync_handler)
+{
+    SetUpBusObjectTestService();
+
+    alljoyn_proxybusobject proxyObj = alljoyn_proxybusobject_create(bus, OBJECT_NAME, OBJECT_PATH, 0);
+    EXPECT_TRUE(proxyObj);
+    status = alljoyn_proxybusobject_introspectremoteobject(proxyObj);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    getpropertycb_flag = QCC_FALSE; //make sure the flag is in a known state.
+    status = alljoyn_proxybusobject_getpropertyasync(proxyObj, INTERFACE_NAME, "prop1", &getpropertycb_prop1, ALLJOYN_MESSAGE_DEFAULT_TIMEOUT, (void*)"AllJoyn Test String.");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    //Wait upto 2 seconds for the getproperty call to complete.
+    for (int i = 0; i < 200; ++i) {
+
+        if (getpropertycb_flag) {
+            break;
+        }
+        qcc::Sleep(10);
+    }
+
+    EXPECT_TRUE(getpropertycb_flag);
+    /* should fail to read a write only property*/
+    getpropertycb_flag = QCC_FALSE; //make sure the flag is in a known state.
+    status = alljoyn_proxybusobject_getpropertyasync(proxyObj, INTERFACE_NAME, "prop2", &getpropertycb_prop2, ALLJOYN_MESSAGE_DEFAULT_TIMEOUT, (void*)"AllJoyn Test String.");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    //Wait upto 2 seconds for the getproperty call to complete.
+    for (int i = 0; i < 200; ++i) {
+
+        if (getpropertycb_flag) {
+            break;
+        }
+        qcc::Sleep(10);
+    }
+
+    EXPECT_TRUE(getpropertycb_flag);
+
+    getpropertycb_flag = QCC_FALSE; //make sure the flag is in a known state.
+    status = alljoyn_proxybusobject_getpropertyasync(proxyObj, INTERFACE_NAME, "prop3", &getpropertycb_prop3, ALLJOYN_MESSAGE_DEFAULT_TIMEOUT, (void*)"AllJoyn Test String.");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    //Wait upto 2 seconds for the getproperty call to complete.
+    for (int i = 0; i < 200; ++i) {
+
+        if (getpropertycb_flag) {
+            break;
+        }
+        qcc::Sleep(10);
+    }
+
+    EXPECT_TRUE(getpropertycb_flag);
+
+    alljoyn_proxybusobject_destroy(proxyObj);
+    TearDownBusObjectTestService();
+}
+
+static QCC_BOOL setpropertycb_flag = QCC_FALSE;
+
+static void setpropertycb_prop1(QStatus status, alljoyn_proxybusobject obj, void* context)
+{
+    EXPECT_EQ(ER_BUS_PROPERTY_ACCESS_DENIED, status) << "  Actual Status: " << QCC_StatusText(status);
+    EXPECT_STREQ("AllJoyn Test String.", (char*)context);
+    setpropertycb_flag = QCC_TRUE;
+}
+
+static void setpropertycb_prop2(QStatus status, alljoyn_proxybusobject obj, void* context)
+{
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    EXPECT_STREQ("AllJoyn Test String.", (char*)context);
+    setpropertycb_flag = QCC_TRUE;
+}
+
+TEST_F(BusObjectTest, set_propertyasync_handler)
+{
+    SetUpBusObjectTestService();
+
+    alljoyn_proxybusobject proxyObj = alljoyn_proxybusobject_create(bus, OBJECT_NAME, OBJECT_PATH, 0);
+    EXPECT_TRUE(proxyObj);
+    status = alljoyn_proxybusobject_introspectremoteobject(proxyObj);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    setpropertycb_flag = QCC_FALSE;
+    /* should fail to write a read only property*/
+    alljoyn_msgarg value = alljoyn_msgarg_create_and_set("s", "This should not work.");
+    status = alljoyn_proxybusobject_setpropertyasync(proxyObj, INTERFACE_NAME, "prop1", value, &setpropertycb_prop1, ALLJOYN_MESSAGE_DEFAULT_TIMEOUT, (void*)"AllJoyn Test String.");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    //Wait upto 2 seconds for the getproperty call to complete.
+    for (int i = 0; i < 200; ++i) {
+
+        if (setpropertycb_flag) {
+            break;
+        }
+        qcc::Sleep(10);
+    }
+
+    EXPECT_TRUE(setpropertycb_flag);
+
+    alljoyn_msgarg_destroy(value);
+
+    setpropertycb_flag = QCC_FALSE;
+    value = alljoyn_msgarg_create_and_set("i", -888);
+    status = alljoyn_proxybusobject_setpropertyasync(proxyObj, INTERFACE_NAME, "prop2", value, &setpropertycb_prop2, ALLJOYN_MESSAGE_DEFAULT_TIMEOUT, (void*)"AllJoyn Test String.");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    //Wait upto 2 seconds for the getproperty call to complete.
+    for (int i = 0; i < 200; ++i) {
+
+        if (setpropertycb_flag) {
+            break;
+        }
+        qcc::Sleep(10);
+    }
+
+    EXPECT_TRUE(setpropertycb_flag);
+
+    EXPECT_EQ(-888, prop2);
+    alljoyn_msgarg_destroy(value);
+
+    setpropertycb_flag = QCC_FALSE;
+    value = alljoyn_msgarg_create_and_set("u", 98);
+    //reusing the setpropertycb_prop2 we expect this callback to have the exact same results.
+    status = alljoyn_proxybusobject_setpropertyasync(proxyObj, INTERFACE_NAME, "prop3", value, &setpropertycb_prop2, ALLJOYN_MESSAGE_DEFAULT_TIMEOUT, (void*)"AllJoyn Test String.");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    //Wait upto 2 seconds for the getproperty call to complete.
+    for (int i = 0; i < 200; ++i) {
+
+        if (setpropertycb_flag) {
+            break;
+        }
+        qcc::Sleep(10);
+    }
+
+    EXPECT_TRUE(setpropertycb_flag);
+
+    EXPECT_EQ((uint32_t)98, prop3);
+    alljoyn_msgarg_destroy(value);
+
+    alljoyn_proxybusobject_destroy(proxyObj);
+    TearDownBusObjectTestService();
+}
+
+static QCC_BOOL getallpropertiescb_flag = QCC_FALSE;
+
+static void getallpropertiescb(QStatus status, alljoyn_proxybusobject obj, const alljoyn_msgarg values, void* context)
+{
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    alljoyn_msgarg variant_arg;
+    const char* str;
+    status = alljoyn_msgarg_getdictelement(values, "{sv}", "prop1", &variant_arg);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_msgarg_get(variant_arg, "s", &str);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    EXPECT_STREQ(prop1, str);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    uint32_t num;
+    status = alljoyn_msgarg_getdictelement(values, "{sv}", "prop3", &variant_arg);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_msgarg_get(variant_arg, "u", &num);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    EXPECT_EQ((uint32_t)42, num);
+    EXPECT_STREQ("AllJoyn Test String.", (char*)context);
+
+    getallpropertiescb_flag = QCC_TRUE;
+}
+
+TEST_F(BusObjectTest, getallpropertiesasync)
+{
+    SetUpBusObjectTestService();
+
+    alljoyn_proxybusobject proxyObj = alljoyn_proxybusobject_create(bus, OBJECT_NAME, OBJECT_PATH, 0);
+    EXPECT_TRUE(proxyObj);
+    status = alljoyn_proxybusobject_introspectremoteobject(proxyObj);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    //alljoyn_msgarg value = alljoyn_msgarg_create();
+    getallpropertiescb_flag = QCC_FALSE;
+    status = alljoyn_proxybusobject_getallpropertiesasync(proxyObj, INTERFACE_NAME, &getallpropertiescb, ALLJOYN_MESSAGE_DEFAULT_TIMEOUT, (void*)"AllJoyn Test String.");
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    //Wait upto 2 seconds for the getproperty call to complete.
+    for (int i = 0; i < 200; ++i) {
+
+        if (getallpropertiescb_flag) {
+            break;
+        }
+        qcc::Sleep(10);
+    }
+
+    EXPECT_TRUE(getallpropertiescb_flag);
+
+    alljoyn_proxybusobject_destroy(proxyObj);
+    TearDownBusObjectTestService();
+}
+

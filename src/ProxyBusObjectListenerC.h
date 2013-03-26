@@ -36,6 +36,33 @@ class IntrospectCallbackContext {
     void* context;
 };
 
+class GetPropertyCallbackContext {
+  public:
+    GetPropertyCallbackContext(alljoyn_proxybusobject_listener_getpropertycb_ptr replyhandler_ptr, void* context) :
+        replyhandler_ptr(replyhandler_ptr), context(context) { }
+
+    alljoyn_proxybusobject_listener_getpropertycb_ptr replyhandler_ptr;
+    void* context;
+};
+
+class GetAllPropertiesCallbackContext {
+  public:
+    GetAllPropertiesCallbackContext(alljoyn_proxybusobject_listener_getallpropertiescb_ptr replyhandler_ptr, void* context) :
+        replyhandler_ptr(replyhandler_ptr), context(context) { }
+
+    alljoyn_proxybusobject_listener_getallpropertiescb_ptr replyhandler_ptr;
+    void* context;
+};
+
+class SetPropertyCallbackContext {
+  public:
+    SetPropertyCallbackContext(alljoyn_proxybusobject_listener_setpropertycb_ptr replyhandler_ptr, void* context) :
+        replyhandler_ptr(replyhandler_ptr), context(context) { }
+
+    alljoyn_proxybusobject_listener_setpropertycb_ptr replyhandler_ptr;
+    void* context;
+};
+
 class ProxyBusObjectListenerC : public ajn::ProxyBusObject::Listener {
   public:
     void IntrospectCB(QStatus status, ajn::ProxyBusObject* obj, void* context)
@@ -52,6 +79,32 @@ class ProxyBusObjectListenerC : public ajn::ProxyBusObject::Listener {
         in->replyhandler_ptr = NULL;
         delete in;
     }
+
+    void GetPropertyCB(QStatus status, ProxyBusObject* obj, const MsgArg& value, void* context)
+    {
+        GetPropertyCallbackContext* in = (GetPropertyCallbackContext*)context;
+        in->replyhandler_ptr(status, (alljoyn_proxybusobject)obj, (alljoyn_msgarg)(&value), in->context);
+        in->replyhandler_ptr = NULL;
+        delete in;
+    }
+
+    void GetAllPropertiesCB(QStatus status, ProxyBusObject* obj, const MsgArg& value, void* context)
+    {
+        GetAllPropertiesCallbackContext* in = (GetAllPropertiesCallbackContext*)context;
+        in->replyhandler_ptr(status, (alljoyn_proxybusobject)obj, (alljoyn_msgarg)(&value), in->context);
+        in->replyhandler_ptr = NULL;
+        delete in;
+    }
+
+    void SetPropertyCB(QStatus status, ProxyBusObject* obj, void* context)
+    {
+        SetPropertyCallbackContext* in = (SetPropertyCallbackContext*)context;
+        in->replyhandler_ptr(status, (alljoyn_proxybusobject)obj, in->context);
+        in->replyhandler_ptr = NULL;
+        delete in;
+    }
+
+
 };
 }
 #endif

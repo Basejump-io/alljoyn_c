@@ -97,16 +97,71 @@ QStatus alljoyn_proxybusobject_getproperty(alljoyn_proxybusobject proxyObj, cons
     return ((ajn::ProxyBusObject*)proxyObj)->GetProperty(iface, property, *reply);
 }
 
+QStatus alljoyn_proxybusobject_getpropertyasync(alljoyn_proxybusobject proxyObj,
+                                                const char* iface,
+                                                const char* property,
+                                                alljoyn_proxybusobject_listener_getpropertycb_ptr callback,
+                                                uint32_t timeout,
+                                                void* context)
+{
+    /*
+     * The new ajn::GetPropertyCallbackContext must be freed in inside the
+     * ajn::ProxyBusObjectListenerC::GetPropertyCB.
+     */
+    return ((ajn::ProxyBusObject*)proxyObj)->GetPropertyAsync(iface, property,
+                                                              &proxyObjListener,
+                                                              static_cast<ajn::ProxyBusObject::Listener::GetPropertyCB>(&ajn::ProxyBusObjectListenerC::GetPropertyCB),
+                                                              (void*) new ajn::GetPropertyCallbackContext(callback, context),
+                                                              timeout);
+
+}
 QStatus alljoyn_proxybusobject_getallproperties(alljoyn_proxybusobject proxyObj, const char* iface, alljoyn_msgarg values)
 {
     ajn::MsgArg* reply = (ajn::MsgArg*)&(*values);
     return ((ajn::ProxyBusObject*)proxyObj)->GetAllProperties(iface, *reply);
 }
 
+QStatus  alljoyn_proxybusobject_getallpropertiesasync(alljoyn_proxybusobject proxyObj,
+                                                      const char* iface,
+                                                      alljoyn_proxybusobject_listener_getallpropertiescb_ptr callback,
+                                                      uint32_t timeout,
+                                                      void* context)
+{
+    /*
+     * The new ajn::GetAllPropertiesCallbackContext must be freed in inside the
+     * ajn::ProxyBusObjectListenerC::GetAllPropertiesCB.
+     */
+    return ((ajn::ProxyBusObject*)proxyObj)->GetAllPropertiesAsync(iface,
+                                                                   &proxyObjListener,
+                                                                   static_cast<ajn::ProxyBusObject::Listener::GetAllPropertiesCB>(&ajn::ProxyBusObjectListenerC::GetAllPropertiesCB),
+                                                                   (void*) new ajn::GetPropertyCallbackContext(callback, context),
+                                                                   timeout);
+}
+
 QStatus alljoyn_proxybusobject_setproperty(alljoyn_proxybusobject proxyObj, const char* iface, const char* property, alljoyn_msgarg value)
 {
     ajn::MsgArg* reply = (ajn::MsgArg*)&(*value);
     return ((ajn::ProxyBusObject*)proxyObj)->SetProperty(iface, property, *reply);
+}
+
+QStatus alljoyn_proxybusobject_setpropertyasync(alljoyn_proxybusobject proxyObj,
+                                                const char* iface,
+                                                const char* property,
+                                                alljoyn_msgarg value,
+                                                alljoyn_proxybusobject_listener_setpropertycb_ptr callback,
+                                                uint32_t timeout,
+                                                void* context)
+{
+    /*
+     * The new ajn::GetPropertyCallbackContext must be freed in inside the
+     * ajn::ProxyBusObjectListenerC::GetPropertyCB.
+     */
+    return ((ajn::ProxyBusObject*)proxyObj)->SetPropertyAsync(iface, property,
+                                                              *(ajn::MsgArg*)value,
+                                                              &proxyObjListener,
+                                                              static_cast<ajn::ProxyBusObject::Listener::SetPropertyCB>(&ajn::ProxyBusObjectListenerC::SetPropertyCB),
+                                                              (void*) new ajn::SetPropertyCallbackContext(callback, context),
+                                                              timeout);
 }
 
 QStatus alljoyn_proxybusobject_methodcall(alljoyn_proxybusobject obj,

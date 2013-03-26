@@ -61,6 +61,43 @@ typedef struct _alljoyn_busattachment_handle*               alljoyn_busattachmen
 typedef void (*alljoyn_proxybusobject_listener_introspectcb_ptr)(QStatus status, alljoyn_proxybusobject obj, void* context);
 
 /**
+ * Callback registered with alljoyn_proxybusobject_getpropertyasync()
+ *
+ * @param status    - #ER_OK if the property get request was successfull or:
+ *                  - #ER_BUS_OBJECT_NO_SUCH_INTERFACE if the specified interfaces does not exist on the remote object.
+ *                  - #ER_BUS_NO_SUCH_PROPERTY if the property does not exist
+ *                  - Other error status codes indicating the reason the get request failed.
+ * @param obj       Remote bus object that was introspected
+ * @param value     If status is ER_OK a MsgArg containing the returned property value
+ * @param context   Caller provided context passed in to alljoyn_proxybusobject_getpropertyasync()
+ */
+typedef void (*alljoyn_proxybusobject_listener_getpropertycb_ptr)(QStatus status, alljoyn_proxybusobject obj, const alljoyn_msgarg value, void* context);
+
+/**
+ * Callback registered with alljoyn_proxybusobject_getallpropertiesasync()
+ *
+ * @param status    - #ER_OK if the get all properties request was successfull or:
+ *                  - #ER_BUS_OBJECT_NO_SUCH_INTERFACE if the specified interfaces does not exist on the remote object.
+ *                  - Other error status codes indicating the reason the get request failed.
+ * @param obj         Remote bus object that was introspected
+ * @param values      If status is ER_OK an array of dictionary entries, signature "a{sv}" listing the properties.
+ * @param context     Caller provided context passed in to alljoyn_proxybusobject_getallpropertiesasync()
+ */
+typedef void (*alljoyn_proxybusobject_listener_getallpropertiescb_ptr)(QStatus status, alljoyn_proxybusobject obj, const alljoyn_msgarg values, void* context);
+
+/**
+ * Callback registered with alljoyn_proxybusobject_setpropertyasync()
+ *
+ * @param status    - ER_OK if the property was successfully set or:
+ *                  - #ER_BUS_OBJECT_NO_SUCH_INTERFACE if the specified interfaces does not exist on the remote object.
+ *                  - #ER_BUS_NO_SUCH_PROPERTY if the property does not exist
+ *                  - Other error status codes indicating the reason the set request failed.
+ * @param obj       Remote bus object that was introspected
+ * @param context   Caller provided context passed in to alljoyn_proxybusobject_setpropertyasync()
+ */
+typedef void (*alljoyn_proxybusobject_listener_setpropertycb_ptr)(QStatus status, alljoyn_proxybusobject obj, void* context);
+
+/**
  * Create an empty proxy bus object that refers to an object at given remote service name. Note
  * that the created proxy bus object does not contain information about the interfaces that the
  * actual remote object implements with the exception that org.freedesktop.DBus.Peer
@@ -222,6 +259,30 @@ extern AJ_API QStatus alljoyn_proxybusobject_introspectremoteobjectasync(alljoyn
 extern AJ_API QStatus alljoyn_proxybusobject_getproperty(alljoyn_proxybusobject proxyObj, const char* iface, const char* property, alljoyn_msgarg value);
 
 /**
+ * Make an asynchronous request to get a property from an interface on the remote object.
+ * The property value is passed to the callback function.
+ *
+ * @param proxyObj  The proxy bus object the property will be read from
+ * @param iface     Name of interface to retrieve property from.
+ * @param property  The name of the property to get.
+ * @param callback  Function that will be called when the getproperty operation is completed.
+ * @param timeout   Timeout specified in milliseconds to wait for a reply.
+ *                  Recommended default #ALLJOYN_MESSAGE_DEFAULT_TIMEOUT which is 25000 ms.
+ * @param context   User defined context which will be passed as-is to callback.
+ *
+ * @return
+ *      - #ER_OK if the request to get the property was successfully issued .
+ *      - #ER_BUS_OBJECT_NO_SUCH_INTERFACE if the no such interface on this remote object.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_proxybusobject_getpropertyasync(alljoyn_proxybusobject proxyObj,
+                                                              const char* iface,
+                                                              const char* property,
+                                                              alljoyn_proxybusobject_listener_getpropertycb_ptr callback,
+                                                              uint32_t timeout,
+                                                              void* context);
+
+/**
  * Get all properties from an interface on the remote object.
  *
  * @param proxyObj    The proxy bus object the properties will be read from
@@ -234,6 +295,27 @@ extern AJ_API QStatus alljoyn_proxybusobject_getproperty(alljoyn_proxybusobject 
  *      - #ER_BUS_NO_SUCH_PROPERTY if the property does not exist
  */
 extern AJ_API QStatus alljoyn_proxybusobject_getallproperties(alljoyn_proxybusobject proxyObj, const char* iface, alljoyn_msgarg values);
+
+/**
+ * Make an asynchronous request to get all properties from an interface on the remote object.
+ *
+ * @param proxyObj  The proxy bus object the properties will be read from
+ * @param iface     Name of interface to retrieve properties from.
+ * @param callback  Function that will be called when the getallproperties operation is completed.
+ * @param timeout   Timeout specified in milliseconds to wait for a reply
+ *                  Recommended default #ALLJOYN_MESSAGE_DEFAULT_TIMEOUT which is 25000 ms.
+ * @param context   User defined context which will be passed as-is to callback.
+ *
+ * @return
+ *      - #ER_OK if the request to get all properties was successfully issued .
+ *      - #ER_BUS_OBJECT_NO_SUCH_INTERFACE if the no such interface on this remote object.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus  alljoyn_proxybusobject_getallpropertiesasync(alljoyn_proxybusobject proxyObj,
+                                                                    const char* iface,
+                                                                    alljoyn_proxybusobject_listener_getallpropertiescb_ptr callback,
+                                                                    uint32_t timeout,
+                                                                    void* context);
 
 /**
  * Set a property on an interface on the remote object.
@@ -249,6 +331,33 @@ extern AJ_API QStatus alljoyn_proxybusobject_getallproperties(alljoyn_proxybusob
  *      - #ER_BUS_NO_SUCH_PROPERTY if the property does not exist
  */
 extern AJ_API QStatus alljoyn_proxybusobject_setproperty(alljoyn_proxybusobject proxyObj, const char* iface, const char* property, alljoyn_msgarg value);
+
+/**
+ * Make an asynchronous request to set a property on an interface on the remote object.
+ * A callback function reports the success or failure of there operation.
+ *
+ * @param proxyObj  The proxy bus object the property will be set o
+ * @param iface     Remote object's interface on which the property is defined.
+ * @param property  The name of the property to set.
+ * @param value     The value to set
+ * @param callback  Function that will be called when the setproperty operation is completed.
+ * @param timeout   Timeout specified in milliseconds to wait for a reply
+ *                  Recommended default #ALLJOYN_MESSAGE_DEFAULT_TIMEOUT which is 25000 ms.
+ * @param context   User defined context which will be passed as-is to callback.
+ *
+ * @return
+ *      - #ER_OK if the request to set the property was successfully issued .
+ *      - #ER_BUS_OBJECT_NO_SUCH_INTERFACE if the specified interfaces does not exist on the remote object.
+ *      - An error status otherwise
+ */
+extern AJ_API QStatus alljoyn_proxybusobject_setpropertyasync(alljoyn_proxybusobject proxyObj,
+                                                              const char* iface,
+                                                              const char* property,
+                                                              alljoyn_msgarg value,
+                                                              alljoyn_proxybusobject_listener_setpropertycb_ptr callback,
+                                                              uint32_t timeout,
+                                                              void* context);
+
 
 /**
  * Make a synchronous method call
