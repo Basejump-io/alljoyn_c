@@ -61,7 +61,8 @@ class BusObjectC : public BusObject {
                     const alljoyn_msgarg args,
                     size_t numArgs,
                     uint16_t timeToLive,
-                    uint8_t flags)
+                    uint8_t flags,
+                    alljoyn_message msg)
     {
         return this->Signal(destination,
                             *(ajn::SessionId*)&sessionId,
@@ -69,7 +70,8 @@ class BusObjectC : public BusObject {
                             (const ajn::MsgArg*)args,
                             numArgs,
                             timeToLive,
-                            flags);
+                            flags,
+                            (ajn::Message*)msg);
     }
 
     void EmitPropChangedC(const char* ifcName, const char* propName, alljoyn_msgarg val, alljoyn_sessionid id)
@@ -286,7 +288,8 @@ QStatus alljoyn_busobject_signal(alljoyn_busobject bus,
                                  const alljoyn_msgarg args,
                                  size_t numArgs,
                                  uint16_t timeToLive,
-                                 uint8_t flags)
+                                 uint8_t flags,
+                                 alljoyn_message msg)
 {
     /* must call the Signal Method through BusObjectC since Signal is a protected Method */
     return ((ajn::BusObjectC*)bus)->SignalC(
@@ -296,5 +299,16 @@ QStatus alljoyn_busobject_signal(alljoyn_busobject bus,
                args,
                numArgs,
                timeToLive,
-               flags);
+               flags,
+               msg);
+}
+
+QStatus alljoyn_busobject_cancelsessionlessmessage_serial(alljoyn_busobject bus, uint32_t serialNumber)
+{
+    return ((ajn::BusObjectC*)bus)->CancelSessionlessMessage(serialNumber);
+}
+
+QStatus alljoyn_busobject_cancelsessionlessmessage(alljoyn_busobject bus, const alljoyn_message msg)
+{
+    return ((ajn::BusObjectC*)bus)->CancelSessionlessMessage(*((ajn::Message*)msg));
 }

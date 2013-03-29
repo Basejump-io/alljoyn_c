@@ -283,14 +283,17 @@ extern AJ_API QStatus alljoyn_busobject_methodreply_status(alljoyn_busobject bus
  * @param args             The arguments for the signal (can be NULL)
  * @param numArgs          The number of arguments
  * @param timeToLive       If non-zero this specifies the useful lifetime for this signal.
- *                         The units are milliseconds for non-sessionless signals and seconds for
- *                         sessionless signals. If delivery of the signal is delayed beyond the
- *                         timeToLive due to network congestion or other factors the signal may be
- *                         discarded. There is no guarantee that expired signals will not still be delivered.
+ *                         For sessionless signals the units are seconds.
+ *                         For all other signals the units are milliseconds.
+ *                         If delivery of the signal is delayed beyond the timeToLive due to
+ *                         network congestion or other factors the signal may be discarded. There is
+ *                         no guarantee that expired signals will not still be delivered.
  * @param flags            Logical OR of the message flags for this signals. The following flags apply to signals:
  *                         - If #ALLJOYN_MESSAGE_FLAG_GLOBAL_BROADCAST is set broadcast signal (null destination) will be forwarded across bus-to-bus connections.
  *                         - If #ALLJOYN_MESSAGE_FLAG_COMPRESSED is set the header is compressed for destinations that can handle header compression.
  *                         - If #ALLJOYN_MESSAGE_FLAG_ENCRYPTED is set the message is authenticated and the payload if any is encrypted.
+ *                         - IF #ALLJOYN_MESSAGE_FLAG_SESSIONLESS is set the message will be sent using the sessionless signal mechanism.
+ * @param[out] msg         If non-null, the sent signal message is returned to the caller.
  * @return
  *      - #ER_OK if successful
  *      - An error status otherwise
@@ -302,7 +305,27 @@ extern AJ_API QStatus alljoyn_busobject_signal(alljoyn_busobject bus,
                                                const alljoyn_msgarg args,
                                                size_t numArgs,
                                                uint16_t timeToLive,
-                                               uint8_t flags);
+                                               uint8_t flags,
+                                               alljoyn_message msg);
+/**
+ * Remove sessionless message sent from this object from local daemon's
+ * store/forward cache.
+ *
+ * @param bus             The bus used to send cancel the sessionless message
+ * @param serialNumber    Serial number of previously sent sessionless signal.
+ * @return   ER_OK if successful.
+ */
+extern AJ_API QStatus alljoyn_busobject_cancelsessionlessmessage_serial(alljoyn_busobject bus, uint32_t serialNumber);
+
+/**
+ * Remove sessionless message sent from this object from local daemon's
+ * store/forward cache.
+ *
+ * @param bus    The bus used to send cancel the sessionless message
+ * @param msg    Message to be removed.
+ * @return   ER_OK if successful.
+ */
+extern AJ_API QStatus alljoyn_busobject_cancelsessionlessmessage(alljoyn_busobject bus, const alljoyn_message msg);
 #if 0
 /* TODO list of C++ methods that have not be mapped to the C yet */
 /**
