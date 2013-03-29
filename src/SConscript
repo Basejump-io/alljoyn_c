@@ -1,4 +1,4 @@
-# Copyright 2010 - 2011, Qualcomm Innovation Center, Inc.
+# Copyright 2010 - 2013, Qualcomm Innovation Center, Inc.
 # 
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -21,11 +21,7 @@ srcs = env.Glob('*.cc')
 objs = env.Object(srcs)
 objs_shared = env.SharedObject(srcs)
 
-# AllJoyn Library
-# suppress the creation of static import lib, and and export (.exp) when building
-# using Microsoft Visual Studio using env.SharedLibrary
-env['no_import_lib'] = 1;
-liballjoyn_c = env.StaticLibrary('alljoyn_c', objs)
+liballjoyn_c_static = env.StaticLibrary('alljoyn_c_static', objs)
 liballjoyn_c_shared = env.SharedLibrary('alljoyn_c', objs_shared)
 
-Return('liballjoyn_c_shared', 'liballjoyn_c')
+Return('liballjoyn_c_static', 'liballjoyn_c_shared')
