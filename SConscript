@@ -78,8 +78,12 @@ env.Append(LIBPATH = [env.Dir('$C_DISTDIR/lib')])
 # Search through the list and assign the static library to the ALLJOYN_C_LIB_STATIC 
 # env variable and the shared library to ALLJOYN_C_LIB_SHARED env variable.
 for x in dlibs: 
-    if 'alljoyn_c_static' + env['LIBSUFFIX'] in str(x):
-        env['ALLJOYN_C_LIB_STATIC'] = x;
+    if env['OS_GROUP'] == 'windows' or env['OS_GROUP'] == 'winrt':
+        if 'alljoyn_c_static' + env['LIBSUFFIX'] in str(x):
+            env['ALLJOYN_C_LIB_STATIC'] = x;
+    else:
+        if 'alljoyn_c' + env['LIBSUFFIX'] in str(x):
+            env['ALLJOYN_C_LIB_STATIC'] = x;
     if 'alljoyn_c' + env['SHLIBSUFFIX'] in str(x):
         env['ALLJOYN_C_LIB_SHARED'] = x;
 
