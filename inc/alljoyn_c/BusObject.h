@@ -164,12 +164,11 @@ extern AJ_API const char* alljoyn_busobject_getpath(alljoyn_busobject bus);
  * @param val       The new value of the property
  * @param id        ID of the session we broadcast the signal to (0 for all)
  */
-extern AJ_API void alljoyn_emit_property_changed(
-    alljoyn_busobject bus,
-    const char* ifcName,
-    const char* propName,
-    alljoyn_msgarg val,
-    alljoyn_sessionid id);
+extern AJ_API void alljoyn_emit_property_changed(alljoyn_busobject bus,
+                                                 const char* ifcName,
+                                                 const char* propName,
+                                                 alljoyn_msgarg val,
+                                                 alljoyn_sessionid id);
 
 /**
  * Get the name of this object.
@@ -273,6 +272,21 @@ extern AJ_API QStatus alljoyn_busobject_methodreply_err(alljoyn_busobject bus, a
  */
 extern AJ_API QStatus alljoyn_busobject_methodreply_status(alljoyn_busobject bus, alljoyn_message msg, QStatus status);
 
+/**
+ * Get a reference to the underlying alljoyn_busattachment
+ *
+ * There is no need to call alljoyn_busattachment_create or
+ * alljoyn_busattachment_destory for the return value.
+ * This is handled in the code that registered the alljoyn_busobject with
+ * the alljoyn_busattachment.
+ *
+ * @see alljoyn_busattachment_registerbusobject
+ *
+ * @param bus   The alljoyn_busobject to obtain the alljoyn_busattachment from
+ *
+ * @return a reference to the alljoyn_busattachment
+ */
+extern AJ_API const alljoyn_busattachment alljoyn_busobject_getbusattachment(alljoyn_busobject bus);
 /**
  * Send a signal.
  *

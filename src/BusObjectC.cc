@@ -5,7 +5,7 @@
  */
 
 /******************************************************************************
- * Copyright 2009-2011, Qualcomm Innovation Center, Inc.
+ * Copyright 2009-2013, Qualcomm Innovation Center, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -279,6 +279,11 @@ QStatus alljoyn_busobject_methodreply_err(alljoyn_busobject bus, alljoyn_message
 QStatus alljoyn_busobject_methodreply_status(alljoyn_busobject bus, alljoyn_message msg, QStatus status)
 {
     return ((ajn::BusObjectC*)bus)->MethodReplyC(msg, status);
+}
+
+const alljoyn_busattachment alljoyn_busobject_getbusattachment(alljoyn_busobject bus)
+{
+    return (const alljoyn_busattachment) &((ajn::BusObjectC*)bus)->GetBusAttachment();
 }
 
 QStatus alljoyn_busobject_signal(alljoyn_busobject bus,

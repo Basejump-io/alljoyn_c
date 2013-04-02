@@ -937,3 +937,12 @@ TEST_F(BusObjectTest, getallpropertiesasync)
     TearDownBusObjectTestService();
 }
 
+TEST_F(BusObjectTest, getbusattachment)
+{
+    SetUpBusObjectTestService();
+    /* the testObj was registered with the servicebus. */
+    alljoyn_busattachment returnbus = alljoyn_busobject_getbusattachment(testObj);
+    EXPECT_STREQ(alljoyn_busattachment_getglobalguidstring(servicebus), alljoyn_busattachment_getglobalguidstring(returnbus));
+
+    TearDownBusObjectTestService();
+}
