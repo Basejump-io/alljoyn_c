@@ -173,6 +173,7 @@ int main(int argc, char** argv, char** envArg)
             NULL,
             &name_owner_changed,
             NULL,
+            NULL,
             NULL
         };
         g_busListener = alljoyn_buslistener_create(&callbacks, NULL);

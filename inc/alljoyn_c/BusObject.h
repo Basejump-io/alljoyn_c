@@ -164,11 +164,11 @@ extern AJ_API const char* alljoyn_busobject_getpath(alljoyn_busobject bus);
  * @param val       The new value of the property
  * @param id        ID of the session we broadcast the signal to (0 for all)
  */
-extern AJ_API void alljoyn_emit_property_changed(alljoyn_busobject bus,
-                                                 const char* ifcName,
-                                                 const char* propName,
-                                                 alljoyn_msgarg val,
-                                                 alljoyn_sessionid id);
+extern AJ_API void alljoyn_busobject_emitpropertychanged(alljoyn_busobject bus,
+                                                         const char* ifcName,
+                                                         const char* propName,
+                                                         alljoyn_msgarg val,
+                                                         alljoyn_sessionid id);
 
 /**
  * Get the name of this object.

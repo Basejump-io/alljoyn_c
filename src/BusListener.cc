@@ -30,7 +30,7 @@
 
 static void __PropertyChanged(alljoyn_buslistener_bus_prop_changed_ptr fcn, const void* context, const char* prop_name, alljoyn_msgarg prop_value)
 {
-    (*fcn)(context, prop_name, prop_value);
+    fcn(context, prop_name, prop_value);
 
     if (prop_value) {
         alljoyn_msgarg_destroy(prop_value);
@@ -143,17 +143,17 @@ class BusListenerCallbackC : BusListener {
         }
     }
 
-    void PropertyChanged(const char* prop_name, MsgArg* prop_value)
+    void PropertyChanged(const char* propName, const MsgArg* propValue)
     {
         if (callbacks.property_changed != NULL) {
-            alljoyn_msgarg msg_arg = prop_value ? alljoyn_msgarg_create_and_set(prop_value->Signature().c_str(), prop_value->v_variant.val) : NULL;
+            alljoyn_msgarg msg_arg = propValue ? alljoyn_msgarg_create_and_set(propValue->Signature().c_str(), propValue->v_variant.val) : NULL;
             // must wrap the user function in order to properly clean up msg_arg
             if (!DeferredCallback::sMainThreadCallbacksOnly) {
-                __PropertyChanged(callbacks.property_changed, context, prop_name, msg_arg);
+                __PropertyChanged(callbacks.property_changed, context, propName, msg_arg);
             } else {
                 DeferredCallback_4<void, alljoyn_buslistener_bus_prop_changed_ptr, const void*, const char*, alljoyn_msgarg>* dcb =
                     new DeferredCallback_4<void, alljoyn_buslistener_bus_prop_changed_ptr, const void*, const char*, alljoyn_msgarg>(
-                        __PropertyChanged, callbacks.property_changed, context, prop_name, msg_arg);
+                        __PropertyChanged, callbacks.property_changed, context, propName, msg_arg);
                 DEFERRED_CALLBACK_EXECUTE(dcb);
             }
         }

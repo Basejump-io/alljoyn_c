@@ -116,6 +116,7 @@ class AuthListenerAsyncTest : public testing::Test {
             NULL,
             &name_owner_changed,
             NULL,
+            NULL,
             NULL
         };
         buslistener = alljoyn_buslistener_create(&buslistenerCbs, NULL);

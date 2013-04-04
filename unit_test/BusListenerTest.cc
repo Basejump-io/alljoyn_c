@@ -32,6 +32,7 @@ static QCC_BOOL lost_advertised_name_flag = QCC_FALSE;
 static QCC_BOOL name_owner_changed_flag = QCC_FALSE;
 static QCC_BOOL bus_stopping_flag = QCC_FALSE;
 static QCC_BOOL bus_disconnected_flag = QCC_FALSE;
+static QCC_BOOL prop_changed_flag = QCC_FALSE;
 
 /* bus listener functions */
 static void listener_registered(const void* context, alljoyn_busattachment bus) {
@@ -56,6 +57,10 @@ static void bus_disconnected(const void* context) {
     bus_disconnected_flag = QCC_TRUE;
 }
 
+static void bus_prop_changed(const void* context, const char* prop_name, alljoyn_msgarg prop_value) {
+    prop_changed_flag = QCC_TRUE;
+}
+
 class BusListenerTest : public testing::Test {
   public:
     virtual void SetUp() {
@@ -68,7 +73,8 @@ class BusListenerTest : public testing::Test {
             &lost_advertised_name,
             &name_owner_changed,
             &bus_stopping,
-            &bus_disconnected
+            &bus_disconnected,
+            &bus_prop_changed
         };
         buslistener = alljoyn_buslistener_create(&buslistenerCbs, NULL);
         bus = alljoyn_busattachment_create("BusListenerTest", QCC_FALSE);
@@ -87,6 +93,7 @@ class BusListenerTest : public testing::Test {
         name_owner_changed_flag = QCC_FALSE;
         bus_stopping_flag = QCC_FALSE;
         bus_disconnected_flag = QCC_FALSE;
+        prop_changed_flag = QCC_FALSE;
     }
     QStatus status;
     alljoyn_busattachment bus;

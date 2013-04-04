@@ -69,7 +69,8 @@ class BusListenerMainThreadTest : public testing::Test {
             &lost_advertised_name,
             &name_owner_changed,
             &bus_stopping,
-            &bus_disconnected
+            &bus_disconnected,
+            NULL
         };
         buslistener = alljoyn_buslistener_create(&buslistenerCbs, NULL);
         bus = alljoyn_busattachment_create("BusListenerMainThreadTest", QCC_FALSE);

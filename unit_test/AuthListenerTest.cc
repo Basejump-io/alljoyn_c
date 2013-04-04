@@ -116,6 +116,7 @@ class AuthListenerTest : public testing::Test {
             NULL,
             &name_owner_changed,
             NULL,
+            NULL,
             NULL
         };
         buslistener = alljoyn_buslistener_create(&buslistenerCbs, NULL);
@@ -316,7 +317,6 @@ static QCC_BOOL authlistener_requestcredentials_service_srp_logon(const void* co
                                                                   const char* peerName, uint16_t authCount,
                                                                   const char* userName, uint16_t credMask,
                                                                   alljoyn_credentials credentials) {
-    QStatus status = ER_FAIL;
     EXPECT_STREQ("ALLJOYN_SRP_LOGON", authMechanism);
     if (!userName) {
         return QCC_FALSE;

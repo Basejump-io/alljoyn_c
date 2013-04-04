@@ -114,13 +114,14 @@ class SessionTest : public testing::Test {
 
 //        /* register bus listener */
 //        alljoyn_buslistener_callbacks buslistenerCbs = {
-//            NULL, /* bus listener registered CB*/
+//            NULL, /* bus listener registered CB */
 //            NULL, /* bus listener unregistered CB */
-//            NULL, /* found advertised name CB*/
+//            NULL, /* found advertised name CB */
 //            NULL, /* lost advertised name CB */
-//            NULL, /* name owner changed CB*/
+//            NULL, /* name owner changed CB */
 //            NULL, /* Bus Stopping CB */
-//            NULL /* Bus Disconnected CB*/
+//            NULL, /* Bus Disconnected CB */
+//            NULL  /* Property Changed CB */
 //        };
 //        buslistener = alljoyn_buslistener_create(&buslistenerCbs, NULL);
 //        alljoyn_busattachment_registerbuslistener(servicebus, buslistener);

@@ -59,6 +59,7 @@ TEST(ConcurrentCallbackTest, enableconcurrentcallbacks_not_used)
         &name_owner_changed_blocking_call, //name_owner_changed
         NULL,     //bus_stopping
         NULL,     //bus_disconnected
+        NULL              //prop_changed
     };
     alljoyn_buslistener buslistener = alljoyn_buslistener_create(&buslistenerCbs, NULL);
     s_bus = alljoyn_busattachment_create("BusListenerTest", QCC_FALSE);
@@ -119,6 +120,7 @@ TEST(ConcurrentCallbackTest, enableconcurrentcallbacks_used)
         &name_owner_changed_enableconcurrentcallbacks, //name_owner_changed
         NULL,     //bus_stopping
         NULL,     //bus_disconnected
+        NULL              //prop_changed
     };
     alljoyn_buslistener buslistener = alljoyn_buslistener_create(&buslistenerCbs, NULL);
     s_bus = alljoyn_busattachment_create("BusListenerTest", QCC_FALSE);

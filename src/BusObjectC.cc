@@ -228,12 +228,11 @@ const char* alljoyn_busobject_getpath(alljoyn_busobject bus)
 }
 
 
-void alljoyn_emit_property_changed(
-    alljoyn_busobject bus,
-    const char* ifcName,
-    const char* propName,
-    alljoyn_msgarg val,
-    alljoyn_sessionid id)
+void alljoyn_busobject_emitpropertychanged(alljoyn_busobject bus,
+                                           const char* ifcName,
+                                           const char* propName,
+                                           alljoyn_msgarg val,
+                                           alljoyn_sessionid id)
 {
     ((ajn::BusObjectC*)bus)->EmitPropChangedC(ifcName, propName, val, id);
 }
