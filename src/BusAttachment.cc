@@ -112,9 +112,19 @@ QStatus alljoyn_busattachment_findadvertisedname(alljoyn_busattachment bus, cons
     return ((ajn::BusAttachmentC*)bus)->FindAdvertisedName(namePrefix);
 }
 
+QStatus alljoyn_busattachment_findadvertisednamebytransport(alljoyn_busattachment bus, const char* namePrefix, alljoyn_transportmask transports)
+{
+    return ((ajn::BusAttachmentC*)bus)->FindAdvertisedNameByTransport(namePrefix, transports);
+}
+
 QStatus alljoyn_busattachment_cancelfindadvertisedname(alljoyn_busattachment bus, const char* namePrefix)
 {
     return ((ajn::BusAttachmentC*)bus)->CancelFindAdvertisedName(namePrefix);
+}
+
+QStatus alljoyn_busattachment_cancelfindadvertisednamebytransport(alljoyn_busattachment bus, const char* namePrefix, alljoyn_transportmask transports)
+{
+    return ((ajn::BusAttachmentC*)bus)->CancelFindAdvertisedNameByTransport(namePrefix, transports);
 }
 
 const alljoyn_interfacedescription alljoyn_busattachment_getinterface(alljoyn_busattachment bus, const char* name)

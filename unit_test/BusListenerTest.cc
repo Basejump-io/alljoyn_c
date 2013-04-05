@@ -33,6 +33,7 @@ static QCC_BOOL name_owner_changed_flag = QCC_FALSE;
 static QCC_BOOL bus_stopping_flag = QCC_FALSE;
 static QCC_BOOL bus_disconnected_flag = QCC_FALSE;
 static QCC_BOOL prop_changed_flag = QCC_FALSE;
+static alljoyn_transportmask transport_found = 0;
 
 /* bus listener functions */
 static void listener_registered(const void* context, alljoyn_busattachment bus) {
@@ -42,6 +43,7 @@ static void listener_unregistered(const void* context) {
     listener_unregistered_flag = QCC_TRUE;
 }
 static void found_advertised_name(const void* context, const char* name, alljoyn_transportmask transport, const char* namePrefix) {
+    transport_found |= transport;
     found_advertised_name_flag = QCC_TRUE;
 }
 static void lost_advertised_name(const void* context, const char* name, alljoyn_transportmask transport, const char* namePrefix) {
@@ -94,6 +96,7 @@ class BusListenerTest : public testing::Test {
         bus_stopping_flag = QCC_FALSE;
         bus_disconnected_flag = QCC_FALSE;
         prop_changed_flag = QCC_FALSE;
+        transport_found = 0;
     }
     QStatus status;
     alljoyn_busattachment bus;
@@ -233,6 +236,88 @@ TEST_F(BusListenerTest, found_lost_advertised_name) {
     status = alljoyn_busattachment_stop(bus);
     EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
     alljoyn_sessionopts_destroy(opts);
+}
+
+TEST_F(BusListenerTest, found_name_by_transport) {
+    status = alljoyn_busattachment_start(bus);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    status = alljoyn_busattachment_connect(bus, ajn::getConnectArg().c_str());
+
+    alljoyn_busattachment_registerbuslistener(bus, buslistener);
+    for (size_t i = 0; i < 200; ++i) {
+        if (listener_registered_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+    EXPECT_TRUE(listener_registered_flag);
+
+    alljoyn_sessionopts opts = alljoyn_sessionopts_create(ALLJOYN_TRAFFIC_TYPE_MESSAGES, QCC_FALSE, ALLJOYN_PROXIMITY_ANY, ALLJOYN_TRANSPORT_ANY);
+
+    status = alljoyn_busattachment_findadvertisednamebytransport(bus, OBJECT_NAME, ALLJOYN_TRANSPORT_LOCAL);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    status = alljoyn_busattachment_advertisename(bus, OBJECT_NAME, alljoyn_sessionopts_get_transports(opts));
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    for (size_t i = 0; i < 200; ++i) {
+        if (found_advertised_name_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+    EXPECT_TRUE(found_advertised_name_flag);
+    EXPECT_EQ(ALLJOYN_TRANSPORT_LOCAL, transport_found);
+
+    status = alljoyn_busattachment_canceladvertisename(bus, OBJECT_NAME, alljoyn_sessionopts_get_transports(opts));
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    status = alljoyn_busattachment_cancelfindadvertisednamebytransport(bus, OBJECT_NAME, ALLJOYN_TRANSPORT_LOCAL);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    found_advertised_name_flag = QCC_FALSE;
+    status = alljoyn_busattachment_advertisename(bus, OBJECT_NAME, alljoyn_sessionopts_get_transports(opts));
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+
+    for (size_t i = 0; i < 50; ++i) {
+        if (found_advertised_name_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+
+    EXPECT_FALSE(found_advertised_name_flag);
+    alljoyn_busattachment_stop(bus);
+    for (size_t i = 0; i < 200; ++i) {
+        if (bus_stopping_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+    EXPECT_TRUE(bus_stopping_flag);
+    alljoyn_busattachment_join(bus);
+    /* the bus will automatically disconnect when it is stopped */
+    for (size_t i = 0; i < 200; ++i) {
+        if (bus_disconnected_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+    EXPECT_TRUE(bus_disconnected_flag);
+
+    alljoyn_busattachment_unregisterbuslistener(bus, buslistener);
+    for (size_t i = 0; i < 200; ++i) {
+        if (listener_unregistered_flag) {
+            break;
+        }
+        qcc::Sleep(5);
+    }
+    EXPECT_TRUE(listener_unregistered_flag);
+
+    status = alljoyn_busattachment_stop(bus);
+    EXPECT_EQ(ER_OK, status) << "  Actual Status: " << QCC_StatusText(status);
+    alljoyn_sessionopts_destroy(opts);
+
 }
 
 TEST_F(BusListenerTest, name_owner_changed) {

@@ -346,7 +346,7 @@ extern AJ_API void alljoyn_busattachment_registerbuslistener(alljoyn_busattachme
 extern AJ_API void alljoyn_busattachment_unregisterbuslistener(alljoyn_busattachment bus, alljoyn_buslistener listener);
 
 /**
- * Register interest in a well-known name prefix for the purpose of discovery.
+ * Register interest in a well-known name prefix for the purpose of discovery over transports included in TRANSPORT_ANY.
  * This method is a shortcut/helper that issues an org.alljoyn.Bus.FindAdvertisedName method call to the local daemon
  * and interprets the response.
  *
@@ -362,8 +362,26 @@ extern AJ_API void alljoyn_busattachment_unregisterbuslistener(alljoyn_busattach
 extern AJ_API QStatus alljoyn_busattachment_findadvertisedname(alljoyn_busattachment bus, const char* namePrefix);
 
 /**
+ * Register interest in a well-known name prefix for the purpose of discovery over specified transports.
+ * This method is a shortcut/helper that issues an org.alljoyn.Bus.FindAdvertisedNameByTransport method call to the local daemon
+ * and interprets the response.
+ *
+ * @param      bus           The alljoyn_busattachment on which to register interest in the namePrefix.
+ * @param[in]  namePrefix    Well-known name prefix that application is interested in receiving
+ *                           alljoyn_buslistener_foundadvertisedname notifications about.
+ * @param[in]  transports    Set of transports to use for discovery.
+ *
+ * @return
+ *      - #ER_OK iff daemon response was received and discovery was successfully started.
+ *      - #ER_BUS_NOT_CONNECTED if a connection has not been made with a local bus.
+ *      - Other error status codes indicating a failure.
+ */
+extern AJ_API QStatus alljoyn_busattachment_findadvertisednamebytransport(alljoyn_busattachment bus, const char* namePrefix, alljoyn_transportmask transports);
+
+/**
  * Cancel interest in a well-known name prefix that was previously registered
- * with alljoyn_busattachment_findadvertisedname.  This method is a shortcut/helper
+ * with alljoyn_busattachment_findadvertisedname over transports included in TRANSPORT_ANY.
+ * This method is a shortcut/helper
  * that issues an org.alljoyn.Bus.CancelFindAdvertisedName method call to the
  * local daemon and interprets the response.
  *
@@ -377,6 +395,24 @@ extern AJ_API QStatus alljoyn_busattachment_findadvertisedname(alljoyn_busattach
  *      - Other error status codes indicating a failure.
  */
 extern AJ_API QStatus alljoyn_busattachment_cancelfindadvertisedname(alljoyn_busattachment bus, const char* namePrefix);
+
+/**
+ * Cancel interest in a well-known name prefix that was previously registered
+ * with alljoyn_busattachment_findadvertisedname over specified transports.  This method is a shortcut/helper
+ * that issues an org.alljoyn.Bus.CancelFindAdvertisedNameByTransport method call to the
+ * local daemon and interprets the response.
+ *
+ * @param      bus           The alljoyn_busattachment from which to remove interest in the namePrefix.
+ * @param[in]  namePrefix    Well-known name prefix that application is no longer interested in receiving
+ *                           BusListener::FoundAdvertisedName notifications about.
+ * @param[in]  transports    Set of transports to cancel discovery on.
+ *
+ * @return
+ *      - #ER_OK iff daemon response was received and cancel was successfully completed.
+ *      - #ER_BUS_NOT_CONNECTED if a connection has not been made with a local bus.
+ *      - Other error status codes indicating a failure.
+ */
+extern AJ_API QStatus alljoyn_busattachment_cancelfindadvertisednamebytransport(alljoyn_busattachment bus, const char* namePrefix, alljoyn_transportmask transports);
 
 /**
  * Advertise the existence of a well-known name to other (possibly disconnected) AllJoyn daemons.
