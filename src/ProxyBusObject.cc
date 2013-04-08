@@ -60,6 +60,11 @@ QStatus alljoyn_proxybusobject_addinterface_by_name(alljoyn_proxybusobject proxy
     return ((ajn::ProxyBusObject*)proxyObj)->AddInterface(name);
 }
 
+size_t alljoyn_proxybusobject_getchildren(alljoyn_proxybusobject proxyObj, alljoyn_proxybusobject* children, size_t numChildren)
+{
+    return ((ajn::ProxyBusObject*)proxyObj)->GetChildren((ajn::ProxyBusObject**)children, numChildren);
+}
+
 alljoyn_proxybusobject alljoyn_proxybusobject_getchild(alljoyn_proxybusobject proxyObj, const char* path)
 {
     return (alljoyn_proxybusobject)((ajn::ProxyBusObject*)proxyObj)->GetChild(path);

@@ -156,6 +156,21 @@ extern AJ_API QStatus alljoyn_proxybusobject_addinterface(alljoyn_proxybusobject
  */
 extern AJ_API QStatus alljoyn_proxybusobject_addinterface_by_name(alljoyn_proxybusobject proxyObj, const char* name);
 
+
+/**
+ * Returns an array of alljoyn_proxybusobjects for the children of this %alljoyn_proxybusobject.
+ *
+ * @param proxyObj     The proxybus object we are getting the children from
+ * @param children     An %alljoyn_proxybusobject array to receive the children. Can be NULL in
+ *                     which case no children are returned and the return value gives the number
+ *                     of children available.
+ * @param numChildren  The size of the %alljoyn_proxybusobject array. If this value is smaller than the total
+ *                     number of children only numChildren will be returned.
+ *
+ * @return  The number of children returned or the total number of children if children is NULL.
+ */
+extern AJ_API size_t alljoyn_proxybusobject_getchildren(alljoyn_proxybusobject proxyObj, alljoyn_proxybusobject* children, size_t numChildren);
+
 /**
  * Get a path descendant alljoyn_proxybusobject (child) by its relative path name.
  *
@@ -689,23 +704,6 @@ extern AJ_API alljoyn_proxybusobject alljoyn_proxybusobject_copy(const alljoyn_p
  * @return true if a valid proxy bus object, false otherwise.
  */
 extern AJ_API QCC_BOOL alljoyn_proxybusobject_isvalid(alljoyn_proxybusobject proxyObj);
-
-#if 0
-/*TODO create C bindings for the following C++ methods */
-
-/**
- * Returns an array of alljoyn_proxybusobjects for the children of this %alljoyn_proxybusobject.
- *
- * @param children     A pointer to an %alljoyn_proxybusobject array to receive the children. Can be
- *                     NULL in which case no children are returned and the return value gives the number
- *                     of children available.
- * @param numChildren  The size of the %alljoyn_proxybusobject array. If this value is smaller than
- *                     the total number of children only numChildren will be returned.
- *
- * @return  The number of children returned or the total number of children if children is NULL.
- */
-size_t GetChildren(ProxyBusObject** children = NULL, size_t numChildren = 0);
-#endif
 
 #ifdef __cplusplus
 } /* extern "C" */
